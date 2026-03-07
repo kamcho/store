@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -31,24 +31,6 @@
             --accent-gradient: linear-gradient(135deg, #0047AB, #1E90FF);
         }
 
-        [data-theme="dark"] {
-            /* Match Innovations Section Dark Theme */
-            --bg-primary: #0f0c29;
-            /* Same as landing page sections */
-            --bg-secondary: #0f0c29;
-            /* Consistent dark background */
-            --bg-card: rgba(255, 255, 255, 0.05);
-            /* Semi-transparent cards */
-            --text-primary: #ffffff;
-            --text-secondary: #b0c4de;
-            /* Light Steel Blue for text */
-            --border-color: rgba(255, 255, 255, 0.1);
-            --shadow: rgba(0, 0, 0, 0.6);
-            --shadow-lg: rgba(0, 0, 0, 0.8);
-
-            /* Enhanced Glows */
-            --accent-glow: rgba(168, 85, 247, 0.5);
-        }
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -81,100 +63,6 @@
             height: 40px !important;
         }
 
-        /* Dark theme body background */
-        [data-theme="dark"] body {
-            background-color: #0f0c29;
-        }
-
-        /* Navigation dark theme */
-        [data-theme="dark"] .navbar {
-            background-color: rgba(15, 12, 41, 0.9);
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-        }
-
-        [data-theme="dark"] .navbar-brand,
-        [data-theme="dark"] .nav-link {
-            color: #ffffff !important;
-        }
-
-        [data-theme="dark"] .nav-link:hover {
-            color: #b0c4de !important;
-        }
-
-        [data-theme="dark"] #theme-toggle {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-        }
-
-        [data-theme="dark"] #theme-toggle:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        [data-theme="dark"] #mobile-menu {
-            background-color: rgba(15, 12, 41, 0.95);
-            border-top-color: rgba(255, 255, 255, 0.1);
-        }
-
-        [data-theme="dark"] #mobile-menu a {
-            color: #ffffff;
-        }
-
-        [data-theme="dark"] #mobile-menu a:hover {
-            color: #b0c4de;
-        }
-
-        /* Legacy navbar styles removed to avoid conflict with fixed header.html */
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary) !important;
-            display: flex;
-            align-items: center;
-            letter-spacing: -1px;
-        }
-
-        .navbar-brand i {
-            margin-right: 10px;
-            font-size: 1.8rem;
-            color: var(--samsung-sky);
-        }
-
-        .nav-link {
-            color: var(--text-secondary) !important;
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin: 0 12px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--text-primary) !important;
-        }
-
-        .theme-toggle {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 12px;
-            padding: 8px 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-secondary);
-            border-color: var(--samsung-sky);
-        }
-
-        [data-theme="dark"] .navbar-toggler-icon {
-            filter: invert(1);
-        }
 
         .main-container {
             background-color: var(--bg-primary);
@@ -772,88 +660,6 @@
     </footer>
 
     <script>
-        // Updated Theme Toggle Functionality (Data-Theme Attribute)
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-
-            // Update theme icon
-            updateThemeIcons();
-        }
-
-        function updateThemeIcons() {
-            const themeIcon = document.getElementById('theme-icon');
-            const mobileThemeIcon = document.getElementById('mobile-theme-icon');
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            
-            if (currentTheme === 'dark') {
-                themeIcon.className = 'fas fa-sun';
-                if (mobileThemeIcon) {
-                    mobileThemeIcon.className = 'fas fa-sun text-lg';
-                }
-            } else {
-                themeIcon.className = 'fas fa-moon';
-                if (mobileThemeIcon) {
-                    mobileThemeIcon.className = 'fas fa-moon text-lg';
-                }
-            }
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const body = document.body;
-            menu.classList.toggle('hidden');
-            
-            // Add/remove glassy overlay
-            if (menu.classList.contains('hidden')) {
-                body.classList.remove('mobile-menu-open');
-            } else {
-                body.classList.add('mobile-menu-open');
-            }
-        }
-
-        // Close mobile menu when clicking on links
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
-            mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    const menu = document.getElementById('mobile-menu');
-                    const body = document.body;
-                    if (!menu.classList.contains('hidden')) {
-                        menu.classList.add('hidden');
-                        body.classList.remove('mobile-menu-open');
-                    }
-                });
-            });
-
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const menu = document.getElementById('mobile-menu');
-                const body = document.body;
-                const menuButton = event.target.closest('button[onclick="toggleMobileMenu()"]');
-                
-                if (!menu.classList.contains('hidden') && 
-                    !menu.contains(event.target) && 
-                    !menuButton) {
-                    menu.classList.add('hidden');
-                    body.classList.remove('mobile-menu-open');
-                }
-            });
-        });
-
-        // Load saved theme on page load
-        (function () {
-            const savedTheme = localStorage.getItem('theme');
-            const themeToUse = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', themeToUse);
-            
-            // Update icons after setting theme
-            updateThemeIcons();
-        })();
 
         // Auto-generate slug from name
         document.addEventListener('DOMContentLoaded', function () {
