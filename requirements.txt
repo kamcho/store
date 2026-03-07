@@ -1,4 +1,4 @@
 Django
 openai
 python-dotenv
-mysqlclient
+PyMySQL>=1.1.0
