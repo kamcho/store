@@ -5,6 +5,7 @@ from django.urls import reverse
 class ProductCategory(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -101,6 +102,15 @@ class Product(models.Model):
             except (json.JSONDecodeError, TypeError):
                 pass
         return []
+    
+    def get_category_hierarchy_slugs(self):
+        """Return a list of slugs for the product's category and all its ancestors."""
+        slugs = []
+        curr = self.category
+        while curr:
+            slugs.append(curr.slug)
+            curr = curr.parent
+        return slugs
 
 
 class ProductImage(models.Model):

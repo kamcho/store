@@ -37,8 +37,21 @@ class ProductForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = ProductCategory.objects.all()
-        self.fields['category'].empty_label = "Select a category"
+        
+        # Build hierarchical category choices
+        choices = [('', 'Select a category')]
+        
+        def add_category(category, level=0):
+            prefix = "— " * level if level > 0 else ""
+            choices.append((category.pk, f"{prefix}{category.name}"))
+            for child in category.subcategories.all().order_by('name'):
+                add_category(child, level + 1)
+        
+        top_categories = ProductCategory.objects.filter(parent=None).order_by('name')
+        for cat in top_categories:
+            add_category(cat)
+            
+        self.fields['category'].choices = choices
         
         # Convert list of features to multi-line string for the widget
         if self.instance and self.instance.pk:

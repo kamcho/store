@@ -36,7 +36,68 @@
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-0.5">
                 <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'home' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Home</a>
-                <a href="{% url 'product_list' %}" class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'product_list' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Products</a>
+                <!-- Products Mega Menu -->
+                <div class="relative group px-1">
+                    <a href="{% url 'product_list' %}"
+                        class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'product_list' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap flex items-center gap-1 group">
+                        Products <i
+                            class="fas fa-chevron-down text-[10px] group-hover:rotate-180 transition-transform duration-300"></i>
+                    </a>
+                
+                    <!-- Dropdown Menu -->
+                    <div
+                        class="absolute top-full left-0 w-64 bg-white border border-slate-100 shadow-xl rounded-xl py-3 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-[70]">
+                        {% for cat in nav_categories %}
+                        <div class="relative group/sub">
+                            <a href="{% url 'product_list' %}?category={{ cat.slug }}"
+                                class="flex items-center justify-between px-5 py-2 text-sm text-slate-600 hover:text-samsung-blue hover:bg-slate-50 transition-colors no-underline">
+                                {{ cat.name }}
+                                {% if cat.subcategories.exists %}
+                                <i class="fas fa-chevron-right text-[10px]"></i>
+                                {% endif %}
+                            </a>
+                
+                            {% if cat.subcategories.exists %}
+                            <!-- Subcategories side menu -->
+                            <div
+                                class="absolute top-0 left-full w-60 bg-white border border-slate-100 shadow-xl rounded-xl py-3 opacity-0 invisible translate-x-1 group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 transition-all duration-300 z-[80]">
+                                {% for sub in cat.subcategories.all %}
+                                <div class="relative group/leaf">
+                                    <a href="{% url 'product_list' %}?category={{ sub.slug }}"
+                                        class="flex items-center justify-between px-5 py-2 text-sm text-slate-600 hover:text-samsung-blue hover:bg-slate-50 transition-colors no-underline">
+                                        {{ sub.name }}
+                                        {% if sub.subcategories.exists %}
+                                        <i class="fas fa-chevron-right text-[10px]"></i>
+                                        {% endif %}
+                                    </a>
+                
+                                    {% if sub.subcategories.exists %}
+                                    <!-- Leaf items -->
+                                    <div
+                                        class="absolute top-0 left-full w-56 bg-white border border-slate-100 shadow-xl rounded-xl py-3 opacity-0 invisible translate-x-1 group-hover/leaf:opacity-100 group-hover/leaf:visible group-hover/leaf:translate-x-0 transition-all duration-300 z-[90]">
+                                        {% for leaf in sub.subcategories.all %}
+                                        <a href="{% url 'product_list' %}?category={{ leaf.slug }}"
+                                            class="block px-5 py-2 text-sm text-slate-600 hover:text-samsung-blue hover:bg-slate-50 transition-colors no-underline">
+                                            {{ leaf.name }}
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <div class="border-t border-slate-50 my-2 pt-2">
+                            <a href="{% url 'product_list' %}"
+                                class="block px-5 py-2 text-sm font-bold text-samsung-blue hover:bg-samsung-blue/5 transition-colors no-underline">
+                                View All Products
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}" class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Services</a>
                 <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}" class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Reviews</a>
                 <a href="{% if request.resolver_match.url_name == 'home' %}#contact{% else %}{% url 'home' %}#contact{% endif %}" class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Contact</a>
@@ -85,7 +146,63 @@
     <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-t border-slate-100 shadow-xl overflow-y-auto max-h-[80vh]">
         <div class="flex flex-col p-5 space-y-1">
             <a href="{% url 'home' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Home</a>
-            <a href="{% url 'product_list' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Products</a>
+            <!-- Mobile Products Hierarchy -->
+            <div class="space-y-1">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-slate-700 font-bold text-sm rounded-lg hover:bg-slate-50 transition-colors"
+                    onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
+                    Products
+                    <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                </button>
+                <div class="hidden pl-4 space-y-1 bg-slate-50/50 rounded-lg">
+                    <a href="{% url 'product_list' %}"
+                        class="block px-4 py-2.5 text-samsung-blue font-bold text-xs uppercase tracking-wider no-underline">View All
+                        Products</a>
+                    {% for cat in nav_categories %}
+                    <div class="space-y-1">
+                        <button
+                            class="w-full flex items-center justify-between px-4 py-2 text-slate-600 font-semibold text-sm rounded-lg hover:bg-slate-100 transition-colors"
+                            onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
+                            {{ cat.name }}
+                            {% if cat.subcategories.exists %}
+                            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                            {% endif %}
+                        </button>
+                        {% if cat.subcategories.exists %}
+                        <div class="hidden pl-4 space-y-1">
+                            {% for sub in cat.subcategories.all %}
+                            <div class="space-y-1">
+                                <button
+                                    class="w-full flex items-center justify-between px-4 py-2 text-slate-500 font-medium text-sm rounded-lg hover:bg-slate-100 transition-colors"
+                                    onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
+                                    {{ sub.name }}
+                                    {% if sub.subcategories.exists %}
+                                    <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                                    {% endif %}
+                                </button>
+                                {% if sub.subcategories.exists %}
+                                <div class="hidden pl-4 space-y-1">
+                                    {% for leaf in sub.subcategories.all %}
+                                    <a href="{% url 'product_list' %}?category={{ leaf.slug }}"
+                                        class="block px-4 py-2 text-slate-500 text-sm hover:text-samsung-blue no-underline">{{
+                                        leaf.name }}</a>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <a href="{% url 'product_list' %}?category={{ sub.slug }}"
+                                    class="block px-4 py-2 text-samsung-blue text-xs italic no-underline">Shop All {{ sub.name
+                                    }}</a>
+                            </div>
+                            {% endfor %}
+                            <a href="{% url 'product_list' %}?category={{ cat.slug }}"
+                                class="block px-4 py-2 text-samsung-blue text-xs font-bold uppercase no-underline">All {{ cat.name
+                                }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
             <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Services</a>
             <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Reviews</a>
             <a href="{% if request.resolver_match.url_name == 'home' %}#contact{% else %}{% url 'home' %}#contact{% endif %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Contact</a>

@@ -41,13 +41,29 @@
         border-color: #1428A0;
         box-shadow: 0 0 0 3px rgba(20, 40, 160, 0.1);
     }
+    /* Category Submenu */
+    .cat-submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+    }
+    .cat-submenu.open {
+        max-height: 1000px;
+        transition: max-height 0.4s ease-in-out;
+    }
+    .cat-toggle i {
+        transition: transform 0.3s ease;
+    }
+    .cat-toggle.open i {
+        transform: rotate(180deg);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 
     <!-- ══════════ PAGE HEADER ══════════ -->
-    <div class="bg-gradient-to-b from-slate-50 to-white pt-10 pb-6 mt-28 md:mt-[115px]">
+    <div class="bg-gradient-to-b from-slate-50 to-white pt-6 pb-6">
         <div class="container mx-auto px-6">
             <!-- Breadcrumb -->
             <div class="flex items-center gap-2 text-sm text-slate-400 mb-4">
@@ -74,16 +90,57 @@
                     <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm mb-6">
                         <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Categories</h3>
                         <div class="space-y-1">
-                            <a href="?search={{ search_query }}&sort={{ sort_by }}"
+                            <a href="{% url 'product_list' %}?search={{ search_query }}&sort={{ sort_by }}"
                                 class="cat-link flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium {% if not selected_category %}active{% else %}text-slate-600{% endif %}">
                                 <span>All Products</span>
-                                <span class="text-xs {% if not selected_category %}text-white/70{% else %}text-slate-400{% endif %}">{{ page_obj.paginator.count|default:"0" }}</span>
                             </a>
-                            {% for category in categories %}
-                            <a href="?category={{ category.slug }}&search={{ search_query }}&sort={{ sort_by }}"
-                                class="cat-link flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium {% if selected_category == category.slug %}active{% else %}text-slate-600{% endif %}">
-                                <span>{{ category.name }}</span>
-                            </a>
+                            {% for cat in nav_categories %}
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between group">
+                                    <a href="?category={{ cat.slug }}&search={{ search_query }}&sort={{ sort_by }}"
+                                        class="cat-link flex-1 flex items-center justify-between px-3 py-2 text-sm font-bold {% if selected_category == cat.slug %}active{% else %}text-slate-900{% endif %} rounded-xl">
+                                        <span>{{ cat.name }}</span>
+                                    </a>
+                                    {% if cat.subcategories.exists %}
+                                    <button class="cat-toggle p-2 text-slate-400 hover:text-samsung-blue transition-colors"
+                                        data-target="submenu-{{ cat.id }}">
+                                        <i class="fas fa-chevron-down text-[10px]"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            
+                                {% if cat.subcategories.exists %}
+                                <div id="submenu-{{ cat.id }}" class="cat-submenu pl-3 space-y-1 border-l border-slate-100 ml-2">
+                                    {% for sub in cat.subcategories.all %}
+                                    <div class="space-y-1">
+                                        <div class="flex items-center justify-between group">
+                                            <a href="?category={{ sub.slug }}&search={{ search_query }}&sort={{ sort_by }}"
+                                                class="cat-link flex-1 flex items-center justify-between px-3 py-1.5 text-xs font-semibold {% if selected_category == sub.slug %}active{% else %}text-slate-600{% endif %} rounded-lg">
+                                                <span>{{ sub.name }}</span>
+                                            </a>
+                                            {% if sub.subcategories.exists %}
+                                            <button class="cat-toggle p-1.5 text-slate-400 hover:text-samsung-blue transition-colors"
+                                                data-target="submenu-{{ sub.id }}">
+                                                <i class="fas fa-chevron-down text-[8px]"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                            
+                                        {% if sub.subcategories.exists %}
+                                        <div id="submenu-{{ sub.id }}" class="cat-submenu pl-3 space-y-1 border-l border-slate-50 ml-2">
+                                            {% for leaf in sub.subcategories.all %}
+                                            <a href="?category={{ leaf.slug }}&search={{ search_query }}&sort={{ sort_by }}"
+                                                class="cat-link block px-3 py-1 text-[10px] font-medium {% if selected_category == leaf.slug %}active{% else %}text-slate-500{% endif %} rounded-md">
+                                                {{ leaf.name }}
+                                            </a>
+                                            {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -275,4 +332,36 @@
         </div>
     </div>
 
+{% endblock %}
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggles = document.querySelectorAll('.cat-toggle');
+
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target');
+                const target = document.getElementById(targetId);
+
+                if (target) {
+                    target.classList.toggle('open');
+                    this.classList.toggle('open');
+                }
+            });
+        });
+
+        // Auto-expand parents of active category
+        const activeLink = document.querySelector('.cat-link.active');
+        if (activeLink) {
+            let parent = activeLink.closest('.cat-submenu');
+            while (parent) {
+                parent.classList.add('open');
+                const toggle = document.querySelector(`[data-target="${parent.id}"]`);
+                if (toggle) toggle.classList.add('open');
+                parent = parent.parentElement.closest('.cat-submenu');
+            }
+        }
+    });
+</script>
 {% endblock %}

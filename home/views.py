@@ -24,46 +24,56 @@ def home(request):
             is_active=True
         ).select_related('category').prefetch_related('images').first()
 
-    # Featured products for the hero cards (up to 4, excluding hero product)
-    featured_qs = Product.objects.filter(is_active=True).exclude(
+    # Featured products for the hero cards (up to 12)
+    featured_products = Product.objects.filter(is_active=True).exclude(
         pk=hero_product.pk if hero_product else 0
     ).select_related('category').prefetch_related('images').order_by('-is_featured', '-created_at')[:12]
 
-    # All products for the "Our Innovations" section
-    all_products = Product.objects.filter(
-        is_active=True
-    ).select_related('category').prefetch_related('images').order_by('-created_at')[:12]
+    # Custom sections as requested by the user
+    # Pair of (Section Display Name, Category Slug)
+    section_configs = [
+        ("Mobile & Wearables", "mobile-wearables"),
+        ("TV & Audio", "tv-audio"),
+        ("Home Appliances", "home-appliances"),
+        ("Computing & Storage", "computing-storage"),
+        ("Earbuds", "earbuds-galaxy-buds"),
+        ("Smart Watches", "smart-watches"),
+        ("Cameras & Imaging", "cameras-imaging"),
+        ("Smart Home & IoT", "smart-home-iot"),
+        ("Home Entertainment", "tv-audio"), # Re-using TV & Audio or could be a different slug if available
+    ]
 
-    # Categories for quick-links
-    categories = ProductCategory.objects.all()
+    homepage_sections = []
+    
+    def get_category_descendants(category):
+        descendant_ids = [category.id]
+        for sub in category.subcategories.all():
+            descendant_ids.extend(get_category_descendants(sub))
+        return descendant_ids
 
-    # Categories with their products (for per-category sections)
-    categories_with_products = ProductCategory.objects.prefetch_related(
-        Prefetch(
-            'product_set',
-            queryset=Product.objects.filter(is_active=True).select_related('category').prefetch_related('images').order_by('-created_at')[:8],
-            to_attr='active_products'
-        )
-    )
-
-    # Flash sale products (products with a sale price)
-    flash_sale_products = Product.objects.filter(
-        is_active=True, sale_price__isnull=False
-    ).select_related('category').prefetch_related('images').order_by('sale_price')[:8]
-
-    # Recent arrivals (newest products)
-    recent_arrivals = Product.objects.filter(
-        is_active=True
-    ).select_related('category').prefetch_related('images').order_by('-created_at')[:8]
+    for display_name, slug in section_configs:
+        try:
+            category = ProductCategory.objects.get(slug=slug)
+            all_cat_ids = get_category_descendants(category)
+            
+            section_products = Product.objects.filter(
+                is_active=True, 
+                category_id__in=all_cat_ids
+            ).select_related('category').prefetch_related('images').order_by('-created_at')[:8]
+            
+            if section_products.exists():
+                homepage_sections.append({
+                    'name': display_name,
+                    'slug': slug,
+                    'products': section_products
+                })
+        except ProductCategory.DoesNotExist:
+            continue
 
     context = {
         'hero_product': hero_product,
-        'featured_products': featured_qs,
-        'products': all_products,
-        'categories': categories,
-        'categories_with_products': categories_with_products,
-        'flash_sale_products': flash_sale_products,
-        'recent_arrivals': recent_arrivals,
+        'featured_products': featured_products,
+        'homepage_sections': homepage_sections,
         'store_name': 'World Tech Partners',
         'store_tagline': 'Your Premium Technology Partner',
     }
@@ -75,7 +85,16 @@ def product_list(request):
     # Get category filter
     category_slug = request.GET.get('category')
     if category_slug:
-        products = products.filter(category__slug=category_slug)
+        category = get_object_or_404(ProductCategory, slug=category_slug)
+        
+        def get_descendants(cat):
+            descendants = [cat.id]
+            for child in cat.subcategories.all():
+                descendants.extend(get_descendants(child))
+            return descendants
+            
+        all_cat_ids = get_descendants(category)
+        products = products.filter(category_id__in=all_cat_ids)
     
     # Get search query
     search_query = request.GET.get('search')
