@@ -23,7 +23,7 @@ db.sqlite3-journal
 media/
 **/migrations/*.py
 !**/migrations/__init__.py
-
+migrations/
 # Environment variables
 .env
 .env.*

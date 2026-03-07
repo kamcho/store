@@ -50,7 +50,8 @@
     </div>
 
     <!-- ══════════ PRODUCT DETAIL ══════════ -->
-    <div class="container mx-auto px-6 py-10">
+    <div class="container mx-auto px-6 py-10" id="product-chat-context" data-product-id="{{ product.id }}"
+        data-product-name="{{ product.name }}">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16">
 
             <!-- LEFT: Gallery -->
@@ -334,9 +335,6 @@
         </div>
     </footer>
 
-    <!-- AI Chat Widget -->
-    {% include 'home/ai_chat.html' %}
-
     <script>
         // Image gallery
         function updateImage(url, btn) {
@@ -392,4 +390,5 @@
 
             btn.href = "https://wa.me/254714044399?text=" + encodeURIComponent(msg);
         })();
+</script>
 {% endblock %}

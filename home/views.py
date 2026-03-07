@@ -320,68 +320,73 @@ def ai_chat(request):
         # Parse request body
         data = json.loads(request.body)
         user_message = data.get('message', '').strip()
+        product_id = data.get('product_id')
         
         if not user_message:
             return JsonResponse({'error': 'Message is required'}, status=400)
         
-        # Fetch product data from database
-        products = Product.objects.filter(is_active=True).select_related('category')[:20]
+        # Fetch current product if context provided
+        current_product = None
+        if product_id:
+            current_product = Product.objects.filter(id=product_id, is_active=True).first()
+
+        # Fetch all active products for broad context
+        products = Product.objects.filter(is_active=True).select_related('category')
         
         # Build product context
-        product_context = "## Available Products:\n\n"
+        product_context = "## Available Products at World Tech Partners:\n\n"
+        if current_product:
+            product_context += f"CURRENTLY VIEWED PRODUCT: **{current_product.name}**\n"
+            product_context += f"- Price: KSH {current_product.price:,.2f}\n"
+            if current_product.model_code:
+                product_context += f"- Model: {current_product.model_code}\n"
+            product_context += f"- Details: {current_product.description}\n\n"
+            product_context += "OTHER PRODUCTS:\n"
+
         for product in products:
-            product_context += f"**{product.name}** ({product.category.name if product.category else 'Uncategorized'})\n"
-            product_context += f"- Price: KSH {product.price:,.2f}\n"
-            if product.description:
-                product_context += f"- Description: {product.description[:200]}\n"
-            if product.model_code:
-                product_context += f"- Model: {product.model_code}\n"
-            product_context += "\n"
+            if current_product and product.id == current_product.id:
+                continue
+            product_context += f"- {product.name} ({product.category.name if product.category else 'Samsung'}): KSH {product.price:,.2f}\n"
         
         # Try to use OpenAI API if available
         try:
             from django.conf import settings
             from openai import OpenAI
             
-            # Check if API key is configured
-           
-            
             # Initialize OpenAI client
             client = OpenAI(api_key=settings.OPENAI_API_KEY)
             
-            # Create enhanced system prompt with product context
-            system_prompt = f"""You are a helpful AI assistant for World Tech Partners, 
-an authorized Samsung dealer in Kenya.
+            # Create professional system prompt
+            current_focus = f"The user is currently looking at: {current_product.name}. " if current_product else ""
+            
+            system_prompt = f"""You are a professional AI sales and technical specialist for World Tech Partners, an authorized Samsung dealer in Kenya.
 
-IMPORTANT GUIDELINES:
-- Only answer questions about Samsung products, electronics, and our services
-- Politely decline to answer questions about other topics (politics, religion, other brands, etc.) but respond to greetings
-- Use the product information provided below to answer specific product questions
-- Be friendly, professional, and knowledgeable
-- Keep responses concise (2-3 sentences max)
-- If asked about a product not in our inventory, mention we can source it
+CONSTRAINTS:
+1. ONLY answer questions about Samsung products (phones, TVs, appliances, etc.), Samsung repair services, and World Tech Partners' services.
+2. If the user asks about ANY other brand or topic, politely decline and steer back to Samsung.
+3. BE PROFESSIONAL, concise, and to the point.
+4. You are encouraged to use your external technical knowledge about Samsung devices to provide detailed advice.
+5. {current_focus}If the user asks about 'this product', focus on the currently viewed product.
 
-YOUR SERVICES:
-- Product sales (phones, TVs, watches, buds, appliances)
-- Warranty and support
-- Delivery across Kenya
-- Genuine Samsung products only
+SERVICES PROVIDED:
+- Sales of genuine Samsung electronics.
+- Professional Samsung repair and maintenance services.
+- Warranty support.
+- Nationwide delivery in Kenya.
 
+PRODUCT CONTEXT FROM OUR STORE:
 {product_context}
-
-When users ask off-topic questions, politely say:
-"I'm here to help with Samsung products and our services at World Tech Partners. Is there a Samsung device you'd like to know more about?"
 """
             
-            # Call OpenAI API (new format for openai>=1.0.0)
+            # Call OpenAI API
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",  # Using gpt-4o for better performance
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message}
                 ],
-                max_tokens=250,
-                temperature=0.7
+                max_tokens=350,
+                temperature=0.5
             )
             
             ai_response = response.choices[0].message.content

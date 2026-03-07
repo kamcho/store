@@ -360,13 +360,19 @@
             typingIndicator.classList.remove('hidden');
 
             // Send to backend
+            const contextElement = document.getElementById('product-chat-context');
+            const productId = contextElement ? contextElement.dataset.productId : null;
+
             fetch('/api/chat/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCSRFToken()
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({
+                    message: message,
+                    product_id: productId
+                })
             })
                 .then(response => response.json())
                 .then(data => {
