@@ -1,0 +1,88 @@
+{% extends 'home/base.html' %}
+
+{% block content %}
+<div class="mt-28 md:mt-[115px] pb-24 bg-slate-50 min-h-screen">
+    <div class="container mx-auto px-6">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">Notifications</h1>
+                <p class="text-slate-500 mt-1">Manage contact form messages and inquiries.</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-48">Date</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-48">Customer</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Message</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-32">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for msg in page_obj %}
+                        <tr class="hover:bg-slate-50/50 transition-colors {% if not msg.is_read %}bg-blue-50/30 font-medium{% endif %}">
+                            <td class="px-6 py-5 text-sm text-slate-500">
+                                {{ msg.created_at|date:"M d, Y" }}<br>
+                                <span class="text-[10px] text-slate-400">{{ msg.created_at|time:"H:i" }}</span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="text-sm font-bold text-slate-900">{{ msg.name }}</div>
+                                <div class="text-xs text-slate-500">{{ msg.email }}</div>
+                                <div class="text-xs text-slate-500">{{ msg.phone }}</div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <p class="text-sm text-slate-600 line-clamp-2" title="{{ msg.message }}">
+                                    {{ msg.message }}
+                                </p>
+                            </td>
+                            <td class="px-6 py-5">
+                                {% if not msg.is_read %}
+                                <a href="{% url 'notification_mark_read' msg.pk %}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-samsung-blue text-white text-[10px] font-bold hover:bg-samsung-dark transition-all">
+                                    <i class="fas fa-check"></i> Mark Read
+                                </a>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-400 text-[10px] font-bold">
+                                    <i class="fas fa-check-double"></i> Read
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-20 text-center">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+                                        <i class="fas fa-bell-slash text-2xl"></i>
+                                    </div>
+                                    <p class="text-slate-500 font-medium">No messages found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                <span class="text-xs text-slate-500">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} messages
+                </span>
+                <div class="flex gap-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white transition-all">Previous</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white transition-all">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

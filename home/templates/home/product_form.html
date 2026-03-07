@@ -1,0 +1,326 @@
+{% extends 'home/base.html' %}
+
+{% block title %}{{ title }} - Samsung Dealer{% endblock %}
+
+{% block content %}<br><br>
+<div class="form-container mt-28 md:mt-[115px]">
+    <div class="page-title">
+        <i
+            class="fas {% if request.resolver_match.url_name == 'product_create' %}fa-plus-circle{% else %}fa-edit{% endif %}"></i>
+        {{ title }}
+    </div>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- Basic Information -->
+        <div class="section-title">
+            <i class="fas fa-info-circle"></i> Basic Information
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 form-row">
+                <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.category.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-6 form-row">
+                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }} *</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.name.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 form-row">
+                <label for="{{ form.slug.id_for_label }}" class="form-label">{{ form.slug.label }} *</label>
+                {{ form.slug }}
+                <small class="form-text text-muted">URL-friendly version of the product name</small>
+                {% if form.slug.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.slug.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-6 form-row">
+                <label for="{{ form.model_code.id_for_label }}" class="form-label">{{ form.model_code.label }} *</label>
+                {{ form.model_code }}
+                {% if form.model_code.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.model_code.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 form-row">
+                <label for="{{ form.series.id_for_label }}" class="form-label">{{ form.series.label }}</label>
+                {{ form.series }}
+                {% if form.series.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.series.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Descriptions -->
+        <div class="section-title">
+            <i class="fas fa-align-left"></i> Descriptions
+        </div>
+
+        <div class="form-row">
+            <label for="{{ form.short_description.id_for_label }}" class="form-label">{{ form.short_description.label }}</label>
+            {{ form.short_description }}
+            <small class="form-text text-muted">Brief description for product listings (max 500 characters)</small>
+            {% if form.short_description.errors %}
+            <div class="invalid-feedback d-block">
+                {{ form.short_description.errors.0 }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="invalid-feedback d-block">
+                {{ form.description.errors.0 }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Pricing -->
+        <div class="section-title">
+            <i class="fas fa-dollar-sign"></i> Pricing
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 form-row">
+                <label for="{{ form.price.id_for_label }}" class="form-label">{{ form.price.label }} *</label>
+                {{ form.price }}
+                {% if form.price.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.price.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4 form-row">
+                <label for="{{ form.sale_price.id_for_label }}" class="form-label">{{ form.sale_price.label }}</label>
+                {{ form.sale_price }}
+                <small class="form-text text-muted">Leave empty if not on sale</small>
+                {% if form.sale_price.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.sale_price.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-4 form-row">
+                <label for="{{ form.cost_price.id_for_label }}" class="form-label">{{ form.cost_price.label }}</label>
+                {{ form.cost_price }}
+                <small class="form-text text-muted">Internal use only</small>
+                {% if form.cost_price.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.cost_price.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Inventory -->
+        <div class="section-title">
+            <i class="fas fa-warehouse"></i> Inventory
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 form-row">
+                <label for="{{ form.stock_quantity.id_for_label }}" class="form-label">{{ form.stock_quantity.label }}</label>
+                {{ form.stock_quantity }}
+                {% if form.stock_quantity.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.stock_quantity.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-3 form-row">
+                <label for="{{ form.min_stock_level.id_for_label }}" class="form-label">{{ form.min_stock_level.label }}</label>
+                {{ form.min_stock_level }}
+                {% if form.min_stock_level.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.min_stock_level.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-3 form-row">
+                <label for="{{ form.availability.id_for_label }}" class="form-label">{{ form.availability.label }}</label>
+                {{ form.availability }}
+                {% if form.availability.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.availability.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-3 form-row">
+                <label for="{{ form.warranty_period.id_for_label }}" class="form-label">{{ form.warranty_period.label }}</label>
+                {{ form.warranty_period }}
+                <small class="form-text text-muted">Months</small>
+                {% if form.warranty_period.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.warranty_period.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="section-title">
+            <i class="fas fa-star"></i> Features
+        </div>
+
+        <div class="form-row">
+            <label for="{{ form.features.id_for_label }}" class="form-label">{{ form.features.label }}</label>
+            {{ form.features }}
+            <small class="form-text text-muted">Enter one feature per line (e.g., Premium Dynamic AMOLED 2X)</small>
+            {% if form.features.errors %}
+            <div class="invalid-feedback d-block">
+                {{ form.features.errors.0 }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Images -->
+        <div class="section-title">
+            <i class="fas fa-images"></i> Product Images
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                {{ image_formset.management_form }}
+                {% for image_form in image_formset %}
+                <div class="image-form-row pb-3 mb-3 border-bottom">
+                    {{ image_form.id }}
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label class="form-label">Image File</label>
+                            {{ image_form.image }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Alt Text</label>
+                            {{ image_form.alt_text }}
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center mt-4">
+                            <div class="form-check">
+                                {{ image_form.is_main_image }}
+                                <label class="form-check-label">Main?</label>
+                            </div>
+                        </div>
+                        {% if image_formset.can_delete %}
+                        <div class="col-md-1 d-flex align-items-center mt-4">
+                            <div class="form-check text-danger">
+                                {{ image_form.DELETE }}
+                                <label class="form-check-label"><i class="fas fa-trash"></i></label>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Specifications -->
+        <div class="section-title">
+            <i class="fas fa-list-ul"></i> Specifications
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                {{ spec_formset.management_form }}
+                {% for spec_form in spec_formset %}
+                <div class="spec-form-row pb-3 mb-3 border-bottom">
+                    {{ spec_form.id }}
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Category</label>
+                            {{ spec_form.category }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Name</label>
+                            {{ spec_form.name }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Value</label>
+                            {{ spec_form.value }}
+                        </div>
+                        {% if spec_formset.can_delete %}
+                        <div class="col-md-2 d-flex align-items-center mt-4">
+                            <div class="form-check text-danger">
+                                {{ spec_form.DELETE }}
+                                <label class="form-check-label">Delete</label>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div class="section-title">
+            <i class="fas fa-cog"></i> Options
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 form-row">
+                <div class="form-check">
+                    {{ form.is_featured }}
+                    <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                        {{ form.is_featured.label }}
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 form-row">
+                <div class="form-check">
+                    {{ form.is_active }}
+                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                        {{ form.is_active.label }}
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                    <i
+                        class="fas {% if request.resolver_match.url_name == 'product_create' %}fa-plus{% else %}fa-save{% endif %}"></i>
+                    {{ button_text }}
+                </button>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary ms-2">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

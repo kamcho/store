@@ -1,0 +1,1541 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}World Tech Partners - Premium Samsung Electronics{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/inter.css' %}">
+<style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Smooth hero product hover */
+    .hero-product-img {
+        transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .hero-product-img:hover {
+        transform: scale(1.04) translateY(-8px);
+    }
+
+    /* Product card lift */
+    .product-card {
+        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        border-color: #e2e8f0;
+    }
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.08);
+        border-color: #cbd5e1;
+    }
+
+    /* Category pill hover */
+    .cat-pill {
+        transition: all 0.3s ease;
+    }
+    .cat-pill:hover {
+        background: #1428A0;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(20, 40, 160, 0.25);
+    }
+
+    /* Gentle gradient background for hero */
+    .hero-bg {
+        background: linear-gradient(170deg, #ffffff 0%, #f8fafc 40%, #eef2ff 100%);
+    }
+
+    /* Mobile Menu Overlay - Overriding base if needed */
+    .mobile-menu-open::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(6px);
+        z-index: 40;
+        pointer-events: none;
+    }
+    .mobile-menu-open > *:not(nav) {
+        filter: blur(2px);
+        pointer-events: none;
+    }
+    .mobile-menu-open nav { z-index: 50; }
+
+    /* Section fade-in on scroll */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ─── Featured Carousel ─── */
+    .carousel-wrapper {
+        overflow: hidden;
+        position: relative;
+    }
+    .carousel-track {
+        display: flex;
+        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .carousel-slide {
+        min-width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        padding: 0 2px;
+    }
+    @media (max-width: 1024px) {
+        .carousel-slide {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 640px) {
+        .carousel-slide {
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+    }
+    .carousel-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0;
+    }
+    .carousel-dot.active {
+        background: #1428A0;
+        width: 24px;
+        border-radius: 4px;
+    }
+
+    /* Featured card clean look */
+    .feat-card {
+        position: relative;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .feat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.1);
+        border-color: #cbd5e1;
+    }
+    .feat-card-img {
+        position: relative;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 1;
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    }
+    .feat-card-img::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 10%;
+        width: 80%;
+        height: 30%;
+        background: radial-gradient(ellipse, rgba(20, 40, 160, 0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    /* ─── Hero Slideshow ─── */
+    .hero-slides-container {
+        position: relative;
+        min-height: 450px;
+    }
+    .hero-slide {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+        z-index: 1;
+    }
+    .hero-slide.active {
+        position: relative;
+        opacity: 1;
+        visibility: visible;
+        z-index: 2;
+    }
+    .hero-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.35s ease;
+    }
+    .hero-dot.active {
+        background: #1428A0;
+        width: 28px;
+        border-radius: 5px;
+    }
+    .hero-dot:hover:not(.active) {
+        background: #94a3b8;
+        transform: scale(1.2);
+    }
+
+    /* ─── Category Filter Buttons ─── */
+    .cat-filter-btn {
+        background: #fff;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+    .cat-filter-btn:hover {
+        border-color: #1428A0;
+        color: #1428A0;
+    }
+    /* Trust Badge Glow */
+    .trust-badge-glow {
+        animation: trustGlow 3s ease-in-out infinite;
+    }
+    @keyframes trustGlow {
+        0%, 100% { box-shadow: 0 0 8px rgba(20, 40, 160, 0.15); }
+        50% { box-shadow: 0 0 20px rgba(20, 40, 160, 0.3); }
+    }
+    .authorized-ribbon {
+        position: absolute;
+        top: 16px;
+        right: -8px;
+        z-index: 20;
+        background: linear-gradient(135deg, #1428A0 0%, #0b1d5c 100%);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 6px 16px 6px 12px;
+        border-radius: 6px 0 0 6px;
+        box-shadow: 0 4px 12px rgba(20, 40, 160, 0.25);
+    }
+    .authorized-ribbon::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: -8px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 8px 8px 0;
+        border-color: transparent #0b1d5c transparent transparent;
+    }
+
+    .cat-filter-btn.active {
+        background: #1428A0;
+        color: #fff;
+        border-color: #1428A0;
+        box-shadow: 0 4px 14px rgba(20, 40, 160, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- ══════════════════════════════════════════════ HERO SECTION ══════════════════════════════════════════════ -->
+    <section id="home" class="hero-bg relative min-h-screen flex items-center overflow-hidden pt-28 pb-16">
+        <!-- Decorative blurred circles -->
+        <div class="absolute top-[-5%] right-[-8%] w-[450px] h-[450px] bg-blue-200/30 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-[10%] left-[-5%] w-[350px] h-[350px] bg-indigo-200/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Category Quick Links -->
+            {% if categories %}
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-10 opacity-0 animate-fade-in-up">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-2">Browse:</span>
+                {% for cat in categories %}
+                <a href="{% url 'product_list' %}?category={{ cat.slug }}"
+                    class="cat-pill px-4 py-1.5 rounded-full border border-slate-200 text-slate-500 text-xs font-semibold tracking-wide hover:border-samsung-blue">
+                    {{ cat.name }}
+                </a>
+                {% endfor %}
+                <a href="{% url 'product_list' %}"
+                    class="cat-pill px-4 py-1.5 rounded-full border border-slate-200 text-slate-500 text-xs font-semibold tracking-wide">
+                    View All →
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Hero Product Showcase — Auto-Rotating -->
+            {% if hero_product %}
+            <div id="hero-slideshow" class="relative mb-16">
+                <!-- Build all hero slides (hero_product + featured_products) -->
+                {% with all_hero=hero_product %}
+                
+                <!-- Slide container -->
+                <div class="hero-slides-container relative">
+                    <!-- Slide 0: Main hero product -->
+                    <div class="hero-slide active" data-slug="{{ hero_product.slug }}">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                            <!-- Image -->
+                            <div class="relative flex items-center justify-center order-2 lg:order-1 min-h-[350px] lg:min-h-[450px]">
+                                <!-- Floating Authorized Ribbon -->
+                                <div class="authorized-ribbon hidden lg:flex items-center gap-1.5">
+                                    <i class="fas fa-check-circle text-green-300 text-[10px]"></i>
+                                    Official Samsung Partner
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div class="w-[65%] h-[65%] bg-gradient-to-br from-blue-50/60 to-indigo-50/40 rounded-full blur-[80px]"></div>
+                                </div>
+                                <div class="hero-product-img relative cursor-pointer w-full flex items-center justify-center">
+                                    {% if hero_product.get_main_image %}
+                                    <img src="{{ hero_product.get_main_image.image.url }}" alt="{{ hero_product.name }}"
+                                        class="w-auto max-w-[85%] max-h-[420px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+                                    {% else %}
+                                    <div class="w-64 h-64 rounded-[2rem] bg-gradient-to-br from-slate-50 to-white flex items-center justify-center shadow-inner">
+                                        <i class="fas fa-mobile-alt text-5xl text-slate-200"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Details -->
+                            <div class="space-y-5 order-1 lg:order-2 text-center lg:text-left">
+                                <!-- Verified Samsung Dealer Badge -->
+                                <div class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-samsung-blue/10 to-indigo-500/5 border border-samsung-blue/20 trust-badge-glow">
+                                    <i class="fas fa-shield-alt text-samsung-blue text-sm"></i>
+                                    <span class="text-xs font-bold uppercase tracking-[0.12em] text-samsung-blue">Authorized Samsung Dealer</span>
+                                    <i class="fas fa-check-circle text-green-500 text-xs"></i>
+                                </div>
+                                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-slate-900">
+                                    {{ hero_product.name }}
+                                </h1>
+                                <p class="text-base lg:text-lg text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                                    {{ hero_product.short_description|truncatewords:20 }}
+                                </p>
+                                <div class="flex items-end gap-3 justify-center lg:justify-start">
+                                    {% if hero_product.sale_price %}
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ hero_product.sale_price|floatformat:0 }}</span>
+                                    <span class="text-lg text-slate-400 line-through mb-1">KSH {{ hero_product.price|floatformat:0 }}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold">-{{ hero_product.get_discount_percentage }}%</span>
+                                    {% else %}
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ hero_product.price|floatformat:0 }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                                    <a href="{% url 'product_detail' hero_product.slug %}"
+                                        class="group px-7 py-3.5 bg-samsung-blue text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-samsung-blue/25 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm">
+                                        <i class="fas fa-shopping-bag text-xs opacity-80"></i> Shop Now
+                                        <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                                    </a>
+                                    <a href="{% url 'product_list' %}"
+                                        class="group px-7 py-3.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl transition-all duration-300 hover:border-samsung-blue/30 hover:text-samsung-blue hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm shadow-sm">
+                                        <i class="fas fa-th-large text-xs opacity-60"></i> All Products
+                                    </a>
+                                </div>
+                                <!-- Enhanced Trust Row -->
+                                <div class="flex flex-wrap items-center gap-4 justify-center lg:justify-start pt-2">
+                                    <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                                        <i class="fas fa-award text-samsung-blue text-xs"></i><span class="font-semibold">Samsung Authorized</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                                        <i class="fas fa-globe-africa text-samsung-blue text-xs"></i><span class="font-semibold">East Africa Partner</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                                        <i class="fas fa-calendar-check text-samsung-blue text-xs"></i><span class="font-semibold">Certified Since 2020</span>
+                                    </div>
+                                </div>
+                                <!-- Samsung Authorized Mark -->
+                                <div class="flex items-center gap-2 justify-center lg:justify-start pt-1">
+                                    <div class="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                                        <i class="fas fa-check-double text-green-500 text-[10px]"></i>
+                                        Authorized by Samsung Electronics East Africa
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional slides from featured_products -->
+                    {% for product in featured_products %}
+                    <div class="hero-slide" data-slug="{{ product.slug }}">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                            <div class="relative flex items-center justify-center order-2 lg:order-1 min-h-[350px] lg:min-h-[450px]">
+                                <!-- Floating Authorized Ribbon -->
+                                <div class="authorized-ribbon hidden lg:flex items-center gap-1.5">
+                                    <i class="fas fa-check-circle text-green-300 text-[10px]"></i>
+                                    Official Samsung Partner
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div class="w-[65%] h-[65%] bg-gradient-to-br from-blue-50/60 to-indigo-50/40 rounded-full blur-[80px]"></div>
+                                </div>
+                                <div class="hero-product-img relative cursor-pointer w-full flex items-center justify-center">
+                                    {% if product.get_main_image %}
+                                    <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
+                                        class="w-auto max-w-[85%] max-h-[420px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+                                    {% else %}
+                                    <div class="w-64 h-64 rounded-[2rem] bg-gradient-to-br from-slate-50 to-white flex items-center justify-center shadow-inner">
+                                        <i class="fas fa-mobile-alt text-5xl text-slate-200"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="space-y-5 order-1 lg:order-2 text-center lg:text-left">
+                                <!-- Verified Samsung Dealer Badge -->
+                                <div class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-samsung-blue/10 to-indigo-500/5 border border-samsung-blue/20 trust-badge-glow">
+                                    <i class="fas fa-shield-alt text-samsung-blue text-sm"></i>
+                                    <span class="text-xs font-bold uppercase tracking-[0.12em] text-samsung-blue">{{ product.category.name|default:"Authorized Dealer" }}</span>
+                                    <i class="fas fa-check-circle text-green-500 text-xs"></i>
+                                </div>
+                                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-slate-900">
+                                    {{ product.name }}
+                                </h1>
+                                <p class="text-base lg:text-lg text-slate-500 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                                    {{ product.short_description|truncatewords:20 }}
+                                </p>
+                                <div class="flex items-end gap-3 justify-center lg:justify-start">
+                                    {% if product.sale_price %}
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                    <span class="text-lg text-slate-400 line-through mb-1">KSH {{ product.price|floatformat:0 }}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold">-{{ product.get_discount_percentage }}%</span>
+                                    {% else %}
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                                    <a href="{% url 'product_detail' product.slug %}"
+                                        class="group px-7 py-3.5 bg-samsung-blue text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-samsung-blue/25 hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm">
+                                        <i class="fas fa-shopping-bag text-xs opacity-80"></i> Shop Now
+                                        <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                                    </a>
+                                    <a href="{% url 'product_list' %}"
+                                        class="group px-7 py-3.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl transition-all duration-300 hover:border-samsung-blue/30 hover:text-samsung-blue hover:-translate-y-0.5 flex items-center justify-center gap-2 text-sm shadow-sm">
+                                        <i class="fas fa-th-large text-xs opacity-60"></i> All Products
+                                    </a>
+                                </div>
+                                <!-- Enhanced Trust Row -->
+                                <div class="flex flex-wrap items-center gap-4 justify-center lg:justify-start pt-2">
+                                    <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                                        <i class="fas fa-award text-samsung-blue text-xs"></i><span class="font-semibold">Samsung Authorized</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                                        <i class="fas fa-globe-africa text-samsung-blue text-xs"></i><span class="font-semibold">East Africa Partner</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                                        <i class="fas fa-calendar-check text-samsung-blue text-xs"></i><span class="font-semibold">Certified Since 2020</span>
+                                    </div>
+                                </div>
+                                <!-- Samsung Authorized Mark -->
+                                <div class="flex items-center gap-2 justify-center lg:justify-start pt-1">
+                                    <div class="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                                        <i class="fas fa-check-double text-green-500 text-[10px]"></i>
+                                        Authorized by Samsung Electronics East Africa
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Hero slide indicators -->
+                <div class="flex items-center justify-center gap-2 mt-8" id="hero-dots">
+                    <div class="hero-dot active" data-index="0"></div>
+                    {% for product in featured_products %}
+                    <div class="hero-dot" data-index="{{ forloop.counter }}"></div>
+                    {% endfor %}
+                </div>
+
+                {% endwith %}
+            </div>
+            {% endif %}
+
+            <!-- Featured Products — Static Grid -->
+            {% if featured_products %}
+            <div class="mt-8">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-lg font-bold text-slate-800">More to Explore</h2>
+                    <a href="{% url 'product_list' %}" class="text-sm font-semibold text-samsung-blue hover:underline">See all →</a>
+                </div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    {% for product in featured_products|slice:":4" %}
+                    <a href="{% url 'product_detail' product.slug %}" class="feat-card group">
+                        <div class="feat-card-img">
+                            {% if product.get_main_image %}
+                            <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
+                                class="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500 relative z-10 drop-shadow-sm">
+                            {% else %}
+                            <div class="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center">
+                                <i class="fas fa-box text-2xl text-slate-300"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="p-4">
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-samsung-blue/60 mb-1">
+                                {{ product.category.name|default:"Samsung" }}
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-800 group-hover:text-samsung-blue transition-colors line-clamp-1">
+                                {{ product.name }}
+                            </h3>
+                            <div class="mt-2 flex items-center gap-2">
+                                {% if product.sale_price %}
+                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                <span class="text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                {% else %}
+                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ ABOUT / HISTORY ══════════════════════════════════════════════ -->
+    <section id="about" class="py-24 bg-slate-50 relative overflow-hidden reveal">
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Our Journey</span>
+                <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
+                    <span class="font-light">The </span>
+                    <span class="font-bold text-samsung-blue">Story</span>
+                </h2>
+                <div class="w-16 h-1 bg-samsung-blue mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="max-w-3xl mx-auto space-y-10">
+                <!-- Milestone 1 -->
+                <div class="relative pl-8 md:pl-14 border-l-2 border-samsung-blue/20">
+                    <div class="absolute -left-5 md:-left-7 top-0 w-10 h-10 md:w-14 md:h-14 rounded-full bg-samsung-blue flex items-center justify-center shadow-lg shadow-samsung-blue/20">
+                        <span class="text-white text-xs md:text-sm font-black">2018</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Foundation</h3>
+                        <p class="text-slate-500 leading-relaxed text-sm">
+                            The company began in February 2018, mainly dealing in simple repairs and software updates.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Milestone 2 -->
+                <div class="relative pl-8 md:pl-14 border-l-2 border-samsung-blue/20">
+                    <div class="absolute -left-5 md:-left-7 top-0 w-10 h-10 md:w-14 md:h-14 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                        <span class="text-white text-xs md:text-sm font-black">2019</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Expansion</h3>
+                        <p class="text-slate-500 leading-relaxed text-sm">
+                            We later started selling Samsung phones & accessories, expanding our product range.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Milestone 3 -->
+                <div class="relative pl-8 md:pl-14 border-l-2 border-samsung-blue/20">
+                    <div class="absolute -left-5 md:-left-7 top-0 w-10 h-10 md:w-14 md:h-14 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                        <span class="text-white text-xs md:text-sm font-black">2020</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                            Authorized Partner
+                            <i class="fas fa-certificate text-samsung-blue text-base"></i>
+                        </h3>
+                        <p class="text-slate-500 leading-relaxed text-sm">
+                            In 2020, the business was registered and contracted by <strong class="text-slate-800">Samsung Electronics East Africa</strong> as an authorized service center.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ PRODUCTS / INNOVATIONS ══════════════════════════════════════════════ -->
+    <section id="products" class="py-24 bg-white relative overflow-hidden reveal">
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-14">
+                <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Premium Collection</span>
+                <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
+                    <span class="font-light">Our </span>
+                    <span class="font-bold text-samsung-blue">Innovations</span>
+                </h2>
+                <div class="w-16 h-1 bg-samsung-blue mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-10" id="product-category-filter">
+                <button class="cat-filter-btn active px-5 py-2 rounded-full text-sm font-semibold transition-all" data-category="all">
+                    All
+                </button>
+                {% for cat in categories %}
+                <button class="cat-filter-btn px-5 py-2 rounded-full text-sm font-semibold transition-all" data-category="{{ cat.slug }}">
+                    {{ cat.name }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid">
+                {% for product in products %}
+                <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden group shadow-sm" data-category="{{ product.category.slug }}">
+                    <div class="h-40 sm:h-56 overflow-hidden bg-slate-50 p-4 sm:p-6 flex items-center justify-center relative">
+                        {% if product.get_main_image %}
+                        <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
+                            class="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110">
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=800"
+                            alt="{{ product.name }}"
+                            class="object-cover w-full h-full rounded-xl opacity-30 grayscale">
+                        {% endif %}
+
+                        {% if product.sale_price %}
+                        <div class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            Sale
+                        </div>
+                        {% elif product.created_at %}
+                        <div class="absolute top-3 right-3 bg-samsung-blue text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            New
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-3 sm:p-6">
+                        <div class="text-samsung-blue/70 text-[9px] sm:text-[10px] font-bold tracking-widest uppercase mb-1 sm:mb-1.5">
+                            {{ product.category.name|default:"Samsung" }}
+                        </div>
+                        <h3 class="text-sm sm:text-lg font-bold text-slate-900 mb-1 sm:mb-1.5 group-hover:text-samsung-blue transition-colors line-clamp-1">
+                            {{ product.name }}
+                        </h3>
+                        <p class="text-slate-400 text-xs sm:text-sm mb-3 sm:mb-5 line-clamp-1 sm:line-clamp-2">
+                            {{ product.description|truncatewords:15 }}
+                        </p>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                            <div class="flex flex-wrap items-center gap-1 sm:gap-2">
+                                {% if product.sale_price %}
+                                <span class="text-sm sm:text-lg font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                <span class="text-[10px] sm:text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                {% else %}
+                                <span class="text-sm sm:text-lg font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'product_detail' product.slug %}"
+                                class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-[10px] sm:text-xs font-bold text-center">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center text-slate-400 py-12">
+                    <i class="fas fa-box-open text-4xl mb-4 text-slate-300"></i>
+                    <p>No products found yet. Check back soon!</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- See All Button -->
+            <div class="mt-14 text-center">
+                <a href="{% url 'product_list' %}"
+                    class="inline-flex items-center gap-2 px-7 py-3.5 bg-slate-900 text-white font-bold rounded-xl transition-all duration-300 hover:bg-samsung-blue hover:shadow-lg hover:shadow-samsung-blue/20 group text-sm">
+                    View All Products
+                    <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ SERVICES ══════════════════════════════════════════════ -->
+    <section id="services" class="py-24 bg-slate-50 relative overflow-hidden reveal">
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-14">
+                <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Repair & Support</span>
+                <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
+                    <span class="font-light">Our </span>
+                    <span class="font-bold text-samsung-blue">Services</span>
+                </h2>
+                <p class="text-slate-500 text-base max-w-xl mx-auto">
+                    Professional repair and maintenance for all Samsung devices. Expert technicians, genuine parts, quick turnaround.
+                </p>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Phone Repair -->
+                <div class="product-card bg-white rounded-2xl p-7 text-center border border-slate-100 shadow-sm group">
+                    <div class="flex justify-center mb-5">
+                        <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:bg-samsung-blue group-hover:shadow-lg group-hover:shadow-samsung-blue/20 transition-all duration-300">
+                            <i class="fas fa-mobile-alt text-2xl text-samsung-blue group-hover:text-white transition-colors"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">Phone Repair</h3>
+                    <p class="text-slate-400 text-sm mb-5 leading-relaxed">Screen replacement, battery service, camera repair, and more.</p>
+                    <a href="#contact" class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">
+                        Book Service
+                    </a>
+                </div>
+
+                <!-- TV Repair -->
+                <div class="product-card bg-white rounded-2xl p-7 text-center border border-slate-100 shadow-sm group">
+                    <div class="flex justify-center mb-5">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:shadow-lg group-hover:shadow-indigo-600/20 transition-all duration-300">
+                            <i class="fas fa-tv text-2xl text-indigo-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">TV Repair</h3>
+                    <p class="text-slate-400 text-sm mb-5 leading-relaxed">Display issues, sound problems, connectivity repairs, and diagnostics.</p>
+                    <a href="#contact" class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">
+                        Book Service
+                    </a>
+                </div>
+
+                <!-- Watch Repair -->
+                <div class="product-card bg-white rounded-2xl p-7 text-center border border-slate-100 shadow-sm group">
+                    <div class="flex justify-center mb-5">
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-600 group-hover:shadow-lg group-hover:shadow-emerald-600/20 transition-all duration-300">
+                            <i class="fas fa-clock text-2xl text-emerald-600 group-hover:text-white transition-colors"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">Watch Repair</h3>
+                    <p class="text-slate-400 text-sm mb-5 leading-relaxed">Battery replacement, strap repair, sensor calibration, and water damage.</p>
+                    <a href="#contact" class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">
+                        Book Service
+                    </a>
+                </div>
+
+                <!-- Tablet Repair -->
+                <div class="product-card bg-white rounded-2xl p-7 text-center border border-slate-100 shadow-sm group">
+                    <div class="flex justify-center mb-5">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-500 group-hover:shadow-lg group-hover:shadow-amber-500/20 transition-all duration-300">
+                            <i class="fas fa-tablet-alt text-2xl text-amber-500 group-hover:text-white transition-colors"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">Tablet Repair</h3>
+                    <p class="text-slate-400 text-sm mb-5 leading-relaxed">Touchscreen repair, charging port fix, software updates, and more.</p>
+                    <a href="#contact" class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">
+                        Book Service
+                    </a>
+                </div>
+            </div>
+
+            <!-- Trust Row -->
+            <div class="mt-12 flex flex-wrap justify-center gap-6 text-sm text-slate-400">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-samsung-blue text-xs"></i>
+                    <span>Genuine Parts</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-tools text-samsung-blue text-xs"></i>
+                    <span>Expert Technicians</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-clock text-samsung-blue text-xs"></i>
+                    <span>Quick Turnaround</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ TESTIMONIALS ══════════════════════════════════════════════ -->
+    <section id="testimonials" class="py-24 bg-white relative overflow-hidden reveal">
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-14">
+                <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Reviews</span>
+                <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
+                    <span class="font-light">What Our </span>
+                    <span class="font-bold text-samsung-blue">Customers Say</span>
+                </h2>
+            </div>
+
+            <!-- Testimonials Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Testimonial 1 -->
+                <div class="product-card bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+                    <div class="flex items-center gap-3.5 mb-5">
+                        <div class="w-12 h-12 rounded-full bg-samsung-blue/10 flex items-center justify-center text-base font-bold text-samsung-blue">
+                            DK
+                        </div>
+                        <div>
+                            <h4 class="text-slate-900 font-bold text-sm">David Kamau</h4>
+                            <div class="flex gap-0.5 mt-0.5">
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed text-sm italic">
+                        "The Galaxy S24 Ultra exceeded all my expectations! The camera quality is phenomenal and the AI features are incredibly useful. Best phone I've ever owned."
+                    </p>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="product-card bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+                    <div class="flex items-center gap-3.5 mb-5">
+                        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-base font-bold text-indigo-600">
+                            MW
+                        </div>
+                        <div>
+                            <h4 class="text-slate-900 font-bold text-sm">Mercy Wanjiku</h4>
+                            <div class="flex gap-0.5 mt-0.5">
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed text-sm italic">
+                        "Amazing repair service! My TV was fixed within 24 hours with genuine parts. The technician was professional and explained everything clearly."
+                    </p>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="product-card bg-white rounded-2xl p-7 border border-slate-100 shadow-sm">
+                    <div class="flex items-center gap-3.5 mb-5">
+                        <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-base font-bold text-emerald-600">
+                            BO
+                        </div>
+                        <div>
+                            <h4 class="text-slate-900 font-bold text-sm">Brian Omondi</h4>
+                            <div class="flex gap-0.5 mt-0.5">
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                                <i class="fas fa-star text-amber-400 text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed text-sm italic">
+                        "The Neo QLED TV transformed my living room. The picture quality is stunning and the smart features make it so easy to use. Highly recommend!"
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ FLASH SALE ══════════════════════════════════════════════ -->
+    {% if flash_sale_products %}
+    <section class="py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 relative overflow-hidden reveal">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 right-0 w-72 h-72 bg-red-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-56 h-56 bg-orange-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="inline-flex items-center gap-2 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider animate-pulse">
+                            <i class="fas fa-bolt"></i> Flash Sale
+                        </span>
+                        <span class="text-sm text-red-500/70 font-semibold" id="flash-sale-timer">Limited Time Offer!</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl text-slate-900">
+                        <span class="font-light">Today's </span>
+                        <span class="font-bold text-red-500">Best Deals</span>
+                    </h2>
+                </div>
+                <a href="{% url 'product_list' %}?sort=price_low"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 text-red-500 text-sm font-semibold hover:bg-red-500 hover:text-white transition-all duration-300 group">
+                    View All Deals
+                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <!-- Flash Sale Products Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for product in flash_sale_products|slice:":4" %}
+                <a href="{% url 'product_detail' product.slug %}?offer_price={{ product.sale_price|floatformat:0 }}" class="group block">
+                    <div class="bg-white rounded-2xl border border-red-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-red-500/10 transition-all duration-300 hover:-translate-y-2 relative">
+                        <!-- Sale Badge -->
+                        <div class="absolute top-3 left-3 z-10 flex items-center gap-1.5">
+                            <span class="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                -{{ product.get_discount_percentage }}%
+                            </span>
+                        </div>
+
+                        <!-- Image -->
+                        <div class="h-48 bg-gradient-to-b from-white to-slate-50/30 p-5 flex items-center justify-center overflow-hidden">
+                            {% if product.get_main_image %}
+                            <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
+                                class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center">
+                                <i class="fas fa-box text-xl text-slate-300"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Info -->
+                        <div class="p-4 border-t border-slate-50">
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                                {{ product.category.name|default:"Samsung" }}
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-800 group-hover:text-red-500 transition-colors line-clamp-1 mb-2">
+                                {{ product.name }}
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-extrabold text-red-500">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                <span class="text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                            </div>
+                            <div class="mt-2 text-[10px] font-semibold text-red-400 flex items-center gap-1">
+                                <i class="fas fa-fire text-[8px]"></i> Hot Deal — Don't miss out!
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- ══════════════════════════════════════════════ RECENT ARRIVALS ══════════════════════════════════════════════ -->
+    {% if recent_arrivals %}
+    <section class="py-20 bg-gradient-to-br from-emerald-50 via-white to-teal-50 relative overflow-hidden reveal">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-56 h-56 bg-teal-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="inline-flex items-center gap-2 bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            <i class="fas fa-sparkles"></i> Just In
+                        </span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl text-slate-900">
+                        <span class="font-light">Recent </span>
+                        <span class="font-bold text-emerald-600">Arrivals</span>
+                    </h2>
+                </div>
+                <a href="{% url 'product_list' %}?sort=newest"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald-200 text-emerald-600 text-sm font-semibold hover:bg-emerald-600 hover:text-white transition-all duration-300 group">
+                    View All New
+                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <!-- Recent Arrivals Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for product in recent_arrivals|slice:":8" %}
+                <a href="{% url 'product_detail' product.slug %}" class="group block">
+                    <div class="bg-white rounded-2xl border border-emerald-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 hover:-translate-y-2 relative">
+                        <!-- New Badge -->
+                        <span class="absolute top-3 left-3 z-10 bg-emerald-500 text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                            <i class="fas fa-certificate text-[7px]"></i> New
+                        </span>
+
+                        <!-- Image -->
+                        <div class="h-48 bg-gradient-to-b from-white to-slate-50/30 p-5 flex items-center justify-center overflow-hidden">
+                            {% if product.get_main_image %}
+                            <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
+                                class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center">
+                                <i class="fas fa-box text-xl text-slate-300"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Info -->
+                        <div class="p-4 border-t border-slate-50">
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-600/50 mb-1">
+                                {{ product.category.name|default:"Samsung" }}
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-800 group-hover:text-emerald-500 transition-colors line-clamp-1 mb-2">
+                                {{ product.name }}
+                            </h3>
+                            <p class="text-xs text-slate-400 line-clamp-1 mb-3">
+                                {{ product.short_description|truncatewords:8 }}
+                            </p>
+                            <div class="flex items-center justify-between">
+                                {% if product.sale_price %}
+                                <span class="text-base font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                <span class="text-[10px] text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                {% else %}
+                                <span class="text-base font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    <!-- ══════════════════════════════════════════════ CATEGORY HUB SEPARATOR ══════════════════════════════════════════════ -->
+    <section class="pt-24 pb-12 bg-white relative reveal">
+        <div class="container mx-auto px-6 text-center">
+            <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-3 block">Samsung Ecosystem</span>
+            <h2 class="text-3xl md:text-5xl text-slate-900 mb-6 font-black tracking-tight">
+                Shop by <span class="text-samsung-blue whitespace-nowrap">Category</span>
+            </h2>
+            <p class="text-slate-500 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Discover the latest innovations tailored to your lifestyle. Browse our full range of certified Samsung products across East Africa.
+            </p>
+            <div class="mt-10 flex items-center justify-center gap-4">
+                <div class="h-[1px] w-20 bg-gradient-to-r from-transparent to-slate-200"></div>
+                <i class="fas fa-layer-group text-slate-300 text-sm"></i>
+                <div class="h-[1px] w-20 bg-gradient-to-l from-transparent to-slate-200"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ CATEGORY SECTIONS ══════════════════════════════════════════════ -->
+    {% for cat in categories_with_products %}
+    {% if cat.active_products %}
+    {% cycle 'greenish' 'white' as section_theme silent %}
+    
+    <section class="py-20 {% if section_theme == 'greenish' %}bg-gradient-to-br from-emerald-50 via-white to-teal-50{% else %}bg-white{% endif %} relative overflow-hidden reveal">
+        {% if section_theme == 'greenish' %}
+        <!-- Decorative elements for greenish theme -->
+        <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-56 h-56 bg-teal-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+        {% endif %}
+
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl {% if section_theme == 'greenish' %}bg-emerald-500/10 text-emerald-600{% else %}bg-samsung-blue/10 text-samsung-blue{% endif %} flex items-center justify-center">
+                        <i class="fas fa-layer-group text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-900">{{ cat.name }}</h2>
+                        {% if cat.description %}
+                        <p class="text-slate-400 text-sm mt-1">{{ cat.description|truncatewords:15 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <a href="{% url 'product_list' %}?category={{ cat.slug }}"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border {% if section_theme == 'greenish' %}border-emerald-200 text-emerald-600 hover:bg-emerald-600{% else %}border-samsung-blue/20 text-samsung-blue hover:bg-samsung-blue{% endif %} text-sm font-semibold hover:text-white transition-all duration-300 group">
+                    View All
+                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for product in cat.active_products|slice:":4" %}
+                <a href="{% url 'product_detail' product.slug %}" class="group block">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-samsung-blue/30 overflow-hidden transition-all duration-300 hover:-translate-y-2">
+                        <!-- Image -->
+                        <div class="h-44 bg-gradient-to-b from-white to-slate-50/50 p-5 flex items-center justify-center relative overflow-hidden">
+                            {% if product.get_main_image %}
+                            <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
+                                class="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center">
+                                <i class="fas fa-box text-xl text-slate-300"></i>
+                            </div>
+                            {% endif %}
+
+                            {% if product.sale_price %}
+                            <span class="absolute top-2.5 right-2.5 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                                Sale
+                            </span>
+                            {% endif %}
+
+                            <!-- Wishlist button -->
+                            <button class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors z-10">
+                                <i class="far fa-heart text-[10px]"></i>
+                            </button>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="p-4">
+                            <h3 class="text-sm font-bold text-slate-800 {% if section_theme == 'greenish' %}group-hover:text-emerald-500{% else %}group-hover:text-samsung-blue{% endif %} transition-colors line-clamp-1 mb-1">
+                                {{ product.name }}
+                            </h3>
+                            <p class="text-xs text-slate-400 line-clamp-1 mb-3">
+                                {{ product.short_description|truncatewords:8 }}
+                            </p>
+                            <div class="flex items-center justify-between">
+                                {% if product.sale_price %}
+                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                <span class="text-[10px] text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                {% else %}
+                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endfor %}
+
+    <!-- ══════════════════════════════════════════════ CONTACT ══════════════════════════════════════════════ -->
+    <section id="contact" class="py-24 bg-slate-50 relative overflow-hidden reveal">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+                <!-- Left: Contact Info -->
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Support</span>
+                        <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
+                            <span class="font-light">Get in </span>
+                            <span class="font-bold text-samsung-blue">Touch</span>
+                        </h2>
+                        <p class="text-slate-500 text-base max-w-md">
+                            Reach out to our dedicated support team for any inquiries about products, repairs, or orders.
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Location -->
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-samsung-blue shadow-sm">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-slate-900 font-bold text-sm">Location</h4>
+                                <p class="text-slate-500 text-xs">53 Address, Nakuru, Nakuru, Kenya</p>
+                            </div>
+                        </div>
+
+                        <!-- Phone Numbers -->
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-green-500 shadow-sm">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-slate-900 font-bold text-sm">Call Us</h4>
+                                <div class="flex flex-col gap-1 mt-1">
+                                    <a href="tel:+254714044399" class="text-slate-600 hover:text-samsung-blue transition-colors text-xs flex justify-between">
+                                        <span>+254 714 044 399</span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Primary</span>
+                                    </a>
+                                    <a href="tel:+254790739933" class="text-slate-600 hover:text-samsung-blue transition-colors text-xs flex justify-between">
+                                        <span>+254 790 739 933</span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Secondary</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emails -->
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-indigo-500 shadow-sm">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-slate-900 font-bold text-sm">Write A Line</h4>
+                                <div class="flex flex-col gap-1 mt-1">
+                                    <a href="mailto:Worldtechsolution22@gmail.com" class="text-slate-600 hover:text-samsung-blue transition-colors text-xs flex justify-between">
+                                        <span>Worldtechsolution22@gmail.com</span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Primary</span>
+                                    </a>
+                                    <a href="mailto:info@worldtechpartner.com" class="text-slate-600 hover:text-samsung-blue transition-colors text-xs flex justify-between">
+                                        <span>info@worldtechpartner.com</span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase">Secondary</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Form -->
+                <div class="bg-white border border-slate-100 rounded-2xl p-7 md:p-9 shadow-sm">
+                    <form action="{% url 'contact_submit' %}" method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Name</label>
+                                <input type="text" name="name" placeholder="John Doe" required
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-300 focus:outline-none focus:border-samsung-blue focus:ring-2 focus:ring-samsung-blue/10 transition-all text-sm">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Phone</label>
+                                <input type="tel" name="phone" placeholder="+1 (555) 000-0000"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-300 focus:outline-none focus:border-samsung-blue focus:ring-2 focus:ring-samsung-blue/10 transition-all text-sm">
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Email</label>
+                            <input type="email" name="email" placeholder="john@example.com" required
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-300 focus:outline-none focus:border-samsung-blue focus:ring-2 focus:ring-samsung-blue/10 transition-all text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Message</label>
+                            <textarea name="message" rows="4" placeholder="How can we help you?" required
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-300 focus:outline-none focus:border-samsung-blue focus:ring-2 focus:ring-samsung-blue/10 transition-all text-sm resize-none"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full py-3.5 bg-samsung-blue text-white font-bold rounded-xl hover:bg-samsung-dark hover:shadow-lg hover:shadow-samsung-blue/20 transition-all duration-300 text-sm flex items-center justify-center gap-2 group">
+                            Send Message
+                            <i class="fas fa-paper-plane text-xs group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ FOOTER ══════════════════════════════════════════════ -->
+    <footer class="bg-slate-900 text-white">
+        <div class="container mx-auto px-6 py-14">
+            <!-- Footer Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Location -->
+                <div>
+                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">LOCATION</h4>
+                    <p class="text-slate-400 leading-relaxed text-sm">
+                        53 Address,<br>
+                        Nakuru,<br>
+                        Nakuru, Kenya
+                    </p>
+                </div>
+
+                <!-- Follow Us -->
+                <div>
+                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">FOLLOW US</h4>
+                    <ul class="space-y-4">
+                        <li>
+                            <a href="#" class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
+                                <i class="fab fa-facebook-f w-5 text-center"></i> Facebook
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
+                                <i class="fab fa-twitter w-5 text-center"></i> Twitter
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
+                                <i class="fab fa-instagram w-5 text-center"></i> Instagram
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Call Us -->
+                <div>
+                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">CALL US</h4>
+                    <div class="space-y-4">
+                        <a href="tel:+254714044399" class="block text-slate-400 hover:text-white transition-colors text-sm">
+                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Primary / WhatsApp</span>
+                            +254 714 044 399
+                        </a>
+                        <a href="tel:+254790739933" class="block text-slate-400 hover:text-white transition-colors text-sm">
+                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Secondary</span>
+                            +254 790 739 933
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Write A Line -->
+                <div>
+                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">WRITE A LINE</h4>
+                    <div class="space-y-4">
+                        <a href="mailto:Worldtechsolution22@gmail.com" class="block text-slate-400 hover:text-white transition-colors text-sm">
+                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Primary</span>
+                            Worldtechsolution22@gmail.com
+                        </a>
+                        <a href="mailto:info@worldtechpartner.com" class="block text-slate-400 hover:text-white transition-colors text-sm">
+                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Secondary</span>
+                            info@worldtechpartner.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-7 border-t border-white/10">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+                    <p class="text-slate-500 text-xs">&copy; 2024 World Tech Partners. All rights reserved.</p>
+                    <div class="flex gap-5 text-xs">
+                        <a href="#" class="text-slate-400 hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-slate-400 hover:text-white transition-colors">Terms of Service</a>
+                        <a href="#" class="text-slate-400 hover:text-white transition-colors">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── Mobile Menu ───
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const body = document.body;
+            menu.classList.toggle('hidden');
+            if (menu.classList.contains('hidden')) {
+                body.classList.remove('mobile-menu-open');
+            } else {
+                body.classList.add('mobile-menu-open');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Close mobile menu when clicking links
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    const menu = document.getElementById('mobile-menu');
+                    if (!menu.classList.contains('hidden')) {
+                        menu.classList.add('hidden');
+                        document.body.classList.remove('mobile-menu-open');
+                    }
+                });
+            });
+
+            // Close on outside click
+            document.addEventListener('click', function (event) {
+                const menu = document.getElementById('mobile-menu');
+                const menuButton = event.target.closest('#mobile-menu-btn');
+                if (!menu.classList.contains('hidden') && !menu.contains(event.target) && !menuButton) {
+                    menu.classList.add('hidden');
+                    document.body.classList.remove('mobile-menu-open');
+                }
+            });
+
+            // Mobile menu button
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            }
+
+            // ─── Scroll Reveal ───
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealOnScroll = () => {
+                revealElements.forEach(el => {
+                    const windowHeight = window.innerHeight;
+                    const elementTop = el.getBoundingClientRect().top;
+                    if (elementTop < windowHeight - 100) {
+                        el.classList.add('active');
+                    }
+                });
+            };
+            window.addEventListener('scroll', revealOnScroll);
+            revealOnScroll(); // trigger on load
+
+            // ─── Nav shadow on scroll ───
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.classList.add('shadow-sm');
+                    navbar.classList.remove('border-b', 'border-slate-200/60');
+                    navbar.classList.add('border-b', 'border-slate-200');
+                } else {
+                    navbar.classList.remove('shadow-sm');
+                    navbar.classList.remove('border-b', 'border-slate-200');
+                    navbar.classList.add('border-b', 'border-slate-200/60');
+                }
+            });
+
+            // ─── Hero Slideshow (auto-rotate every 3s) ───
+            const heroSlides = document.querySelectorAll('.hero-slide');
+            const heroDots = document.querySelectorAll('.hero-dot');
+            if (heroSlides.length > 1) {
+                let heroIndex = 0;
+                let heroTimer = null;
+
+                function showHeroSlide(index) {
+                    heroSlides.forEach((s, i) => {
+                        s.classList.toggle('active', i === index);
+                    });
+                    heroDots.forEach((d, i) => {
+                        d.classList.toggle('active', i === index);
+                    });
+                    heroIndex = index;
+                }
+
+                function nextHero() {
+                    showHeroSlide((heroIndex + 1) % heroSlides.length);
+                }
+
+                function startHeroAutoPlay() {
+                    heroTimer = setInterval(nextHero, 3000);
+                }
+
+                function stopHeroAutoPlay() {
+                    if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+                }
+
+                // Dot click navigation
+                heroDots.forEach((dot, i) => {
+                    dot.addEventListener('click', () => {
+                        stopHeroAutoPlay();
+                        showHeroSlide(i);
+                        startHeroAutoPlay();
+                    });
+                });
+
+                // Pause on hover
+                const heroShowcase = document.getElementById('hero-slideshow');
+                if (heroShowcase) {
+                    heroShowcase.addEventListener('mouseenter', stopHeroAutoPlay);
+                    heroShowcase.addEventListener('mouseleave', startHeroAutoPlay);
+                }
+
+                // Start
+                startHeroAutoPlay();
+            }
+
+            // ─── Products Category Filter ───
+            const filterBtns = document.querySelectorAll('.cat-filter-btn');
+            const productCards = document.querySelectorAll('#products-grid > .product-card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cat = btn.dataset.category;
+
+                    // Update active button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Filter cards with fade
+                    productCards.forEach(card => {
+                        if (cat === 'all' || card.dataset.category === cat) {
+                            card.style.display = '';
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(12px)';
+                            requestAnimationFrame(() => {
+                                card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            });
+                        } else {
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(12px)';
+                            setTimeout(() => { card.style.display = 'none'; }, 300);
+                        }
+                    });
+                });
+            });
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ─── Reveal on Scroll ───
+            const revealElements = document.querySelectorAll('.reveal');
+            function revealOnScroll() {
+                for (let i = 0; i < revealElements.length; i++) {
+                    const windowHeight = window.innerHeight;
+                    const elementTop = revealElements[i].getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    if (elementTop < windowHeight - elementVisible) {
+                        revealElements[i].classList.add('active');
+                    }
+                }
+            }
+            window.addEventListener('scroll', revealOnScroll);
+            revealOnScroll(); // init
+
+            // ─── Nav shadow on scroll ───
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.classList.add('shadow-sm');
+                    navbar.classList.remove('border-b', 'border-slate-200/60');
+                    navbar.classList.add('border-b', 'border-slate-200');
+                } else {
+                    navbar.classList.remove('shadow-sm');
+                    navbar.classList.remove('border-b', 'border-slate-200');
+                    navbar.classList.add('border-b', 'border-slate-200/60');
+                }
+            });
+
+            // ─── Hero Slideshow (auto-rotate every 3s) ───
+            const heroSlides = document.querySelectorAll('.hero-slide');
+            const heroDots = document.querySelectorAll('.hero-dot');
+            if (heroSlides.length > 1) {
+                let heroIndex = 0;
+                let heroTimer = null;
+
+                function showHeroSlide(index) {
+                    heroSlides.forEach((s, i) => {
+                        s.classList.toggle('active', i === index);
+                    });
+                    heroDots.forEach((d, i) => {
+                        d.classList.toggle('active', i === index);
+                    });
+                    heroIndex = index;
+                }
+
+                function nextHero() {
+                    showHeroSlide((heroIndex + 1) % heroSlides.length);
+                }
+
+                function startHeroAutoPlay() {
+                    heroTimer = setInterval(nextHero, 3000);
+                }
+
+                function stopHeroAutoPlay() {
+                    if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+                }
+
+                // Dot click navigation
+                heroDots.forEach((dot, i) => {
+                    dot.addEventListener('click', () => {
+                        stopHeroAutoPlay();
+                        showHeroSlide(i);
+                        startHeroAutoPlay();
+                    });
+                });
+
+                // Pause on hover
+                const heroShowcase = document.getElementById('hero-slideshow');
+                if (heroShowcase) {
+                    heroShowcase.addEventListener('mouseenter', stopHeroAutoPlay);
+                    heroShowcase.addEventListener('mouseleave', startHeroAutoPlay);
+                }
+
+                // Start
+                startHeroAutoPlay();
+            }
+
+            // ─── Products Category Filter ───
+            const filterBtns = document.querySelectorAll('.cat-filter-btn');
+            const productCards = document.querySelectorAll('#products-grid > .product-card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cat = btn.dataset.category;
+
+                    // Update active button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Filter cards with fade
+                    productCards.forEach(card => {
+                        if (cat === 'all' || card.dataset.category === cat) {
+                            card.style.display = '';
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(12px)';
+                            requestAnimationFrame(() => {
+                                card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            });
+                        } else {
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(12px)';
+                            setTimeout(() => { card.style.display = 'none'; }, 300);
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}

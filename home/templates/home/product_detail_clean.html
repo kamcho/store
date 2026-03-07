@@ -1,0 +1,231 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - World Tech Partners{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <!-- Breadcrumb -->
+    <nav class="mb-8">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="{% url 'home' %}" class="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Home</a></li>
+            <li><i class="fas fa-chevron-right text-xs"></i></li>
+            <li><a href="{% url 'product_list' %}" class="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Products</a></li>
+            <li><i class="fas fa-chevron-right text-xs"></i></li>
+            <li class="text-gray-900 dark:text-white font-medium">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+        <!-- Product Images -->
+        <div class="space-y-4">
+            <!-- Main Image -->
+            <div class="relative overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
+                {% if product.images.exists %}
+                    {% for image in product.images.all %}
+                        {% if image.is_main_image %}
+                            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" 
+                                 class="w-full h-[500px] object-cover">
+                        {% endif %}
+                    {% endfor %}
+                {% elif product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                         class="w-full h-[500px] object-cover">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=800" 
+                         alt="{{ product.name }}" 
+                         class="w-full h-[500px] object-cover grayscale opacity-50">
+                {% endif %}
+
+                <!-- Sale Badge -->
+                {% if product.sale_price %}
+                    <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        -{{ product.get_discount_percentage }}% OFF
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Thumbnail Gallery -->
+            {% if product.images.exists %}
+                <div class="grid grid-cols-4 gap-2">
+                    {% for image in product.images.all %}
+                        <div class="relative overflow-hidden rounded-lg cursor-pointer hover:opacity-75 transition-opacity">
+                            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" 
+                                 class="w-full h-20 object-cover">
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Information -->
+        <div class="space-y-6">
+            <!-- Product Title -->
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-purple-600 dark:text-purple-400 text-sm font-bold tracking-widest uppercase">
+                        {{ product.category.name|default:"Electronics" }}
+                    </span>
+                    {% if product.is_in_stock %}
+                        <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full font-medium">
+                            In Stock
+                        </span>
+                    {% else %}
+                        <span class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs px-2 py-1 rounded-full font-medium">
+                            {{ product.get_availability_display }}
+                        </span>
+                    {% endif %}
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                    {{ product.name }}
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Model: {{ product.model_code }}
+                </p>
+            </div>
+
+            <!-- Price -->
+            <div class="flex items-baseline gap-3">
+                {% if product.sale_price %}
+                    <span class="text-3xl font-bold text-gray-900 dark:text-white">
+                        ${{ product.sale_price }}
+                    </span>
+                    <span class="text-xl text-gray-500 line-through">
+                        ${{ product.price }}
+                    </span>
+                {% else %}
+                    <span class="text-3xl font-bold text-gray-900 dark:text-white">
+                        ${{ product.price }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="prose prose-gray dark:prose-invert max-w-none">
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {{ product.description|default:"Experience premium quality and cutting-edge technology with this exceptional product." }}
+                </p>
+                {% if product.short_description %}
+                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mt-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            {{ product.short_description }}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Key Features -->
+            {% if product.features %}
+                <div class="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-2xl">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Features</h3>
+                    <ul class="space-y-2">
+                        {% for feature in product.features %}
+                            <li class="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-check text-purple-600 dark:text-purple-400"></i>
+                                <span>{{ feature }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-shopping-cart"></i>
+                    Add to Cart
+                </button>
+                <button class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+
+            <!-- Stock & Warranty Info -->
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                    <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-1">
+                        <i class="fas fa-box"></i>
+                        <span>Stock</span>
+                    </div>
+                    <p class="font-semibold text-gray-900 dark:text-white">
+                        {{ product.stock_quantity }} units available
+                    </p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                    <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-1">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Warranty</span>
+                    </div>
+                    <p class="font-semibold text-gray-900 dark:text-white">
+                        {{ product.warranty_period }} months
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Specifications -->
+    {% if product.specifications.exists %}
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Specifications</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                {% for spec in product.specifications.all %}
+                    <div class="flex items-center justify-between p-4 {% if not forloop.last %}border-b border-gray-200 dark:border-gray-700{% endif %}">
+                        <div>
+                            <h4 class="font-medium text-gray-900 dark:text-white">{{ spec.name }}</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ spec.category }}</p>
+                        </div>
+                        <p class="font-medium text-gray-900 dark:text-white">{{ spec.value }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Related Products -->
+    {% if related_products %}
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Related Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for related_product in related_products %}
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+                        <div class="aspect-w-16 aspect-h-12 bg-gray-100 dark:bg-gray-700">
+                            {% if related_product.image %}
+                                <img src="{{ related_product.image.url }}" alt="{{ related_product.name }}" 
+                                     class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                            {% else %}
+                                <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=400" 
+                                     alt="{{ related_product.name }}" 
+                                     class="w-full h-48 object-cover grayscale opacity-50">
+                            {% endif %}
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                {{ related_product.name }}
+                            </h3>
+                            <div class="flex items-baseline gap-2 mb-3">
+                                {% if related_product.sale_price %}
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        ${{ related_product.sale_price }}
+                                    </span>
+                                    <span class="text-sm text-gray-500 line-through">
+                                        ${{ related_product.price }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-lg font-bold text-gray-900 dark:text-white">
+                                        ${{ related_product.price }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <a href="{{ related_product.get_absolute_url }}" 
+                               class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

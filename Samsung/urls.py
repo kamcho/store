@@ -1,0 +1,57 @@
+"""
+URL configuration for Samsung project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/6.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from home.views import (
+    home, product_list, product_create, product_edit, 
+    product_delete, product_detail, add_to_cart, 
+    cart_detail, remove_from_cart, update_cart,
+    user_login, user_logout, ai_chat,
+    contact_submit, notifications_list, notification_mark_read
+)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', home, name='home'),
+    path('login/', user_login, name='login'),
+    path('logout/', user_logout, name='logout'),
+    path('products/', product_list, name='product_list'),
+    path('products/create/', product_create, name='product_create'),
+    path('products/<slug:slug>/', product_detail, name='product_detail'),
+    path('products/<slug:slug>/edit/', product_edit, name='product_edit'),
+    path('products/<slug:slug>/delete/', product_delete, name='product_delete'),
+    
+    # Notifications URLs
+    path('contact/submit/', contact_submit, name='contact_submit'),
+    path('notifications/', notifications_list, name='notifications_list'),
+    path('notifications/<int:pk>/read/', notification_mark_read, name='notification_mark_read'),
+
+    # Cart URLs
+    path('cart/', cart_detail, name='cart_detail'),
+    path('cart/add/<int:product_id>/', add_to_cart, name='add_to_cart'),
+    path('cart/remove/<int:product_id>/', remove_from_cart, name='remove_from_cart'),
+    path('cart/update/<int:product_id>/', update_cart, name='update_cart'),
+    
+    # API URLs
+    path('api/chat/', ai_chat, name='ai_chat'),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT if hasattr(settings, 'STATIC_ROOT') else settings.BASE_DIR / 'static')
