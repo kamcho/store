@@ -32,7 +32,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-changeme-in-pr
 
 # SECURITY WARNING: don't run with debug turned on in production!
 ENV = os.environ.get('ENV', 'dev').lower()
-DEBUG = ENV == 'dev'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 if DEBUG:
     ALLOWED_HOSTS = ['arhythmically-unciliated-danna.ngrok-free.dev', '127.0.0.1', 'localhost']
