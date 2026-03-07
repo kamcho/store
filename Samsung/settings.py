@@ -34,10 +34,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-changeme-in-pr
 ENV = os.environ.get('ENV', 'dev').lower()
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-if DEBUG:
-    ALLOWED_HOSTS = ['arhythmically-unciliated-danna.ngrok-free.dev', '127.0.0.1', 'localhost']
-else:
-    ALLOWED_HOSTS = ['worldtechpartner.com', 'www.worldtechpartner.com']
+
+ALLOWED_HOSTS = ['arhythmically-unciliated-danna.ngrok-free.dev', '127.0.0.1', 'localhost','worldtechpartner.com', 'www.worldtechpartner.com']
 
 
 # Application definition
@@ -111,6 +109,14 @@ else:
         }
     }
 
+# Debug: Print DB credentials to verify .env loading
+print(f"--- Environment: {ENV} ---")
+if ENV != 'dev':
+    print(f"DB_NAME: {DATABASES['default']['NAME']}")
+    print(f"DB_USER: {DATABASES['default']['USER']}")
+    print(f"DB_HOST: {DATABASES['default']['HOST']}")
+    print(f"DB_PORT: {DATABASES['default']['PORT']}")
+print("--------------------------")
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
