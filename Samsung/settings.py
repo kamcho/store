@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,9 +28,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-changeme-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ENV = os.environ.get('ENV', 'dev').lower()
+DEBUG = ENV == 'dev'
 
-ALLOWED_HOSTS = ['worldtechpartner.com', 'www.worldtechpartner.com', 'arhythmically-unciliated-danna.ngrok-free.dev', '127.0.0.1']
+if DEBUG:
+    ALLOWED_HOSTS = ['arhythmically-unciliated-danna.ngrok-free.dev', '127.0.0.1', 'localhost']
+else:
+    ALLOWED_HOSTS = ['worldtechpartner.com', 'www.worldtechpartner.com']
 
 
 # Application definition
@@ -78,12 +86,27 @@ WSGI_APPLICATION = 'Samsung.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if ENV == 'dev':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'mjnnsutu_store'),
+            'USER': os.environ.get('DB_USER', 'mjnnsutu_root'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+        }
+    }
 
 
 # Password validation
