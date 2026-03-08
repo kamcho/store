@@ -61,7 +61,8 @@
                     {% with main_image=product.images.all|dictsort:"is_main_image"|last %}
                     {% if product.images.all %}
                     <img id="featured-image" src="{{ main_image.image.url }}" alt="{{ product.name }}"
-                        class="max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-500">
+                        class="max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
+                        width="600" height="600">
                     {% else %}
                     <div class="text-center">
                         <div class="w-28 h-28 rounded-3xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
@@ -92,7 +93,7 @@
                     <button onclick="updateImage('{{ image.image.url }}', this)"
                         class="thumb-btn aspect-square rounded-xl border-2 {% if image.is_main_image %}active{% else %}border-slate-100{% endif %} bg-white p-2 hover:border-samsung-blue/40 transition-all overflow-hidden">
                         <img src="{{ image.image.url }}" alt="{{ product.name }} - Image {{ forloop.counter }}"
-                            class="w-full h-full object-contain">
+                            class="w-full h-full object-contain" width="80" height="80">
                     </button>
                     {% endfor %}
                 </div>
@@ -134,17 +135,41 @@
                 </div>
 
                 <!-- Price -->
-                <div class="flex items-baseline gap-3 mb-6">
-                    {% if product.sale_price %}
-                    <span class="text-3xl font-black text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                    <span class="text-lg text-slate-400 line-through">KSH {{ product.price|floatformat:0 }}</span>
-                    <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full">
-                        -{{ product.get_discount_percentage }}%
+                <div class="flex items-baseline gap-3 mb-6" id="price-container">
+                    {% with first_variant=product.variants.first %}
+                    {% if first_variant.sale_price %}
+                    <span class="text-3xl font-black text-slate-900" id="current-price">KSH {{ first_variant.sale_price|floatformat:0
+                        }}</span>
+                    <span class="text-lg text-slate-400 line-through" id="old-price">KSH {{ first_variant.price|floatformat:0 }}</span>
+                    <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full" id="discount-badge">
+                        -{{ first_variant.get_discount_percentage }}%
                     </span>
                     {% else %}
-                    <span class="text-3xl font-black text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                    <span class="text-3xl font-black text-slate-900" id="current-price">KSH {{ first_variant.price|floatformat:0 }}</span>
+                    <span class="text-lg text-slate-400 line-through hidden" id="old-price"></span>
+                    <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full hidden" id="discount-badge"></span>
                     {% endif %}
+                    {% endwith %}
                 </div>
+
+                <!-- Variant Selector (e.g. Size/Storage) -->
+                {% if product.variants.count > 1 %}
+                <div class="mb-8">
+                    <label class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3 block">Select Variation</label>
+                    <div class="flex flex-wrap gap-3">
+                        {% for variant in product.variants.all %}
+                        <button type="button"
+                            class="variant-btn px-4 py-2.5 rounded-xl border-2 {% if forloop.first %}border-samsung-blue bg-samsung-blue/5 text-samsung-blue{% else %}border-slate-100 text-slate-600 hover:border-slate-200{% endif %} text-sm font-bold transition-all"
+                            data-price="{{ variant.price|floatformat:0 }}"
+                            data-sale-price="{{ variant.sale_price|default:''|floatformat:0 }}"
+                            data-discount="{{ variant.get_discount_percentage }}" data-model="{{ variant.model_code }}"
+                            data-name="{{ variant.name }}" onclick="selectVariant(this, '{{ variant.id }}')">
+                            {{ variant.name }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
 
                 <!-- Short Description -->
                 <p class="text-sm text-slate-500 leading-relaxed mb-8 max-w-lg">
@@ -181,13 +206,25 @@
                         </button>
                         <div class="accordion-body open" id="specs-body">
                             <div class="px-5 pb-5 space-y-2.5">
-                                {% if product.specifications.exists %}
+                                {% if product.specifications.exists or variant.variant_specifications.exists %}
+                                <!-- Shared Specs -->
                                 {% for spec in product.specifications.all %}
                                 <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
                                     <span class="text-xs text-slate-400 font-medium">{{ spec.name }}</span>
                                     <span class="text-xs text-slate-800 font-semibold">{{ spec.value }}</span>
                                 </div>
                                 {% endfor %}
+                                    <!-- Variant Specific Specs (Container for JS) -->
+                                    <div id="variant-specs-container">
+                                        {% with first_v=product.variants.first %}
+                                        {% for spec in first_v.variant_specifications.all %}
+                                        <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                                            <span class="text-xs text-slate-400 font-medium">{{ spec.name }}</span>
+                                            <span class="text-xs text-slate-800 font-semibold">{{ spec.value }}</span>
+                                        </div>
+                                        {% endfor %}
+                                        {% endwith %}
+                                    </div>
                                 {% else %}
                                 <p class="text-xs text-slate-400 italic">Specifications are being updated.</p>
                                 {% endif %}
@@ -297,7 +334,8 @@
                         {% with rp_img=rp.images.all|dictsort:"is_main_image"|last %}
                         {% if rp.images.all %}
                         <img src="{{ rp_img.image.url }}" alt="{{ rp.name }}"
-                            class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
+                            class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm"
+                            width="200" height="200">
                         {% else %}
                         <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center">
                             <i class="fas fa-mobile-alt text-xl text-slate-300"></i>
@@ -312,7 +350,7 @@
                         <h3 class="text-sm font-bold text-slate-800 group-hover:text-samsung-blue transition-colors line-clamp-1 mb-2">
                             {{ rp.name }}
                         </h3>
-                        <span class="text-sm font-extrabold text-slate-900">KSH {{ rp.get_current_price }}</span>
+                        <span class="text-sm font-extrabold text-slate-900">KSH {{ rp.get_starting_price|default:0|floatformat:0 }}</span>
                     </div>
                 </a>
                 {% endfor %}
@@ -321,7 +359,6 @@
     </section>
     {% endif %}
 
-{% endblock %}
 
     <script>
         // Image gallery
@@ -358,25 +395,70 @@
             }
         }
 
+            // Variant Selection
+            let currentVariantName = "{% with v=product.variants.first %}{{ v.name }}{% endwith %}";
+            let currentVariantPrice = "{% with v=product.variants.first %}KSH {{ v.price|floatformat:0 }}{% endwith %}";
+            let currentVariantModel = "{% with v=product.variants.first %}{{ v.model_code }}{% endwith %}";
+
+            function selectVariant(btn, variantId) {
+                // Update UI buttons
+                document.querySelectorAll('.variant-btn').forEach(b => {
+                    b.classList.remove('border-samsung-blue', 'bg-samsung-blue/5', 'text-samsung-blue');
+                    b.classList.add('border-slate-100', 'text-slate-600');
+                });
+                btn.classList.remove('border-slate-100', 'text-slate-600');
+                btn.classList.add('border-samsung-blue', 'bg-samsung-blue/5', 'text-samsung-blue');
+
+                // Update Price
+                const price = btn.dataset.price;
+                const salePrice = btn.dataset.salePrice;
+                const discount = btn.dataset.discount;
+                currentVariantName = btn.dataset.name;
+                currentVariantModel = btn.dataset.model;
+
+                const currentPriceEl = document.getElementById('current-price');
+                const oldPriceEl = document.getElementById('old-price');
+                const discountBadge = document.getElementById('discount-badge');
+
+                if (salePrice && salePrice !== 'None' && salePrice !== '') {
+                    currentPriceEl.innerText = `KSH ${Number(salePrice).toLocaleString()}`;
+                    oldPriceEl.innerText = `KSH ${Number(price).toLocaleString()}`;
+                    oldPriceEl.classList.remove('hidden');
+                    discountBadge.innerText = `-${discount}%`;
+                    discountBadge.classList.remove('hidden');
+                    currentVariantPrice = `KSH ${Number(salePrice).toLocaleString()}`;
+                } else {
+                    currentPriceEl.innerText = `KSH ${Number(price).toLocaleString()}`;
+                    oldPriceEl.classList.add('hidden');
+                    discountBadge.classList.add('hidden');
+                    currentVariantPrice = `KSH ${Number(price).toLocaleString()}`;
+                }
+
+                // Update WhatsApp link
+                updateWhatsAppLink();
+            }
+
         // WhatsApp button URL builder
-        (function() {
+                function updateWhatsAppLink() {
             const btn = document.getElementById('whatsapp-btn');
             if (!btn) return;
 
             const productName = "{{ product.name }}";
-            const productId = "{{ product.id }}";
-            const productPrice = "KSH {{ product.price|floatformat:0 }}";
+                const productId = "{{ product.id }}";
             const offerPrice = "{% if offer_price %}{{ offer_price }}{% endif %}";
 
             let msg = "Hi, I'm interested in:\n";
-            msg += "Product: " + productName + "\n";
-            msg += "ID: " + productId + "\n";
-            msg += "Price: " + productPrice + "\n";
+                msg += "Product: " + productName + " (" + currentVariantName + ")\n";
+                msg += "Model: " + currentVariantModel + "\n";
+                msg += "Price: " + currentVariantPrice + "\n";
             if (offerPrice) {
                 msg += "Offer Price: KSH " + offerPrice + "\n";
             }
 
             btn.href = "https://wa.me/254714044399?text=" + encodeURIComponent(msg);
-        })();
-</script>
+                }
+
+                // Initialize WhatsApp link
+                updateWhatsAppLink();
+            </script>
 {% endblock %}

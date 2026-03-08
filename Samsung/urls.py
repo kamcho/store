@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from home.views import (
     home, product_list, product_create, product_edit, 
-    product_delete, product_detail, add_to_cart, 
+    product_delete, product_detail, product_variant_manage, product_variant_edit, add_to_cart, 
     cart_detail, remove_from_cart, update_cart,
     user_login, user_logout, ai_chat,
     contact_submit, notifications_list, notification_mark_read
@@ -35,6 +35,8 @@ urlpatterns = [
     path('products/create/', product_create, name='product_create'),
     path('products/<slug:slug>/', product_detail, name='product_detail'),
     path('products/<slug:slug>/edit/', product_edit, name='product_edit'),
+    path('products/<slug:slug>/variants/', product_variant_manage, name='product_variant_manage'),
+    path('products/<slug:slug>/variants/<int:variant_id>/edit/', product_variant_edit, name='product_variant_edit'),
     path('products/<slug:slug>/delete/', product_delete, name='product_delete'),
     
     # Notifications URLs

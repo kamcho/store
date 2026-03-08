@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q, Min
 from django.contrib import messages
 from django.urls import reverse
 from django.forms import formset_factory
@@ -10,24 +10,24 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
-from .models import Product, ProductCategory, ProductImage, ProductSpecification, ContactMessage
-from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ContactMessageForm
+from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
+from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
 from .forms_login import CustomLoginForm
 
 def home(request):
     # Hero product: first featured product, or newest active product
     hero_product = Product.objects.filter(
         is_active=True, is_featured=True
-    ).select_related('category').prefetch_related('images').first()
+    ).select_related('category').prefetch_related('images', 'variants').first()
     if not hero_product:
         hero_product = Product.objects.filter(
             is_active=True
-        ).select_related('category').prefetch_related('images').first()
+        ).select_related('category').prefetch_related('images', 'variants').first()
 
     # Featured products for the hero cards (up to 12)
     featured_products = Product.objects.filter(is_active=True).exclude(
         pk=hero_product.pk if hero_product else 0
-    ).select_related('category').prefetch_related('images').order_by('-is_featured', '-created_at')[:12]
+    ).select_related('category').prefetch_related('images', 'variants').order_by('-is_featured', '-created_at')[:12]
 
     # Custom sections as requested by the user
     # Pair of (Section Display Name, Category Slug)
@@ -59,7 +59,7 @@ def home(request):
             section_products = Product.objects.filter(
                 is_active=True, 
                 category_id__in=all_cat_ids
-            ).select_related('category').prefetch_related('images').order_by('-created_at')[:8]
+            ).select_related('category').prefetch_related('images', 'variants').order_by('-created_at')[:8]
             
             if section_products.exists():
                 homepage_sections.append({
@@ -70,10 +70,24 @@ def home(request):
         except ProductCategory.DoesNotExist:
             continue
 
+    # Flash sale products (products with an active variant that has a sale price)
+    flash_sale_products = Product.objects.filter(
+        is_active=True,
+        variants__is_active=True,
+        variants__sale_price__isnull=False
+    ).distinct().select_related('category').prefetch_related('images', 'variants')[:8]
+
+    # Recent arrivals (newest products)
+    recent_arrivals = Product.objects.filter(
+        is_active=True
+    ).select_related('category').prefetch_related('images', 'variants').order_by('-created_at')[:8]
+
     context = {
         'hero_product': hero_product,
         'featured_products': featured_products,
         'homepage_sections': homepage_sections,
+        'flash_sale_products': flash_sale_products,
+        'recent_arrivals': recent_arrivals,
         'store_name': 'World Tech Partners',
         'store_tagline': 'Your Premium Technology Partner',
     }
@@ -103,12 +117,15 @@ def product_list(request):
             name__icontains=search_query
         )
     
+    # Annotate with starting price for sorting and display
+    products = products.annotate(starting_price=Min('variants__price'))
+    
     # Get sort option
     sort_by = request.GET.get('sort', 'newest')
     if sort_by == 'price_low':
-        products = products.order_by('price')
+        products = products.order_by('starting_price')
     elif sort_by == 'price_high':
-        products = products.order_by('-price')
+        products = products.order_by('-starting_price')
     elif sort_by == 'name':
         products = products.order_by('name')
     else:  # newest
@@ -139,15 +156,41 @@ def product_create(request):
         image_formset = ProductImageFormSet(request.POST, request.FILES)
         spec_formset = ProductSpecificationFormSet(request.POST)
         
-        if form.is_valid() and image_formset.is_valid() and spec_formset.is_valid():
+        # Debug: Print form errors
+        print("=== FORM VALIDATION DEBUG ===")
+        print(f"Main form valid: {form.is_valid()}")
+        if not form.is_valid():
+            print(f"Main form errors: {form.errors}")
+        
+        print(f"Image formset valid: {image_formset.is_valid()}")
+        if not image_formset.is_valid():
+            print(f"Image formset errors: {image_formset.errors}")
+            for i, img_form in enumerate(image_formset):
+                if img_form.errors:
+                    print(f"Image form {i} errors: {img_form.errors}")
+        
+        print(f"Spec formset valid: {spec_formset.is_valid()}")
+        if not spec_formset.is_valid():
+            print(f"Spec formset errors: {spec_formset.errors}")
+            for i, spec_form in enumerate(spec_formset):
+                if spec_form.errors:
+                    print(f"Spec form {i} errors: {spec_form.errors}")
+        print("=== END DEBUG ===")
+        
+        if form.is_valid():
             product = form.save()
-            image_formset.instance = product
-            image_formset.save()
-            spec_formset.instance = product
-            spec_formset.save()
             
-            messages.success(request, f'Product "{product.name}" has been created successfully!')
-            return redirect('product_list')
+            # Only save formsets if they have valid data
+            if image_formset.is_valid():
+                image_formset.instance = product
+                image_formset.save()
+            
+            if spec_formset.is_valid():
+                spec_formset.instance = product
+                spec_formset.save()
+            
+            messages.success(request, f'Product "{product.name}" has been created successfully! Add variations to proceed.')
+            return redirect('product_variant_manage', slug=product.slug)
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -160,7 +203,7 @@ def product_create(request):
         'image_formset': image_formset,
         'spec_formset': spec_formset,
         'title': 'Create New Product',
-        'button_text': 'Create Product',
+        'button_text': 'Create Product & Add Variants',
     }
     return render(request, 'home/product_form.html', context)
 
@@ -178,7 +221,7 @@ def product_edit(request, slug):
             image_formset.save()
             spec_formset.save()
             messages.success(request, f'Product "{product.name}" has been updated successfully!')
-            return redirect('product_list')
+            return redirect('product_variant_manage', slug=product.slug)
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -192,9 +235,80 @@ def product_edit(request, slug):
         'spec_formset': spec_formset,
         'product': product,
         'title': f'Edit Product: {product.name}',
-        'button_text': 'Update Product',
+        'button_text': 'Update Product & Next',
     }
     return render(request, 'home/product_form.html', context)
+
+@login_required
+def product_variant_manage(request, slug):
+    product = get_object_or_404(Product, slug=slug)
+    
+    if request.method == 'POST':
+        variant_formset = ProductVariantFormSet(request.POST, instance=product)
+        
+        # Check if variant formset is valid
+        if variant_formset.is_valid():
+            variants = variant_formset.save(commit=False)
+            
+            # Handle image uploads for each variant
+            for i, variant in enumerate(variants):
+                if variant.pk:  # Only handle existing variants
+                    # Get images for this variant from POST data
+                    image_formset = ProductVariantImageFormSet(request.POST, request.FILES, instance=variant, prefix=f'variant_images-{i}')
+                    
+                    if image_formset.is_valid():
+                        image_formset.save()
+                    else:
+                        # Add image errors to messages
+                        for error in image_formset.errors:
+                            messages.error(request, f'Image error for variant {variant.name}: {error}')
+            
+            # Save all variants
+            variant_formset.save()
+            messages.success(request, f'Variants for "{product.name}" have been updated successfully!')
+            return redirect('product_list')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        variant_formset = ProductVariantFormSet(instance=product)
+        
+    context = {
+        'variant_formset': variant_formset,
+        'product': product,
+        'title': f'Manage Variants: {product.name}',
+        'button_text': 'Save Variants',
+    }
+    return render(request, 'home/variant_form.html', context)
+
+@login_required
+def product_variant_edit(request, slug, variant_id):
+    product = get_object_or_404(Product, slug=slug)
+    variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+    
+    if request.method == 'POST':
+        form = ProductVariantForm(request.POST, instance=variant)
+        image_formset = ProductVariantImageFormSet(request.POST, request.FILES, instance=variant)
+        
+        if form.is_valid() and image_formset.is_valid():
+            form.save()
+            image_formset.save()
+            messages.success(request, f'Variant "{variant.name}" has been updated successfully!')
+            return redirect('product_variant_manage', slug=product.slug)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ProductVariantForm(instance=variant)
+        image_formset = ProductVariantImageFormSet(instance=variant)
+        
+    context = {
+        'form': form,
+        'image_formset': image_formset,
+        'product': product,
+        'variant': variant,
+        'title': f'Edit Variant: {variant.name}',
+        'button_text': 'Update Variant',
+    }
+    return render(request, 'home/variant_edit.html', context)
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
@@ -259,13 +373,17 @@ def cart_detail(request):
     for product_id, quantity in cart.items():
         try:
             product = Product.objects.get(id=product_id)
-            subtotal = product.price * quantity
-            total_price += subtotal
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-                'subtotal': subtotal
-            })
+            # Default to first variant for now, ideally cart should store variant_id
+            variant = product.variants.first()
+            if variant:
+                subtotal = variant.price * quantity
+                total_price += subtotal
+                cart_items.append({
+                    'product': product,
+                    'variant': variant,
+                    'quantity': quantity,
+                    'subtotal': subtotal
+                })
         except Product.DoesNotExist:
             continue
             
@@ -356,16 +474,18 @@ def ai_chat(request):
         product_context = "## Available Products at World Tech Partners:\n\n"
         if current_product:
             product_context += f"CURRENTLY VIEWED PRODUCT: **{current_product.name}**\n"
-            product_context += f"- Price: KSH {current_product.price:,.2f}\n"
-            if current_product.model_code:
-                product_context += f"- Model: {current_product.model_code}\n"
+            starting_price = current_product.get_starting_price()
+            if starting_price:
+                product_context += f"- Price: starting at KSH {starting_price:,.2f}\n"
             product_context += f"- Details: {current_product.description}\n\n"
             product_context += "OTHER PRODUCTS:\n"
 
         for product in products:
             if current_product and product.id == current_product.id:
                 continue
-            product_context += f"- {product.name} ({product.category.name if product.category else 'Samsung'}): KSH {product.price:,.2f}\n"
+            starting_price = product.get_starting_price()
+            price_str = f"starting at KSH {starting_price:,.2f}" if starting_price else "Price on request"
+            product_context += f"- {product.name} ({product.category.name if product.category else 'Samsung'}): {price_str}\n"
         
         # Try to use OpenAI API if available
         try:
@@ -434,10 +554,11 @@ def get_fallback_response(message, products=None):
     
     # Product-specific responses using database
     if products:
-        # Check if asking about specific product
         for product in products:
-            if product.name.lower() in message_lower or (product.model_code and product.model_code.lower() in message_lower):
-                return f"We have the {product.name} available for KSH {product.price:,.2f}. {product.description[:100] if product.description else 'Contact us for more details!'}"
+            starting_price = product.get_starting_price()
+            if product.name.lower() in message_lower:
+                price_info = f"available for KSH {starting_price:,.2f}" if starting_price else "available"
+                return f"We have the {product.name} {price_info}. {product.description[:100] if product.description else 'Contact us for more details!'}"
     
     # General category responses
     if any(word in message_lower for word in ['price', 'cost', 'how much']):
@@ -446,7 +567,9 @@ def get_fallback_response(message, products=None):
         phone_products = [p for p in products if p.category and 'phone' in p.category.name.lower()] if products else []
         if phone_products:
             sample = phone_products[0]
-            return f"We have the latest Galaxy series! For example, the {sample.name} at KSH {sample.price:,.2f}. Which model interests you?"
+            starting_price = sample.get_starting_price()
+            price_info = f"at KSH {starting_price:,.2f}" if starting_price else ""
+            return f"We have the latest Galaxy series! For example, the {sample.name} {price_info}. Which model interests you?"
         return "We have the latest Galaxy series including S24 Ultra, S23, and Z Fold models. Which model interests you?"
     elif any(word in message_lower for word in ['tv', 'television', 'qled']):
         return "Our Samsung TV range includes QLED, OLED, and Crystal UHD models from 43\" to 85\". What size are you looking for?"

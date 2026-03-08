@@ -25,9 +25,9 @@
     <div class="max-w-[1600px] mx-auto w-full px-6">
         <div class="flex justify-between items-center gap-4">
             <a href="{% url 'home' %}" class="text-xl font-bold flex items-center gap-2.5 text-slate-900 transition-colors duration-300 no-underline whitespace-nowrap flex-shrink-0">
-                <img src="/media/logos/logo-light.png" alt="World Tech Partners" class="h-9 w-auto"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="w-9 h-9 rounded-lg bg-samsung-blue flex items-center justify-center" style="display: none;">
+                <img src="/media/logos/logo-light.png" alt="World Tech Partners" class="h-9 w-auto" height="36" width="36"
+                    onerror="this.style.display='none'; this.nextElementSibling.classList.toggle('hidden-logo');">
+                <div class="logo-fallback w-9 h-9 rounded-lg bg-samsung-blue flex items-center justify-center hidden-logo">
                     <i class="fas fa-mobile-alt text-white text-sm"></i>
                 </div>
                 <span class="whitespace-nowrap">World Tech Partners</span>
@@ -148,58 +148,57 @@
             <a href="{% url 'home' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Home</a>
             <!-- Mobile Products Hierarchy -->
             <div class="space-y-1">
-                <button
-                    class="w-full flex items-center justify-between px-4 py-3 text-slate-700 font-bold text-sm rounded-lg hover:bg-slate-50 transition-colors"
-                    onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
-                    Products
-                    <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
-                </button>
+                <div
+                    class="flex items-center justify-between px-4 py-3 text-slate-700 font-bold text-sm rounded-lg hover:bg-slate-50 transition-colors group">
+                    <a href="{% url 'product_list' %}" class="flex-grow no-underline text-inherit">Products</a>
+                    <button
+                        onclick="this.closest('.group').nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')"
+                        class="p-2 -mr-2">
+                        <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                    </button>
+                </div>
                 <div class="hidden pl-4 space-y-1 bg-slate-50/50 rounded-lg">
-                    <a href="{% url 'product_list' %}"
-                        class="block px-4 py-2.5 text-samsung-blue font-bold text-xs uppercase tracking-wider no-underline">View All
-                        Products</a>
                     {% for cat in nav_categories %}
                     <div class="space-y-1">
-                        <button
-                            class="w-full flex items-center justify-between px-4 py-2 text-slate-600 font-semibold text-sm rounded-lg hover:bg-slate-100 transition-colors"
-                            onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
-                            {{ cat.name }}
+                        <div
+                            class="flex items-center justify-between px-4 py-2 text-slate-600 font-semibold text-sm rounded-lg hover:bg-slate-100 transition-colors group">
+                            <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="flex-grow no-underline text-inherit">{{ cat.name }}</a>
                             {% if cat.subcategories.exists %}
-                            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                            <button
+                                onclick="this.closest('.group').nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')"
+                                class="p-2 -mr-2">
+                                <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                            </button>
                             {% endif %}
-                        </button>
+                        </div>
                         {% if cat.subcategories.exists %}
                         <div class="hidden pl-4 space-y-1">
                             {% for sub in cat.subcategories.all %}
-                            <div class="space-y-1">
-                                <button
-                                    class="w-full flex items-center justify-between px-4 py-2 text-slate-500 font-medium text-sm rounded-lg hover:bg-slate-100 transition-colors"
-                                    onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')">
-                                    {{ sub.name }}
+                                <div class="space-y-1">
+                                    <div
+                                        class="flex items-center justify-between px-4 py-2 text-slate-500 font-medium text-sm rounded-lg hover:bg-slate-100 transition-colors group">
+                                        <a href="{% url 'product_list' %}?category={{ sub.slug }}" class="flex-grow no-underline text-inherit">{{ sub.name  }}</a>
+                                        {% if sub.subcategories.exists %}
+                                        <button
+                                            onclick="this.closest('.group').nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')"
+                                            class="p-2 -mr-2">
+                                            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
                                     {% if sub.subcategories.exists %}
-                                    <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                                    <div class="hidden pl-4 space-y-1">
+                                        {% for leaf in sub.subcategories.all %}
+                                        <a href="{% url 'product_list' %}?category={{ leaf.slug }}"
+                                            class="block px-4 py-2 text-slate-500 text-sm hover:text-samsung-blue no-underline">{{ leaf.name }}</a>
+                                        {% endfor %}
+                                    </div>
                                     {% endif %}
-                                </button>
-                                {% if sub.subcategories.exists %}
-                                <div class="hidden pl-4 space-y-1">
-                                    {% for leaf in sub.subcategories.all %}
-                                    <a href="{% url 'product_list' %}?category={{ leaf.slug }}"
-                                        class="block px-4 py-2 text-slate-500 text-sm hover:text-samsung-blue no-underline">{{
-                                        leaf.name }}</a>
-                                    {% endfor %}
                                 </div>
-                                {% endif %}
-                                <a href="{% url 'product_list' %}?category={{ sub.slug }}"
-                                    class="block px-4 py-2 text-samsung-blue text-xs italic no-underline">Shop All {{ sub.name
-                                    }}</a>
-                            </div>
                             {% endfor %}
-                            <a href="{% url 'product_list' %}?category={{ cat.slug }}"
-                                class="block px-4 py-2 text-samsung-blue text-xs font-bold uppercase no-underline">All {{ cat.name
-                                }}</a>
                         </div>
                         {% endif %}
-                    </div>
+                            </div>
                     {% endfor %}
                 </div>
             </div>

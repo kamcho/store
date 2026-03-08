@@ -311,28 +311,37 @@
     }
 
     @media (max-width: 768px) {
-        .ai-chat-window {
-            width: 100vw;
-            height: 100vh;
-            bottom: 0;
-            right: 0;
-            border-radius: 0;
-            z-index: 10000;
-        }
-
-        .ai-chat-window.hidden {
-            transform: translateY(100%);
-            opacity: 1; /* Keep it ready for slide up */
-        }
-
         .ai-chat-widget {
             bottom: 20px;
             right: 20px;
         }
 
+        .ai-chat-window {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            z-index: 10000;
+            transform: translateY(0);
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .ai-chat-window.hidden {
+            transform: translateY(100%);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
         .ai-chat-header {
             padding: 15px;
             padding-top: max(15px, env(safe-area-inset-top));
+            border-radius: 0;
         }
 
         .ai-chat-input {

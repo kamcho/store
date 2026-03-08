@@ -1,15 +1,23 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Product, ProductCategory, ProductImage, ProductSpecification, ContactMessage
+from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
 
 class ProductForm(forms.ModelForm):
+    features = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control', 
+            'rows': 6, 
+            'placeholder': 'Enter one feature per line:\n\nPremium Dynamic AMOLED 2X Display\nSnapdragon 8 Gen 2 Processor\n5000mAh Battery\n5G Connectivity\nWireless Charging\nIP68 Water Resistance'
+        }),
+        required=False,
+        help_text="Enter one feature per line"
+    )
+    
     class Meta:
         model = Product
         fields = [
             'category', 'name', 'slug', 'description', 'short_description',
-            'model_code', 'series', 'price', 'sale_price', 'cost_price',
-            'stock_quantity', 'min_stock_level', 'availability', 'warranty_period',
-            'features', 'is_featured', 'is_active'
+            'warranty_period', 'is_featured', 'is_active'
         ]
         widgets = {
             'category': forms.Select(attrs={'class': 'form-select'}),
@@ -17,20 +25,7 @@ class ProductForm(forms.ModelForm):
             'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'product-url-slug'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Detailed product description'}),
             'short_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Brief description for listings'}),
-            'model_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. SM-S908E'}),
-            'series': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Galaxy S, Galaxy Z'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
-            'sale_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
-            'cost_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
-            'stock_quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
-            'min_stock_level': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
-            'availability': forms.Select(attrs={'class': 'form-select'}),
             'warranty_period': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'placeholder': '12'}),
-            'features': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 4, 
-                'placeholder': 'Enter one feature per line, e.g.\nPremium Dynamic AMOLED 2X\nSnapdragon 8 Gen 2\n5000mAh Battery'
-            }),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -99,6 +94,82 @@ ProductImageFormSet = inlineformset_factory(
 ProductSpecificationFormSet = inlineformset_factory(
     Product, ProductSpecification,
     form=ProductSpecificationForm,
+    extra=1,
+    can_delete=True
+)
+
+from .models import ProductVariant
+
+class ProductVariantForm(forms.ModelForm):
+    specifications = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control', 
+            'rows': 3, 
+            'placeholder': 'Color: Red\nStorage: 128GB'
+        })
+    )
+
+    class Meta:
+        model = ProductVariant
+        fields = ['name', 'model_code', 'price', 'sale_price', 'cost_price', 'stock_quantity', 'min_stock_level', 'availability', 'specifications', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 55-inch'}),
+            'model_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Unique SKU code'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'sale_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'cost_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'stock_quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'min_stock_level': forms.NumberInput(attrs={'class': 'form-control'}),
+            'availability': forms.Select(attrs={'class': 'form-select'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.specifications:
+            if isinstance(self.instance.specifications, dict):
+                specs_text = "\n".join([f"{k}: {v}" for k, v in self.instance.specifications.items()])
+                self.initial['specifications'] = specs_text
+
+    def clean_specifications(self):
+        data = self.cleaned_data.get('specifications')
+        if not data:
+            return {}
+        
+        specs_dict = {}
+        for line in data.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if ':' in line:
+                key, value = line.split(':', 1)
+                specs_dict[key.strip()] = value.strip()
+            else:
+                specs_dict[line] = ""
+        return specs_dict
+
+class ProductVariantImageForm(forms.ModelForm):
+    class Meta:
+        model = ProductVariantImage
+        fields = ['image', 'alt_text', 'is_main_image', 'display_order']
+        widgets = {
+            'image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+            'alt_text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Describe the image for SEO'}),
+            'is_main_image': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'display_order': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+        }
+
+ProductVariantFormSet = inlineformset_factory(
+    Product, ProductVariant,
+    form=ProductVariantForm,
+    extra=1,
+    can_delete=True
+)
+
+ProductVariantImageFormSet = inlineformset_factory(
+    ProductVariant, ProductVariantImage,
+    form=ProductVariantImageForm,
     extra=1,
     can_delete=True
 )

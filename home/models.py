@@ -36,20 +36,6 @@ class Product(models.Model):
     description = models.TextField()
     short_description = models.CharField(max_length=500)
     
-    # Samsung Specifics
-    model_code = models.CharField(max_length=50, unique=True, help_text="e.g. SM-S908E")
-    series = models.CharField(max_length=50, blank=True, help_text="e.g. Galaxy S, Galaxy Z, Neo QLED")
-    
-    # Pricing
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    sale_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    cost_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    
-    # Inventory
-    stock_quantity = models.PositiveIntegerField(default=0)
-    min_stock_level = models.PositiveIntegerField(default=5)
-    availability = models.CharField(max_length=20, choices=AVAILABILITY_CHOICES, default='in_stock')
-    
     # Product details
     warranty_period = models.PositiveIntegerField(help_text="Warranty in months", default=12)
     features = models.JSONField(default=list, blank=True, help_text="List of key features")
@@ -71,15 +57,40 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'slug': self.slug})
 
-    def get_current_price(self):
-        return self.sale_price if self.sale_price else self.price
+    def get_features_list(self):
+        """Return features as a list of strings for form display."""
+        if isinstance(self.features, list):
+            return self.features
+        elif isinstance(self.features, str):
+            # Handle case where features might be stored as string
+            return [self.features]
+        else:
+            return []
+
+    def get_starting_price(self):
+        """Return the price of the cheapest active variant."""
+        active_variants = self.variants.filter(is_active=True).order_by('price')
+        if active_variants.exists():
+            return active_variants.first().get_current_price()
+        return None
+
+    def get_price_range(self):
+        """Return a tuple of (min_price, max_price) for all variants."""
+        active_variants = self.variants.filter(is_active=True)
+        if not active_variants.exists():
+            return None, None
+        prices = [v.get_current_price() for v in active_variants]
+        return min(prices), max(prices)
 
     def is_in_stock(self):
-        return self.stock_quantity > 0 and self.availability == 'in_stock'
+        """Return True if any variant is in stock."""
+        return any(v.stock_quantity > 0 and v.availability == 'in_stock' for v in self.variants.filter(is_active=True))
 
     def get_discount_percentage(self):
-        if self.sale_price and self.price:
-            return round((self.price - self.sale_price) / self.price * 100, 1)
+        """Return discount percentage of the first variant if it has one."""
+        first = self.variants.filter(is_active=True).first()
+        if first:
+            return first.get_discount_percentage()
         return 0
 
     def get_main_image(self):
@@ -129,6 +140,7 @@ class ProductImage(models.Model):
 
 class ProductSpecification(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='specifications')
+    variant = models.ForeignKey('ProductVariant', on_delete=models.CASCADE, related_name='variant_specifications', null=True, blank=True)
     category = models.CharField(max_length=100, help_text="e.g., Display, Processor, Camera")
     name = models.CharField(max_length=100, help_text="e.g., Screen Size, CPU Type")
     value = models.CharField(max_length=200, help_text="e.g., 6.7 inches, Snapdragon 888")
@@ -139,6 +151,63 @@ class ProductSpecification(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.category}: {self.name}"
+
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
+    name = models.CharField(max_length=100, help_text="e.g. 55-inch, 65-inch, 128GB, 256GB")
+    model_code = models.CharField(max_length=50, unique=True, help_text="Specific model code for this variant")
+    
+    # Pricing (overrides base product if specified)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    sale_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    cost_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    
+    # Inventory
+    stock_quantity = models.PositiveIntegerField(default=0)
+    min_stock_level = models.PositiveIntegerField(default=5)
+    availability = models.CharField(max_length=20, choices=Product.AVAILABILITY_CHOICES, default='in_stock')
+    
+    # Variant specific specs
+    specifications = models.JSONField(default=dict, blank=True, help_text="e.g. {'screen_size': '55-inch', 'resolution': '4K'}")
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['price']
+
+    def __str__(self):
+        return f"{self.product.name} - {self.name}"
+    
+    def get_current_price(self):
+        """Return sale price if available, otherwise regular price."""
+        return self.sale_price if self.sale_price else self.price
+    
+    def get_discount_percentage(self):
+        """Calculate discount percentage."""
+        if self.sale_price and self.price > 0:
+            return round((self.price - self.sale_price) / self.price * 100, 1)
+        return 0
+
+
+class ProductVariantImage(models.Model):
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='variant_images/')
+    alt_text = models.CharField(max_length=200, blank=True, help_text="Describe the image for SEO")
+    display_order = models.PositiveIntegerField(default=0, help_text="Order in which to display this image")
+    is_main_image = models.BooleanField(default=False, help_text="Set as main image for this variant")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['display_order', 'created_at']
+        verbose_name = "Variant Image"
+        verbose_name_plural = "Variant Images"
+        
+    def __str__(self):
+        return f"Image for {self.variant.name}"
 
 
 class ContactMessage(models.Model):

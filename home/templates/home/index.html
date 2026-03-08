@@ -334,13 +334,17 @@
                                     {{ hero_product.short_description|truncatewords:20 }}
                                 </p>
                                 <div class="flex items-end gap-3 justify-center lg:justify-start">
-                                    {% if hero_product.sale_price %}
-                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ hero_product.sale_price|floatformat:0 }}</span>
-                                    <span class="text-lg text-slate-400 line-through mb-1">KSH {{ hero_product.price|floatformat:0 }}</span>
-                                    <span class="px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold">-{{ hero_product.get_discount_percentage }}%</span>
+                                    {% with first_variant=hero_product.variants.first %}
+                                    {% if first_variant.sale_price %}
+                                    <span class="text-[10px] text-slate-400 block -mb-1 mr-2 self-center">Starting from</span>
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ first_variant.sale_price|floatformat:0 }}</span>
+                                    <span class="text-lg text-slate-400 line-through mb-1">KSH {{ first_variant.price|floatformat:0 }}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold">-{{ first_variant.get_discount_percentage }}%</span>
                                     {% else %}
-                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ hero_product.price|floatformat:0 }}</span>
+                                    <span class="text-[10px] text-slate-400 block -mb-1 mr-2 self-center">Starting from</span>
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ first_variant.price|floatformat:0 }}</span>
                                     {% endif %}
+                                    {% endwith %}
                                 </div>
                                 <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                                     <a href="{% url 'product_detail' hero_product.slug %}"
@@ -392,7 +396,8 @@
                                 <div class="hero-product-img relative cursor-pointer w-full flex items-center justify-center">
                                     {% if product.get_main_image %}
                                     <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
-                                        class="w-auto max-w-[85%] max-h-[420px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+                                        class="w-auto max-w-[85%] max-h-[420px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+                                        height="420" width="400">
                                     {% else %}
                                     <div class="w-64 h-64 rounded-[2rem] bg-gradient-to-br from-slate-50 to-white flex items-center justify-center shadow-inner">
                                         <i class="fas fa-mobile-alt text-5xl text-slate-200"></i>
@@ -414,13 +419,17 @@
                                     {{ product.short_description|truncatewords:20 }}
                                 </p>
                                 <div class="flex items-end gap-3 justify-center lg:justify-start">
-                                    {% if product.sale_price %}
-                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                    <span class="text-lg text-slate-400 line-through mb-1">KSH {{ product.price|floatformat:0 }}</span>
-                                    <span class="px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold">-{{ product.get_discount_percentage }}%</span>
+                                    {% with first_variant=product.variants.first %}
+                                    {% if first_variant.sale_price %}
+                                    <span class="text-[10px] text-slate-400 block -mb-1 mr-2 self-center">Starting from</span>
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ first_variant.sale_price|floatformat:0 }}</span>
+                                    <span class="text-lg text-slate-400 line-through mb-1">KSH {{ first_variant.price|floatformat:0 }}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold">-{{ first_variant.get_discount_percentage }}%</span>
                                     {% else %}
-                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                    <span class="text-[10px] text-slate-400 block -mb-1 mr-2 self-center">Starting from</span>
+                                    <span class="text-3xl lg:text-4xl font-black text-slate-900">KSH {{ first_variant.price|floatformat:0 }}</span>
                                     {% endif %}
+                                    {% endwith %}
                                 </div>
                                 <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                                     <a href="{% url 'product_detail' product.slug %}"
@@ -498,12 +507,14 @@
                                 {{ product.name }}
                             </h3>
                             <div class="mt-2 flex items-center gap-2">
-                                {% if product.sale_price %}
-                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                <span class="text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                {% with first_variant=product.variants.first %}
+                                {% if first_variant.sale_price %}
+                                <span class="text-sm font-extrabold text-slate-900">KSH {{ first_variant.sale_price|floatformat:0 }}</span>
+                                <span class="text-xs text-slate-400 line-through">{{ first_variant.price|floatformat:0 }}</span>
                                 {% else %}
-                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                <span class="text-sm font-extrabold text-slate-900">KSH {{ first_variant.price|floatformat:0 }}</span>
                                 {% endif %}
+                                {% endwith %}
                             </div>
                         </div>
                     </a>
@@ -592,15 +603,18 @@
 
             {% for section in homepage_sections %}
             <!-- Category Section: {{ section.name }} -->
-            <div class="mb-20">
-                <div class="flex items-center justify-between mb-8 border-b border-slate-100 pb-4">
-                    <h3 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <span class="w-2 h-8 bg-samsung-blue rounded-full"></span>
-                        {{ section.name }}
-                    </h3>
+            <div class="mb-32">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+                    <div class="space-y-2">
+                        <span class="text-samsung-blue font-bold tracking-[0.2em] text-[10px] uppercase block">Collection</span>
+                        <h3 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                            {{ section.name }}
+                        </h3>
+                    </div>
                     <a href="{% url 'product_list' %}?category={{ section.slug }}"
-                        class="text-samsung-blue text-sm font-bold hover:underline flex items-center gap-1">
-                        View all <i class="fas fa-arrow-right text-[10px]"></i>
+                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-slate-50 text-slate-600 text-sm font-bold hover:bg-samsung-blue hover:text-white transition-all duration-300 group shadow-sm">
+                        Explore Collection
+                        <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
 
@@ -610,23 +624,21 @@
                         <div class="h-40 sm:h-56 overflow-hidden bg-slate-50 p-4 sm:p-6 flex items-center justify-center relative">
                             {% if product.get_main_image %}
                             <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
-                                class="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110">
+                                class="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
+                                height="224" width="224">
                             {% else %}
                             <img src="https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=800"
                                 alt="{{ product.name }}" class="object-cover w-full h-full rounded-xl opacity-30 grayscale">
                             {% endif %}
                 
-                            {% if product.sale_price %}
+                            {% with first_variant=product.variants.first %}
+                            {% if first_variant.sale_price %}
                             <div
                                 class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                Sale
-                            </div>
-                            {% elif product.is_new %}
-                            <div
-                                class="absolute top-3 right-3 bg-samsung-blue text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                New
+                                -{{ first_variant.get_discount_percentage }}%
                             </div>
                             {% endif %}
+                            {% endwith %}
                         </div>
                         <div class="p-3 sm:p-6 text-center">
                             <h3
@@ -634,12 +646,14 @@
                                 {{ product.name }}
                             </h3>
                             <div class="flex items-center justify-center gap-2">
-                                {% if product.sale_price %}
-                                <span class="text-sm sm:text-base font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                <span class="text-[10px] text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                {% with first_variant=product.variants.first %}
+                                {% if first_variant.sale_price %}
+                                <span class="text-sm sm:text-base font-extrabold text-slate-900">KSH {{ first_variant.sale_price|floatformat:0 }}</span>
+                                <span class="text-[10px] text-slate-400 line-through">{{ first_variant.price|floatformat:0 }}</span>
                                 {% else %}
-                                <span class="text-sm sm:text-base font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                <span class="text-sm sm:text-base font-extrabold text-slate-900">KSH {{ first_variant.price|floatformat:0 }}</span>
                                 {% endif %}
+                                {% endwith %}
                             </div>
                             <a href="{% url 'product_detail' product.slug %}"
                                 class="mt-4 inline-block px-4 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-samsung-blue transition-all duration-300 text-[10px] font-bold">
@@ -991,111 +1005,6 @@
         </div>
     </section>
     {% endif %}
-    <!-- ══════════════════════════════════════════════ CATEGORY HUB SEPARATOR ══════════════════════════════════════════════ -->
-    <section class="pt-24 pb-12 bg-white relative reveal">
-        <div class="container mx-auto px-6 text-center">
-            <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-3 block">Samsung Ecosystem</span>
-            <h2 class="text-3xl md:text-5xl text-slate-900 mb-6 font-black tracking-tight">
-                Shop by <span class="text-samsung-blue whitespace-nowrap">Category</span>
-            </h2>
-            <p class="text-slate-500 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-                Discover the latest innovations tailored to your lifestyle. Browse our full range of certified Samsung products across East Africa.
-            </p>
-            <div class="mt-10 flex items-center justify-center gap-4">
-                <div class="h-[1px] w-20 bg-gradient-to-r from-transparent to-slate-200"></div>
-                <i class="fas fa-layer-group text-slate-300 text-sm"></i>
-                <div class="h-[1px] w-20 bg-gradient-to-l from-transparent to-slate-200"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ══════════════════════════════════════════════ CATEGORY SECTIONS ══════════════════════════════════════════════ -->
-    {% for cat in categories_with_products %}
-    {% if cat.active_products %}
-    {% cycle 'greenish' 'white' as section_theme silent %}
-    
-    <section class="py-20 {% if section_theme == 'greenish' %}bg-gradient-to-br from-emerald-50 via-white to-teal-50{% else %}bg-white{% endif %} relative overflow-hidden reveal">
-        {% if section_theme == 'greenish' %}
-        <!-- Decorative elements for greenish theme -->
-        <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        <div class="absolute bottom-0 left-0 w-56 h-56 bg-teal-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
-        {% endif %}
-
-        <div class="container mx-auto px-6 relative z-10">
-            <!-- Section Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl {% if section_theme == 'greenish' %}bg-emerald-500/10 text-emerald-600{% else %}bg-samsung-blue/10 text-samsung-blue{% endif %} flex items-center justify-center">
-                        <i class="fas fa-layer-group text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold text-slate-900">{{ cat.name }}</h2>
-                        {% if cat.description %}
-                        <p class="text-slate-400 text-sm mt-1">{{ cat.description|truncatewords:15 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-                <a href="{% url 'product_list' %}?category={{ cat.slug }}"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border {% if section_theme == 'greenish' %}border-emerald-200 text-emerald-600 hover:bg-emerald-600{% else %}border-samsung-blue/20 text-samsung-blue hover:bg-samsung-blue{% endif %} text-sm font-semibold hover:text-white transition-all duration-300 group">
-                    View All
-                    <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                </a>
-            </div>
-
-            <!-- Products Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {% for product in cat.active_products|slice:":4" %}
-                <a href="{% url 'product_detail' product.slug %}" class="group block">
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-samsung-blue/30 overflow-hidden transition-all duration-300 hover:-translate-y-2">
-                        <!-- Image -->
-                        <div class="h-44 bg-gradient-to-b from-white to-slate-50/50 p-5 flex items-center justify-center relative overflow-hidden">
-                            {% if product.get_main_image %}
-                            <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
-                                class="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
-                            {% else %}
-                            <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center">
-                                <i class="fas fa-box text-xl text-slate-300"></i>
-                            </div>
-                            {% endif %}
-
-                            {% if product.sale_price %}
-                            <span class="absolute top-2.5 right-2.5 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
-                                Sale
-                            </span>
-                            {% endif %}
-
-                            <!-- Wishlist button -->
-                            <button class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors z-10">
-                                <i class="far fa-heart text-[10px]"></i>
-                            </button>
-                        </div>
-
-                        <!-- Info -->
-                        <div class="p-4">
-                            <h3 class="text-sm font-bold text-slate-800 {% if section_theme == 'greenish' %}group-hover:text-emerald-500{% else %}group-hover:text-samsung-blue{% endif %} transition-colors line-clamp-1 mb-1">
-                                {{ product.name }}
-                            </h3>
-                            <p class="text-xs text-slate-400 line-clamp-1 mb-3">
-                                {{ product.short_description|truncatewords:8 }}
-                            </p>
-                            <div class="flex items-center justify-between">
-                                {% if product.sale_price %}
-                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                <span class="text-[10px] text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
-                                {% else %}
-                                <span class="text-sm font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
-    {% endfor %}
-
     <!-- ══════════════════════════════════════════════ CONTACT ══════════════════════════════════════════════ -->
     <section id="contact" class="py-24 bg-slate-50 relative overflow-hidden reveal">
         <div class="container mx-auto px-6 relative z-10">
@@ -1169,7 +1078,7 @@
 
                 <!-- Right: Form -->
                 <div class="bg-white border border-slate-100 rounded-2xl p-7 md:p-9 shadow-sm">
-                    <form action="{% url 'contact_submit' %}" method="POST" class="space-y-4">
+                    <form action="{% url 'contact_submit' %}" method="post" class="space-y-4">
                         {% csrf_token %}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-1.5">

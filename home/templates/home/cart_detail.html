@@ -95,14 +95,14 @@
                                 </p>
                                 <!-- Mobile Price -->
                                 <p class="text-sm font-bold text-slate-700 mt-2 md:hidden">
-                                    KSH {{ item.product.price|floatformat:0 }}
+                                    KSH {{ item.variant.price|floatformat:0 }}
                                 </p>
                             </div>
                         </div>
 
                         <!-- Price (Desktop) -->
                         <div class="hidden md:flex md:col-span-2 items-center justify-center">
-                            <span class="text-sm font-bold text-slate-700">KSH {{ item.product.price|floatformat:0 }}</span>
+                            <span class="text-sm font-bold text-slate-700">KSH {{ item.variant.price|floatformat:0 }}</span>
                         </div>
 
                         <!-- Quantity -->
@@ -184,7 +184,7 @@
                                 {% for item in cart_items %}
                                 msg += '📦 *{{ item.product.name|escapejs }}*\n';
                                 msg += '   ID: #{{ item.product.id }}\n';
-                                msg += '   Price: KSH {{ item.product.price|floatformat:0 }}\n';
+                                msg += '   Price: KSH {{ item.variant.price|floatformat:0 }}\n';
                                 msg += '   Qty: {{ item.quantity }}\n';
                                 msg += '   Subtotal: KSH {{ item.subtotal|floatformat:0 }}\n';
                                 msg += '   {{ item.product.short_description|truncatewords:10|escapejs }}\n\n';

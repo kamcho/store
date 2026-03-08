@@ -57,6 +57,39 @@
     .cat-toggle.open i {
         transform: rotate(180deg);
     }
+    /* Sidebar Sticky & Scroll */
+    .sticky-sidebar {
+        max-height: calc(100vh - 8rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    .sticky-sidebar::-webkit-scrollbar { width: 4px; }
+    .sticky-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sticky-sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    /* Sidebar Sticky & Scroll */
+    .sticky-sidebar {
+        max-height: calc(100vh - 120px) !important;
+        overflow-y: auto !important;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        position: sticky !important;
+        top: 120px !important;
+        z-index: 40 !important;
+    }
+    .sticky-sidebar::-webkit-scrollbar { width: 4px; }
+    .sticky-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sticky-sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    /* Sidebar Internal Scroll */
+    .sidebar-inner {
+        max-height: calc(100vh - 130px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    .sidebar-inner::-webkit-scrollbar { width: 4px; }
+    .sidebar-inner::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-inner::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 </style>
 {% endblock %}
 
@@ -80,12 +113,13 @@
     </div>
 
     <!-- ══════════ MAIN CONTENT ══════════ -->
-    <div class="container mx-auto px-6 py-8">
-        <div class="flex flex-col lg:flex-row gap-8">
+    <div class="py-8">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-8">
 
             <!-- Sidebar -->
-            <aside class="lg:w-64 flex-shrink-0">
-                <div class="lg:sticky lg:top-24">
+            <aside class="lg:w-64 flex-shrink-0 lg:sticky lg:top-[120px] lg:h-fit z-40 sticky-sidebar">
+                <div class="sidebar-inner pr-2">
                     <!-- Categories -->
                     <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm mb-6">
                         <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Categories</h3>
@@ -211,7 +245,8 @@
                                 {% with main_image=product.images.all|dictsort:"is_main_image"|last %}
                                 {% if product.images.all %}
                                 <img src="{{ main_image.image.url }}" alt="{{ product.name }}"
-                                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
+                                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm"
+                                    height="224" width="224">
                                 {% else %}
                                 <div class="w-24 h-24 rounded-2xl bg-slate-100 flex items-center justify-center">
                                     <i class="fas fa-mobile-alt text-3xl text-slate-300"></i>
@@ -225,7 +260,7 @@
                                 </span>
                                 {% endif %}
 
-                                {% if product.sale_price %}
+                                {% if product.get_discount_percentage > 0 %}
                                 <span class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
                                     -{{ product.get_discount_percentage }}%
                                 </span>
@@ -254,12 +289,8 @@
 
                             <div class="flex items-center justify-between">
                                 <div>
-                                    {% if product.sale_price %}
-                                    <span class="text-lg font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                    <span class="text-xs text-slate-400 line-through ml-1">{{ product.price|floatformat:0 }}</span>
-                                    {% else %}
-                                    <span class="text-lg font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
-                                    {% endif %}
+                                    <span class="text-[10px] text-slate-400 block -mb-1">Starting from</span>
+                                    <span class="text-lg font-extrabold text-slate-900">KSH {{ product.starting_price|default:0|floatformat:0 }}</span>
                                 </div>
                                 <a href="{% url 'product_detail' product.slug %}"
                                     class="px-4 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">
@@ -331,6 +362,7 @@
             </div>
         </div>
     </div>
+</div>
 
 {% endblock %}
 {% block extra_js %}
