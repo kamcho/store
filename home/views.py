@@ -264,15 +264,33 @@ def product_edit(request, slug):
 
 @login_required
 def product_variant_manage(request, slug):
+    print(f"=== product_variant_manage view called ===")
+    print(f"Method: {request.method}")
+    print(f"Slug: {slug}")
+    
     product = get_object_or_404(Product, slug=slug)
     
     if request.method == 'POST':
+        print(f"=== POST request received ===")
+        print(f"POST keys: {list(request.POST.keys())}")
+        
+        # Debug: Check specifications-related fields
+        for key in request.POST.keys():
+            if 'specifications' in key:
+                print(f"Specifications field: {key} = {repr(request.POST.get(key))}")
+        
         variant_formset = ProductVariantFormSet(request.POST, instance=product)
         
         # Check if variant formset is valid
         if variant_formset.is_valid():
+            print(f"Variant formset is valid")
             variants = variant_formset.save(commit=False)
             
+            # Debug: Check each variant's specifications
+            for i, variant in enumerate(variants):
+                print(f"Variant {i}: {variant.name}")
+                print(f"  Specifications: {repr(variant.specifications)}")
+                
             # Handle image uploads for each variant
             for i, variant in enumerate(variants):
                 if variant.pk:  # Only handle existing variants
@@ -291,6 +309,7 @@ def product_variant_manage(request, slug):
             messages.success(request, f'Variants for "{product.name}" have been updated successfully!')
             return redirect('product_variant_manage', product.slug)
         else:
+            print(f"Variant formset errors: {variant_formset.errors}")
             messages.error(request, 'Please correct the errors below.')
     else:
         variant_formset = ProductVariantFormSet(instance=product)
@@ -302,6 +321,102 @@ def product_variant_manage(request, slug):
         'button_text': 'Save Variants',
     }
     return render(request, 'home/variant_form.html', context)
+
+@login_required
+def variant_image_manage(request, slug, variant_id):
+    """
+    Dedicated page for managing images for a specific variant
+    """
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+    
+    if request.method == 'POST':
+        # Handle image actions (set main, delete)
+        if 'set_main_image' in request.POST:
+            image_id = request.POST.get('set_main_image')
+            image = get_object_or_404(ProductVariantImage, id=image_id)
+            if image.variant.id == variant.id:
+                # Unset all other images as main
+                ProductVariantImage.objects.filter(variant=variant).update(is_main_image=False)
+                
+                # Set this image as main
+                image.is_main_image = True
+                image.save()
+                
+                messages.success(request, f'Image "{image.alt_text}" set as main image!')
+                return redirect('variant_image_manage', variant_id=variant_id)
+            else:
+                messages.error(request, 'Invalid image or variant mismatch.')
+                return redirect('variant_image_manage', variant_id=variant_id)
+                
+        elif 'delete_image' in request.POST:
+            image_id = request.POST.get('delete_image')
+            image = get_object_or_404(ProductVariantImage, id=image_id)
+            if image.variant.id == variant.id:
+                # Delete image file and database record
+                if image.image and os.path.exists(image.image.path):
+                    os.remove(image.image.path)
+                
+                image.delete()
+                messages.success(request, f'Image "{image.alt_text}" deleted successfully!')
+                return redirect('variant_image_manage', variant_id=variant_id)
+            else:
+                messages.error(request, 'Invalid image or variant mismatch.')
+                return redirect('variant_image_manage', variant_id=variant_id)
+    
+    context = {
+        'variant': variant,
+        'images': variant.images.all(),
+        'title': f'Manage Images: {variant.name}',
+    }
+    return render(request, 'home/variant_image_manage.html', context)
+
+@login_required
+def add_variant_image_upload(request, variant_id):
+    """
+    Add an image to a variant using a separate operation
+    """
+    if request.method == 'POST':
+        variant = get_object_or_404(ProductVariant, id=variant_id)
+        
+        if 'image' in request.FILES:
+            image_file = request.FILES['image']
+            alt_text = request.POST.get('alt_text', '')
+            display_order = request.POST.get('display_order', 0)
+            is_main_image = request.POST.get('is_main_image', False)
+            
+            try:
+                new_image = ProductVariantImage.objects.create(
+                    variant=variant,
+                    image=image_file,
+                    alt_text=alt_text,
+                    display_order=display_order,
+                    is_main_image=is_main_image
+                )
+                messages.success(request, f'Image added successfully!')
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Image "{alt_text}" added successfully!',
+                    'image_id': new_image.id,
+                    'image_url': new_image.image.url if new_image.image else '',
+                    'alt_text': new_image.alt_text,
+                    'display_order': new_image.display_order,
+                    'is_main_image': new_image.is_main_image
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Error adding image: {str(e)}'
+                })
+        else:
+            return JsonResponse({
+                'success': False,
+                'message': 'No image file provided.'
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    })
 
 @login_required
 def delete_variant(request, slug, variant_id):
@@ -342,42 +457,56 @@ def delete_variant(request, slug, variant_id):
     return redirect('product_variant_manage', slug=slug)
 
 @login_required
-def add_variant_image(request, variant_id):
+def set_main_image(request, image_id):
     """
-    Handle separate image upload for variant to avoid formset validation issues
+    Set an image as the main image for its variant
     """
     if request.method == 'POST':
-        variant = get_object_or_404(ProductVariant, id=variant_id)
+        image = get_object_or_404(ProductVariantImage, id=image_id)
+        variant = image.variant
         
-        if 'image' in request.FILES:
-            image_file = request.FILES['image']
-            alt_text = request.POST.get('alt_text', '')
-            display_order = request.POST.get('display_order', 0)
-            is_main_image = request.POST.get('is_main_image', False)
-            
-            # Create new image
-            ProductVariantImage.objects.create(
-                variant=variant,
-                image=image_file,
-                alt_text=alt_text,
-                display_order=display_order,
-                is_main_image=is_main_image
-            )
-            
-            messages.success(request, 'Image added successfully!')
-            return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant_id)
-        else:
-            messages.error(request, 'Please select an image to upload.')
-            return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant_id)
+        # Unset all other images as main
+        ProductVariantImage.objects.filter(variant=variant).update(is_main_image=False)
+        
+        # Set this image as main
+        image.is_main_image = True
+        image.save()
+        
+        messages.success(request, f'Image "{image.alt_text}" set as main image!')
+        return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant.id)
     
-    return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant_id)
+    return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant.id)
 
 @login_required
+def delete_variant_image(request, image_id):
+    """
+    Delete a variant image
+    """
+    if request.method == 'POST':
+        image = get_object_or_404(ProductVariantImage, id=image_id)
+        variant = image.variant
+        
+        # Delete the image file
+        if image.image:
+            if os.path.exists(image.image.path):
+                os.remove(image.image.path)
+        
+        # Delete the database record
+        image.delete()
+        
 def product_variant_edit(request, slug, variant_id):
+    print(f"=== product_variant_edit view called ===")
+    print(f"Method: {request.method}")
+    print(f"Slug: {slug}")
+    print(f"Variant ID: {variant_id}")
+    
     product = get_object_or_404(Product, slug=slug)
     variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
     
     if request.method == 'POST':
+        print(f"=== POST request received ===")
+        print(f"POST keys: {list(request.POST.keys())}")
+        
         form = ProductVariantForm(request.POST, instance=variant)
         image_formset = ProductVariantImageFormSet(request.POST, request.FILES, instance=variant)
         
@@ -385,6 +514,12 @@ def product_variant_edit(request, slug, variant_id):
         print(f"Form valid: {form.is_valid()}")
         if not form.is_valid():
             print(f"Form errors: {form.errors}")
+        
+        # Debug: Check specifications data
+        print(f"POST data specifications: {request.POST.get('specifications', 'NOT_FOUND')}")
+        if form.cleaned_data.get('specifications'):
+            print(f"Specifications type: {type(form.cleaned_data.get('specifications'))}")
+            print(f"Specifications value: {repr(form.cleaned_data.get('specifications'))}")
         
         print(f"Image formset valid: {image_formset.is_valid()}")
         if not image_formset.is_valid():
@@ -402,6 +537,11 @@ def product_variant_edit(request, slug, variant_id):
             form.save()
             image_formset.save()
             messages.success(request, f'Variant "{variant.name}" has been updated successfully!')
+            return redirect('product_variant_manage', slug=product.slug)
+        elif form.is_valid():
+            # Save the main form even if image formset has validation issues
+            form.save()
+            messages.success(request, f'Variant "{variant.name}" has been updated successfully! (Note: Image upload had validation issues)')
             return redirect('product_variant_manage', slug=product.slug)
         else:
             messages.error(request, 'Please correct the errors below.')

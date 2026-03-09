@@ -528,15 +528,9 @@
                                     <div class="form-group">
                                         <label class="form-label">Specifications (JSON format)</label>
                                         <div class="specifications-container">
-                                            <textarea 
-                                                name="{{ variant_form.specifications.name }}" 
-                                                class="form-control specifications-textarea"
-                                                placeholder="Enter specifications in JSON format..."
-                                                rows="4"
-                                                oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
-                                            >{{ variant_form.specifications.value|default:"" }}</textarea>
+                                            {{ variant_form.specifications }}
+                                            <p class="text-xs text-gray-500 italic mt-2">Format: Key: Value (one per line)</p>
                                         </div>
-                                        <p class="text-xs text-gray-500 italic">Format: Key: Value (one per line)</p>
                                         {% if variant_form.specifications.errors and variant_form.instance.pk %}
                                             <div class="text-red-500 text-sm mt-1">{{ variant_form.specifications.errors|join:", " }}</div>
                                             {% endif %}

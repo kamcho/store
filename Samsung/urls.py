@@ -20,9 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from home.views import (
     home, product_list, product_create, product_edit, 
-    product_delete, product_detail, product_variant_manage, product_variant_edit, delete_variant, add_variant_image, add_to_cart, 
-    cart_detail, remove_from_cart, update_cart,
-    user_login, user_logout, ai_chat,
+    product_delete, product_detail, product_variant_manage, product_variant_edit, delete_variant, set_main_image, delete_variant_image, add_to_cart, 
+    cart_detail, remove_from_cart, update_cart, add_variant_image_upload,
+    user_login, user_logout, ai_chat,variant_image_manage,
     contact_submit, notifications_list, notification_mark_read
 )
 
@@ -38,7 +38,9 @@ urlpatterns = [
     path('products/<slug:slug>/variants/', product_variant_manage, name='product_variant_manage'),
     path('products/<slug:slug>/variants/<int:variant_id>/edit/', product_variant_edit, name='product_variant_edit'),
     path('products/<slug:slug>/variants/<int:variant_id>/delete/', delete_variant, name='delete_variant'),
-    path('products/<slug:slug>/variants/<int:variant_id>/add-image/', add_variant_image, name='add_variant_image'),
+    path('products/<slug:slug>/variants/<int:variant_id>/add_image/', add_variant_image_upload, name='add_variant_image_upload'),
+    path('products/<slug:slug>/variants/<int:variant_id>/images/', variant_image_manage, name='variant_image_manage'),
+    path('products/<slug:slug>/variants/<int:variant_id>/delete-image/<int:image_id>/', delete_variant_image, name='delete_variant_image'),
     path('products/<slug:slug>/delete/', product_delete, name='product_delete'),
     
     # Notifications URLs
