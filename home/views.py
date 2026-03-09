@@ -343,10 +343,10 @@ def variant_image_manage(request, slug, variant_id):
                 image.save()
                 
                 messages.success(request, f'Image "{image.alt_text}" set as main image!')
-                return redirect('variant_image_manage', variant_id=variant_id)
+                return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
             else:
                 messages.error(request, 'Invalid image or variant mismatch.')
-                return redirect('variant_image_manage', variant_id=variant_id)
+                return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
                 
         elif 'delete_image' in request.POST:
             image_id = request.POST.get('delete_image')
@@ -358,10 +358,10 @@ def variant_image_manage(request, slug, variant_id):
                 
                 image.delete()
                 messages.success(request, f'Image "{image.alt_text}" deleted successfully!')
-                return redirect('variant_image_manage', variant_id=variant_id)
+                return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
             else:
                 messages.error(request, 'Invalid image or variant mismatch.')
-                return redirect('variant_image_manage', variant_id=variant_id)
+                return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
     
     context = {
         'variant': variant,
@@ -371,7 +371,7 @@ def variant_image_manage(request, slug, variant_id):
     return render(request, 'home/variant_image_manage.html', context)
 
 @login_required
-def add_variant_image_upload(request, variant_id):
+def add_variant_image_upload(request, slug, variant_id):
     """
     Add an image to a variant using a separate operation
     """
@@ -382,7 +382,7 @@ def add_variant_image_upload(request, variant_id):
             image_file = request.FILES['image']
             alt_text = request.POST.get('alt_text', '')
             display_order = request.POST.get('display_order', 0)
-            is_main_image = request.POST.get('is_main_image', False)
+            is_main_image = 'is_main_image' in request.POST
             
             try:
                 new_image = ProductVariantImage.objects.create(
@@ -392,31 +392,31 @@ def add_variant_image_upload(request, variant_id):
                     display_order=display_order,
                     is_main_image=is_main_image
                 )
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'message': f'Image "{alt_text}" added successfully!',
+                        'image_id': new_image.id,
+                        'image_url': new_image.image.url if new_image.image else '',
+                        'alt_text': new_image.alt_text,
+                        'display_order': new_image.display_order,
+                        'is_main_image': new_image.is_main_image
+                    })
                 messages.success(request, f'Image added successfully!')
-                return JsonResponse({
-                    'success': True,
-                    'message': f'Image "{alt_text}" added successfully!',
-                    'image_id': new_image.id,
-                    'image_url': new_image.image.url if new_image.image else '',
-                    'alt_text': new_image.alt_text,
-                    'display_order': new_image.display_order,
-                    'is_main_image': new_image.is_main_image
-                })
+                return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
             except Exception as e:
-                return JsonResponse({
-                    'success': False,
-                    'message': f'Error adding image: {str(e)}'
-                })
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'Error adding image: {str(e)}'
+                    })
+                messages.error(request, f'Error adding image: {str(e)}')
+                return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
         else:
-            return JsonResponse({
-                'success': False,
-                'message': 'No image file provided.'
-            })
+            messages.error(request, 'No image file provided.')
+            return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
     
-    return JsonResponse({
-        'success': False,
-        'message': 'Invalid request method.'
-    })
+    return redirect('variant_image_manage', slug=slug, variant_id=variant_id)
 
 @login_required
 def delete_variant(request, slug, variant_id):
