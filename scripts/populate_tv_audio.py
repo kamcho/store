@@ -1,18 +1,4 @@
-#!/usr/bin/env python3
-"""
-Script to populate TV & Audio products with comprehensive variations
-"""
-
-import os
-import sys
-import django
-
-# Add the project directory to Python path
-sys.path.append('/home/kali/Downloads/Samsung')
-
-# Setup Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Samsung.settings')
-django.setup()
+import setup_django
 
 from django.db import transaction
 from home.models import ProductCategory, Product, ProductVariant, ProductImage, ProductSpecification

@@ -1,15 +1,4 @@
-import os
-import django
-import sys
-import json
-
-# Setup Django environment
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if BASE_DIR not in sys.path:
-    sys.path.append(BASE_DIR)
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Samsung.settings')
-django.setup()
+import setup_django
 
 from home.models import Product, ProductCategory
 from django.utils.text import slugify

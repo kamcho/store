@@ -1,11 +1,4 @@
-import os
-import django
-import sys
-
-# Setup Django environment
-sys.path.append('/home/kali/Downloads/Samsung')
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Samsung.settings')
-django.setup()
+import setup_django
 
 from home.models import Product, ProductCategory
 

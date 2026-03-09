@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-"""
-Script to add sample images to Samsung Gear 360 Camera
-"""
-
-import os, sys, django
-sys.path.append('/home/kali/Downloads/Samsung')
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Samsung.settings')
-django.setup()
+import setup_django
 
 from django.core.files.base import ContentFile
 from django.db import transaction

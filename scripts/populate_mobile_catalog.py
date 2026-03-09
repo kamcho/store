@@ -1,14 +1,4 @@
-import os
-import sys
-import django
-
-# Setup Django environment (reuse pattern from populate_categories.py)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if BASE_DIR not in sys.path:
-    sys.path.append(BASE_DIR)
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Samsung.settings")
-django.setup()
+import setup_django
 
 from django.db import transaction  # noqa: E402
 from home.models import (  # noqa: E402

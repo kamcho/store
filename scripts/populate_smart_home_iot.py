@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-"""
-Script to populate Smart Home & IoT products
-"""
-
-import os, sys, django
-sys.path.append('/home/kali/Downloads/Samsung')
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Samsung.settings')
-django.setup()
+import setup_django
 
 from django.db import transaction
 from home.models import ProductCategory, Product, ProductVariant, ProductSpecification
