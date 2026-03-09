@@ -57,11 +57,11 @@
             <!-- LEFT: Gallery -->
             <div class="space-y-4">
                 <!-- Main Image -->
-                <div class="aspect-square bg-gradient-to-br from-white to-slate-50 rounded-3xl border border-slate-200 shadow-inner flex items-center justify-center p-10 overflow-hidden group relative">
-                    {% with main_image=product.images.all|dictsort:"is_main_image"|last %}
+                <div class="aspect-square rounded-3xl border border-slate-200 shadow-inner flex items-center justify-center p-10 overflow-hidden group relative">
+                    {% with main_image=product.images.all|first %}
                     {% if product.images.all %}
                     <img id="featured-image" src="{{ main_image.image.url }}" alt="{{ product.name }}"
-                        class="max-w-full max-h-full object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
+                        class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
                         width="600" height="600">
                     {% else %}
                     <div class="text-center">
@@ -138,8 +138,7 @@
                 <div class="flex items-baseline gap-3 mb-6" id="price-container">
                     {% with first_variant=product.variants.first %}
                     {% if first_variant.sale_price %}
-                    <span class="text-3xl font-black text-slate-900" id="current-price">KSH {{ first_variant.sale_price|floatformat:0
-                        }}</span>
+                    <span class="text-3xl font-black text-slate-900" id="current-price">KSH {{ first_variant.sale_price|floatformat:0 }}</span>
                     <span class="text-lg text-slate-400 line-through" id="old-price">KSH {{ first_variant.price|floatformat:0 }}</span>
                     <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full" id="discount-badge">
                         -{{ first_variant.get_discount_percentage }}%
@@ -279,11 +278,17 @@
 
                 <!-- CTA Buttons -->
                 <div class="flex gap-3">
-                    <a href="{% url 'add_to_cart' product.id %}"
-                        class="flex-1 flex items-center justify-center gap-2 bg-samsung-blue text-white font-bold py-4 rounded-xl text-sm hover:bg-samsung-dark transition-all shadow-lg shadow-samsung-blue/20 hover:shadow-xl hover:shadow-samsung-blue/30">
-                        <i class="fas fa-shopping-bag text-xs"></i>
-                        Add to Cart
-                    </a>
+                    <form action="{% url 'add_to_cart' product.id %}" method="POST" class="flex-1">
+                        {% csrf_token %}
+                        {% with first_variant=product.variants.first %}
+                        <input type="hidden" name="variant_id" id="selected-variant-id" value="{{ first_variant.id }}">
+                        {% endwith %}
+                        <button type="submit"
+                            class="w-full flex items-center justify-center gap-2 bg-samsung-blue text-white font-bold py-4 rounded-xl text-sm hover:bg-samsung-dark transition-all shadow-lg shadow-samsung-blue/20 hover:shadow-xl hover:shadow-samsung-blue/30">
+                            <i class="fas fa-shopping-bag text-xs"></i>
+                            Add to Cart
+                        </button>
+                    </form>
                     <button class="w-14 h-14 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 transition-all">
                         <i class="far fa-heart text-lg"></i>
                     </button>
@@ -330,11 +335,11 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {% for rp in related_products %}
                 <a href="{% url 'product_detail' rp.slug %}" class="related-card group block bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                    <div class="h-44 bg-gradient-to-b from-white to-slate-50/30 p-5 flex items-center justify-center overflow-hidden">
+                    <div class="h-44 p-5 flex items-center justify-center overflow-hidden">
                         {% with rp_img=rp.images.all|dictsort:"is_main_image"|last %}
                         {% if rp.images.all %}
                         <img src="{{ rp_img.image.url }}" alt="{{ rp.name }}"
-                            class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm"
+                            class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500"
                             width="200" height="200">
                         {% else %}
                         <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center">
@@ -415,6 +420,12 @@
                 const discount = btn.dataset.discount;
                 currentVariantName = btn.dataset.name;
                 currentVariantModel = btn.dataset.model;
+
+                // Persist selected variant id so the correct one is added to cart
+                const hiddenVariantInput = document.getElementById('selected-variant-id');
+                if (hiddenVariantInput) {
+                    hiddenVariantInput.value = variantId;
+                }
 
                 const currentPriceEl = document.getElementById('current-price');
                 const oldPriceEl = document.getElementById('old-price');

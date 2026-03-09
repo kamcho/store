@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
-from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
+from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
 from .forms_login import CustomLoginForm
 
 def home(request):
@@ -98,7 +98,7 @@ def product_list(request):
     
     # Get category filter
     category_slug = request.GET.get('category')
-    if category_slug:
+    if category_slug and category_slug != 'None':
         category = get_object_or_404(ProductCategory, slug=category_slug)
         
         def get_descendants(cat):
@@ -216,8 +216,31 @@ def product_edit(request, slug):
         image_formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
         spec_formset = ProductSpecificationFormSet(request.POST, instance=product)
         
+        # Debug: Check form validity
+        print(f"Product form valid: {form.is_valid()}")
+        if not form.is_valid():
+            print(f"Product form errors: {form.errors}")
+        
+        print(f"Image formset valid: {image_formset.is_valid()}")
+        if not image_formset.is_valid():
+            print(f"Image formset errors: {image_formset.errors}")
+            for i, img_form in enumerate(image_formset):
+                if not img_form.is_valid():
+                    print(f"Image form {i} errors: {img_form.errors}")
+        
+        print(f"Spec formset valid: {spec_formset.is_valid()}")
+        if not spec_formset.is_valid():
+            print(f"Spec formset errors: {spec_formset.errors}")
+        
         if form.is_valid() and image_formset.is_valid() and spec_formset.is_valid():
+            # Debug: Check is_active field before and after save
+            print(f"Product is_active before save: {product.is_active}")
+            print(f"Form data is_active: {form.cleaned_data.get('is_active')}")
+            
             product = form.save()
+            
+            print(f"Product is_active after save: {product.is_active}")
+            
             image_formset.save()
             spec_formset.save()
             messages.success(request, f'Product "{product.name}" has been updated successfully!')
@@ -237,7 +260,7 @@ def product_edit(request, slug):
         'title': f'Edit Product: {product.name}',
         'button_text': 'Update Product & Next',
     }
-    return render(request, 'home/product_form.html', context)
+    return render(request, 'home/product_edit.html', context)
 
 @login_required
 def product_variant_manage(request, slug):
@@ -266,7 +289,7 @@ def product_variant_manage(request, slug):
             # Save all variants
             variant_formset.save()
             messages.success(request, f'Variants for "{product.name}" have been updated successfully!')
-            return redirect('product_list')
+            return redirect('product_variant_manage', product.slug)
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -281,6 +304,75 @@ def product_variant_manage(request, slug):
     return render(request, 'home/variant_form.html', context)
 
 @login_required
+def delete_variant(request, slug, variant_id):
+    """
+    Delete a single variant via AJAX request
+    """
+    if request.method == 'POST':
+        try:
+            product = get_object_or_404(Product, slug=slug)
+            variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+            
+            variant_name = variant.name
+            variant.delete()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # AJAX request - return JSON response
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Variant "{variant_name}" has been deleted successfully.',
+                    'variant_id': variant_id
+                })
+            else:
+                # Regular request - redirect back with message
+                messages.success(request, f'Variant "{variant_name}" has been deleted successfully.')
+                return redirect('product_variant_manage', slug=slug)
+                
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Error deleting variant: {str(e)}'
+                })
+            else:
+                messages.error(request, f'Error deleting variant: {str(e)}')
+                return redirect('product_variant_manage', slug=slug)
+    
+    # If not POST, redirect back
+    return redirect('product_variant_manage', slug=slug)
+
+@login_required
+def add_variant_image(request, variant_id):
+    """
+    Handle separate image upload for variant to avoid formset validation issues
+    """
+    if request.method == 'POST':
+        variant = get_object_or_404(ProductVariant, id=variant_id)
+        
+        if 'image' in request.FILES:
+            image_file = request.FILES['image']
+            alt_text = request.POST.get('alt_text', '')
+            display_order = request.POST.get('display_order', 0)
+            is_main_image = request.POST.get('is_main_image', False)
+            
+            # Create new image
+            ProductVariantImage.objects.create(
+                variant=variant,
+                image=image_file,
+                alt_text=alt_text,
+                display_order=display_order,
+                is_main_image=is_main_image
+            )
+            
+            messages.success(request, 'Image added successfully!')
+            return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant_id)
+        else:
+            messages.error(request, 'Please select an image to upload.')
+            return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant_id)
+    
+    return redirect('product_variant_edit', slug=variant.product.slug, variant_id=variant_id)
+
+@login_required
 def product_variant_edit(request, slug, variant_id):
     product = get_object_or_404(Product, slug=slug)
     variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
@@ -288,6 +380,23 @@ def product_variant_edit(request, slug, variant_id):
     if request.method == 'POST':
         form = ProductVariantForm(request.POST, instance=variant)
         image_formset = ProductVariantImageFormSet(request.POST, request.FILES, instance=variant)
+        
+        # Debug: Check form validity
+        print(f"Form valid: {form.is_valid()}")
+        if not form.is_valid():
+            print(f"Form errors: {form.errors}")
+        
+        print(f"Image formset valid: {image_formset.is_valid()}")
+        if not image_formset.is_valid():
+            print(f"Image formset errors: {image_formset.errors}")
+            for i, img_form in enumerate(image_formset):
+                print(f"Form {i} - Has instance pk: {bool(img_form.instance.pk)}")
+                print(f"Form {i} - Has cleaned_data: {bool(img_form.cleaned_data)}")
+                if img_form.cleaned_data:
+                    print(f"Form {i} - Cleaned data keys: {list(img_form.cleaned_data.keys())}")
+                    print(f"Form {i} - Has image in cleaned_data: {'image' in img_form.cleaned_data}")
+                if not img_form.is_valid():
+                    print(f"Image form {i} errors: {img_form.errors}")
         
         if form.is_valid() and image_formset.is_valid():
             form.save()
@@ -351,40 +460,70 @@ def product_delete(request, slug):
     return render(request, 'home/product_confirm_delete.html', context)
 
 def add_to_cart(request, product_id):
-    cart = request.session.get('cart', {})
-    product_id_str = str(product_id)
-    
-    if product_id_str in cart:
-        cart[product_id_str] += 1
+    """
+    Add a specific product variant to the cart.
+
+    The URL still receives the parent product_id, but the concrete variant
+    to add is determined from POST data (`variant_id`). We store cart items
+    keyed by variant_id in the session so that different variants of the
+    same product can coexist in the cart.
+    """
+    product = get_object_or_404(Product, id=product_id)
+
+    # Only allow POST for adding to cart so we can safely read variant_id
+    if request.method != "POST":
+        messages.error(request, "Invalid request method for adding to cart.")
+        return redirect(request.META.get("HTTP_REFERER", "cart_detail"))
+
+    variant_id = request.POST.get("variant_id")
+
+    if variant_id:
+        # Ensure the variant actually belongs to this product
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
     else:
-        cart[product_id_str] = 1
-        
-    request.session['cart'] = cart
-    messages.success(request, "Product added to cart!")
-    
-    # Redirect back to where user came from, or cart detail
-    return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
+        # Fallback to the first active variant if none provided
+        variant = product.variants.filter(is_active=True).first() or product.variants.first()
+
+    if not variant:
+        messages.error(request, "This product has no available variants to add to cart.")
+        return redirect(request.META.get("HTTP_REFERER", "cart_detail"))
+
+    cart = request.session.get("cart", {})
+    variant_key = str(variant.id)
+
+    if variant_key in cart:
+        cart[variant_key] += 1
+    else:
+        cart[variant_key] = 1
+
+    request.session["cart"] = cart
+    messages.success(request, f'"{product.name} - {variant.name}" added to cart.')
+
+    return redirect(request.META.get("HTTP_REFERER", "cart_detail"))
 
 def cart_detail(request):
     cart = request.session.get('cart', {})
     cart_items = []
     total_price = 0
     
-    for product_id, quantity in cart.items():
+    for variant_id, quantity in cart.items():
         try:
-            product = Product.objects.get(id=product_id)
-            # Default to first variant for now, ideally cart should store variant_id
-            variant = product.variants.first()
-            if variant:
-                subtotal = variant.price * quantity
-                total_price += subtotal
-                cart_items.append({
-                    'product': product,
-                    'variant': variant,
-                    'quantity': quantity,
-                    'subtotal': subtotal
-                })
-        except Product.DoesNotExist:
+            variant = ProductVariant.objects.select_related("product").get(id=variant_id)
+            product = variant.product
+
+            # Prefer sale_price when available, otherwise use regular price
+            unit_price = variant.sale_price if getattr(variant, "sale_price", None) else variant.price
+            subtotal = unit_price * quantity
+            total_price += subtotal
+
+            cart_items.append({
+                "product": product,
+                "variant": variant,
+                "unit_price": unit_price,
+                "quantity": quantity,
+                "subtotal": subtotal,
+            })
+        except ProductVariant.DoesNotExist:
             continue
             
     context = {
@@ -394,30 +533,37 @@ def cart_detail(request):
     }
     return render(request, 'home/cart_detail.html', context)
 
-def remove_from_cart(request, product_id):
-    cart = request.session.get('cart', {})
-    product_id_str = str(product_id)
-    
-    if product_id_str in cart:
-        del cart[product_id_str]
-        request.session['cart'] = cart
-        messages.success(request, "Product removed from cart.")
-    
-    return redirect('cart_detail')
+def remove_from_cart(request, variant_id):
+    """
+    Remove a specific variant from the cart (identified by variant_id).
+    """
+    cart = request.session.get("cart", {})
+    variant_key = str(variant_id)
 
-def update_cart(request, product_id):
-    if request.method == 'POST':
-        quantity = int(request.POST.get('quantity', 1))
-        cart = request.session.get('cart', {})
-        product_id_str = str(product_id)
-        
+    if variant_key in cart:
+        del cart[variant_key]
+        request.session["cart"] = cart
+        messages.success(request, "Item removed from cart.")
+
+    return redirect("cart_detail")
+
+
+def update_cart(request, variant_id):
+    """
+    Update quantity for a specific variant in the cart.
+    """
+    if request.method == "POST":
+        quantity = int(request.POST.get("quantity", 1))
+        cart = request.session.get("cart", {})
+        variant_key = str(variant_id)
+
         if quantity > 0:
-            cart[product_id_str] = quantity
+            cart[variant_key] = quantity
         else:
-            if product_id_str in cart:
-                del cart[product_id_str]
-        
-        request.session['cart'] = cart
+            if variant_key in cart:
+                del cart[variant_key]
+
+        request.session["cart"] = cart
         messages.success(request, "Cart updated.")
     
     return redirect('cart_detail')

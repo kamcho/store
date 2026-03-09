@@ -311,9 +311,9 @@
                                 <div class="hero-product-img relative cursor-pointer w-full flex items-center justify-center">
                                     {% if hero_product.get_main_image %}
                                     <img src="{{ hero_product.get_main_image.image.url }}" alt="{{ hero_product.name }}"
-                                        class="w-auto max-w-[85%] max-h-[420px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
+                                        class="w-auto max-w-[85%] max-h-[420px] object-contain">
                                     {% else %}
-                                    <div class="w-64 h-64 rounded-[2rem] bg-gradient-to-br from-slate-50 to-white flex items-center justify-center shadow-inner">
+                                    <div class="w-64 h-64 rounded-[2rem] flex items-center justify-center shadow-inner">
                                         <i class="fas fa-mobile-alt text-5xl text-slate-200"></i>
                                     </div>
                                     {% endif %}
@@ -396,10 +396,10 @@
                                 <div class="hero-product-img relative cursor-pointer w-full flex items-center justify-center">
                                     {% if product.get_main_image %}
                                     <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
-                                        class="w-auto max-w-[85%] max-h-[420px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+                                        class="w-auto max-w-[85%] max-h-[420px] object-contain"
                                         height="420" width="400">
                                     {% else %}
-                                    <div class="w-64 h-64 rounded-[2rem] bg-gradient-to-br from-slate-50 to-white flex items-center justify-center shadow-inner">
+                                    <div class="w-64 h-64 rounded-[2rem] flex items-center justify-center shadow-inner">
                                         <i class="fas fa-mobile-alt text-5xl text-slate-200"></i>
                                     </div>
                                     {% endif %}
@@ -492,7 +492,7 @@
                         <div class="feat-card-img">
                             {% if product.get_main_image %}
                             <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
-                                class="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500 relative z-10 drop-shadow-sm">
+                                class="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500 relative z-10">
                             {% else %}
                             <div class="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center">
                                 <i class="fas fa-box text-2xl text-slate-300"></i>
@@ -894,10 +894,10 @@
                         </div>
 
                         <!-- Image -->
-                        <div class="h-48 bg-gradient-to-b from-white to-slate-50/30 p-5 flex items-center justify-center overflow-hidden">
+                        <div class="h-48 p-5 flex items-center justify-center overflow-hidden">
                             {% if product.get_main_image %}
                             <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
-                                class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
+                                class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500">
                             {% else %}
                             <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center">
                                 <i class="fas fa-box text-xl text-slate-300"></i>
@@ -967,10 +967,10 @@
                         </span>
 
                         <!-- Image -->
-                        <div class="h-48 bg-gradient-to-b from-white to-slate-50/30 p-5 flex items-center justify-center overflow-hidden">
+                        <div class="h-48 p-5 flex items-center justify-center overflow-hidden">
                             {% if product.get_main_image %}
                             <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}"
-                                class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm">
+                                class="w-[80%] h-[80%] object-contain group-hover:scale-110 transition-transform duration-500">
                             {% else %}
                             <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center">
                                 <i class="fas fa-box text-xl text-slate-300"></i>

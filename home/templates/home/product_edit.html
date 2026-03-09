@@ -1,0 +1,516 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-edit-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+    }
+    
+    .edit-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .edit-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .edit-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .edit-section {
+        padding: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .edit-section:last-child {
+        border-bottom: none;
+    }
+    
+    .edit-section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+    
+    .edit-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+    
+    .edit-section-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        background: #f9fafb;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-secondary:hover {
+        background: #4b5563;
+        transform: translateY(-1px);
+    }
+    
+    .dashboard-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .dashboard-breadcrumb a {
+        color: #6b7280;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    
+    .dashboard-breadcrumb a:hover {
+        color: #667eea;
+    }
+    
+    .dashboard-breadcrumb .separator {
+        color: #d1d5db;
+    }
+    
+    .product-info {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .product-info h3 {
+        margin: 0 0 0.5rem 0;
+        color: #1f2937;
+        font-size: 1.125rem;
+    }
+    
+    .product-info p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-edit-page">
+    <!-- Header -->
+    <div class="edit-header">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold mb-2">{{ title }}</h1>
+                    <div class="dashboard-breadcrumb">
+                        <a href="{% url 'home' %}">Home</a>
+                        <span class="separator">/</span>
+                        <a href="{% url 'product_list' %}">Products</a>
+                        <span class="separator">/</span>
+                        <span>{{ product.name }}</span>
+                    </div>
+                </div>
+                <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
+                    <i class="fas fa-eye"></i>
+                    View Product
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Product Info Card -->
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.short_description|default:"No short description available" }}</p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="product-edit-form">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <div class="edit-card mb-6">
+                    <div class="edit-section">
+                        <div class="edit-section-header">
+                            <div class="edit-section-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <h2 class="edit-section-title">Basic Information</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="form-label">Product Name</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.name.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="form-label">Slug</label>
+                                {{ form.slug }}
+                                {% if form.slug.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.slug.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="form-label">Short Description</label>
+                            {{ form.short_description }}
+                            {% if form.short_description.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.short_description.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="form-label">Full Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-red-500 text-sm mt-1">{{ form.description.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="form-label">Category</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.category.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="form-label">Warranty Period (months)</label>
+                                {{ form.warranty_period }}
+                                {% if form.warranty_period.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.warranty_period.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex flex-wrap gap-6">
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                {{ form.is_featured }}
+                                <span class="text-sm font-medium">Featured Product</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                {{ form.is_active }}
+                                <span class="text-sm font-medium">Active (Visible to customers)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Images -->
+                <div class="edit-card mb-6">
+                    <div class="edit-section">
+                        <div class="edit-section-header">
+                            <div class="edit-section-icon">
+                                <i class="fas fa-images"></i>
+                            </div>
+                            <h2 class="edit-section-title">Product Images</h2>
+                        </div>
+                        
+                        {{ image_formset.management_form }}
+                        <div class="space-y-4" id="images-form-container">
+                            {% for image_form in image_formset %}
+                            <div class="bg-gray-50 p-4 rounded-lg border">
+                                {{ image_form.id }}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="form-label">Image</label>
+                                        {{ image_form.image }}
+                                        {% if image_form.image.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ image_form.image.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Alt text</label>
+                                        {{ image_form.alt_text }}
+                                        {% if image_form.alt_text.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ image_form.alt_text.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="mt-4 flex flex-wrap items-center gap-6">
+                                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                                        {{ image_form.is_main_image }}
+                                        <span class="text-sm font-medium">Set as main image</span>
+                                    </label>
+                                    <div class="flex items-center gap-2">
+                                        <label class="text-sm font-medium">Display order:</label>
+                                        {{ image_form.display_order }}
+                                        {% if image_form.display_order.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ image_form.display_order.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% if image_formset.can_delete and image_form.instance.pk %}
+                                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                                        {{ image_form.DELETE }}
+                                        <span class="text-sm font-medium text-red-600">Remove image</span>
+                                    </label>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="button" onclick="addImageForm()" class="btn-secondary">
+                                <i class="fas fa-plus"></i>
+                                Add Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specifications -->
+                <div class="edit-card mb-6">
+                    <div class="edit-section">
+                        <div class="edit-section-header">
+                            <div class="edit-section-icon">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <h2 class="edit-section-title">Specifications</h2>
+                        </div>
+                        
+                        {{ spec_formset.management_form }}
+                        <div class="space-y-4" id="specs-form-container">
+                            {% for spec_form in spec_formset %}
+                            <div class="bg-gray-50 p-4 rounded-lg border">
+                                {{ spec_form.id }}
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="form-label">Category</label>
+                                        {{ spec_form.category }}
+                                        {% if spec_form.category.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.category.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Name</label>
+                                        {{ spec_form.name }}
+                                        {% if spec_form.name.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.name.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Value</label>
+                                        {{ spec_form.value }}
+                                        {% if spec_form.value.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.value.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Display order</label>
+                                        {{ spec_form.display_order }}
+                                        {% if spec_form.display_order.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.display_order.errors|join:", " }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if spec_formset.can_delete and spec_form.instance.pk %}
+                                <div class="mt-4">
+                                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                                        {{ spec_form.DELETE }}
+                                        <span class="text-sm font-medium text-red-600">Remove</span>
+                                    </label>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="button" onclick="addSpecForm()" class="btn-secondary">
+                                <i class="fas fa-plus"></i>
+                                Add Specification
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="edit-card">
+                    <div class="edit-section">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <a href="{% url 'product_list' %}" class="btn-secondary">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </a>
+                                <a href="{% url 'product_variant_manage' product.slug %}" class="btn-secondary">
+                                    <i class="fas fa-boxes"></i>
+                                    Manage Variants
+                                </a>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i>
+                                {{ button_text }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden Templates -->
+<div id="empty-image-form" class="hidden">
+    <div class="bg-gray-50 p-4 rounded-lg border">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="form-label">Image</label>
+                {{ image_formset.empty_form.image }}
+            </div>
+            <div>
+                <label class="form-label">Alt text</label>
+                {{ image_formset.empty_form.alt_text }}
+            </div>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+            {{ image_formset.empty_form.is_main_image }}
+            <label class="text-sm font-medium">Set as main image</label>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+            <label class="text-sm font-medium">Display order:</label>
+            {{ image_formset.empty_form.display_order }}
+        </div>
+    </div>
+</div>
+
+<div id="empty-spec-form" class="hidden">
+    <div class="bg-gray-50 p-4 rounded-lg border">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="form-label">Category</label>
+                {{ spec_formset.empty_form.category }}
+            </div>
+            <div>
+                <label class="form-label">Name</label>
+                {{ spec_formset.empty_form.name }}
+            </div>
+            <div>
+                <label class="form-label">Value</label>
+                {{ spec_formset.empty_form.value }}
+            </div>
+            <div>
+                <label class="form-label">Display order</label>
+                {{ spec_formset.empty_form.display_order }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addImageForm() {
+    const totalForms = document.getElementById('id_images-TOTAL_FORMS');
+    const formCount = parseInt(totalForms.value);
+    const emptyForm = document.getElementById('empty-image-form');
+    const newForm = emptyForm.innerHTML.replace(/__prefix__/g, formCount);
+    
+    const container = document.getElementById('images-form-container');
+    const formDiv = document.createElement('div');
+    formDiv.innerHTML = newForm;
+    container.appendChild(formDiv.firstElementChild);
+    
+    totalForms.value = formCount + 1;
+}
+
+function addSpecForm() {
+    const totalForms = document.getElementById('id_specifications-TOTAL_FORMS');
+    const formCount = parseInt(totalForms.value);
+    const emptyForm = document.getElementById('empty-spec-form');
+    const newForm = emptyForm.innerHTML.replace(/__prefix__/g, formCount);
+    
+    const container = document.getElementById('specs-form-container');
+    const formDiv = document.createElement('div');
+    formDiv.innerHTML = newForm;
+    container.appendChild(formDiv.firstElementChild);
+    
+    totalForms.value = formCount + 1;
+}
+</script>
+{% endblock %}

@@ -1,226 +1,359 @@
 {% extends 'home/base.html' %}
+{% load static %}
 
 {% block title %}{{ title }} - Samsung Dealer{% endblock %}
 
 {% block extra_css %}
 <style>
-    body {
-        background: linear-gradient(135deg, #f9fafb 0%, #ffffff 50%, #eef2ff 100%) !important;
+    .variant-edit-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+    }
+    
+    .edit-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .edit-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .edit-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .edit-section {
+        padding: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .edit-section:last-child {
+        border-bottom: none;
+    }
+    
+    .edit-section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+    
+    .edit-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+    
+    .edit-section-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        width: 100%;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), 0 0 12px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 1.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-secondary:hover {
+        background: #4b5563;
+        transform: translateY(-1px);
+    }
+    
+    .dashboard-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .dashboard-breadcrumb a {
+        color: #6b7280;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    
+    .dashboard-breadcrumb a:hover {
+        color: #667eea;
+    }
+    
+    .dashboard-breadcrumb .separator {
+        color: #d1d5db;
+    }
+    
+    .variant-info {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .variant-info h3 {
+        margin: 0 0 0.5rem 0;
+        color: #1f2937;
+        font-size: 1.125rem;
+    }
+    
+    .variant-info p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .image-preview {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        margin-bottom: 0.5rem;
+    }
+    
+    .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .spec-item {
+        background: #f8fafc;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border-left: 3px solid #667eea;
+    }
+    
+    .spec-item strong {
+        color: #1f2937;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    .spec-item span {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .specifications-textarea {
+        min-height: 120px;
+        max-height: 400px;
+        resize: vertical;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    
+    .specifications-container {
+        position: relative;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen" style="background: linear-gradient(135deg, #f9fafb 0%, #ffffff 50%, #eef2ff 100%);">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-        <!-- Header Section -->
-        <div class="mb-8">
+<div class="variant-edit-page">
+    <!-- Header -->
+    <div class="edit-header">
+        <div class="container mx-auto px-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
-                        <i class="fas fa-edit text-indigo-600"></i>
-                        {{ title }}
-                    </h1>
-                    <p class="mt-2 text-gray-600">Edit variant details for <span class="font-semibold text-indigo-600">{{ product.name }}</span></p>
+                    <h1 class="text-2xl font-bold mb-2">{{ title }}</h1>
+                    <div class="dashboard-breadcrumb">
+                        <a href="{% url 'home' %}">Home</a>
+                        <span class="separator">/</span>
+                        <a href="{% url 'product_list' %}">Products</a>
+                        <span class="separator">/</span>
+                        <a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a>
+                        <span class="separator">/</span>
+                        <span>{{ variant.name }}</span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="{% url 'product_variant_manage' product.slug %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm">
-                        <i class="fas fa-arrow-left mr-2"></i>
-                        Back to Variants
-                    </a>
-                </div>
+                <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
+                    <i class="fas fa-eye"></i>
+                    View Product
+                </a>
             </div>
         </div>
+    </div>
 
-        <!-- Product Info Card -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 mb-8 text-white shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <i class="fas fa-box text-2xl"></i>
-                        <h2 class="text-xl font-semibold">Product Details</h2>
-                    </div>
-                    <p class="text-lg font-medium">{{ product.name }}</p>
-                    <p class="text-indigo-100 text-sm mt-1">{{ product.short_description|default:"No description available" }}</p>
-                </div>
-                <div class="text-right">
-                    <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                        <p class="text-sm text-indigo-100">Editing Variant</p>
-                        <p class="text-2xl font-bold">{{ variant.name }}</p>
-                    </div>
-                </div>
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Variant Info Card -->
+            <div class="variant-info">
+                <h3>{{ variant.name }}</h3>
+                <p>Editing variant for {{ product.name }} - {{ variant.model_code }}</p>
             </div>
-        </div>
 
-        <form method="post" enctype="multipart/form-data" novalidate class="space-y-8">
-            {% csrf_token %}
-
-            <!-- Variant Details Form -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                <div class="bg-gradient-to-r from-gray-50 to-indigo-50 border-b border-gray-200 px-8 py-6">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-indigo-600 rounded-lg p-2">
-                            <i class="fas fa-edit text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Variant Details</h3>
-                            <p class="text-sm text-gray-600">Pricing, inventory, and specifications</p>
-                        </div>
-                    </div>
-                </div>
+            <form method="post" enctype="multipart/form-data" id="variant-edit-form" action="{% url 'product_variant_edit' product.slug variant.id %}">
+                {% csrf_token %}
                 
-                <div class="px-8 py-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Basic Details -->
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-tag text-indigo-500"></i>
-                                Variant Name *
-                            </label>
-                            <div class="mt-1">
+                <!-- Basic Information -->
+                <div class="edit-card">
+                    <div class="edit-section">
+                        <div class="edit-section-header">
+                            <div class="edit-section-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <h2 class="edit-section-title">Basic Information</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="form-label">Variant Name</label>
                                 {{ form.name }}
-                            </div>
-                            {% if form.name.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.name.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-barcode text-indigo-500"></i>
-                                Model Code (SKU) *
-                            </label>
-                            <div class="mt-1">
-                                {{ form.model_code }}
-                            </div>
-                            {% if form.model_code.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.model_code.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-dollar-sign text-green-500"></i>
-                                Base Price *
-                            </label>
-                            <div class="relative mt-1 rounded-lg shadow-sm">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span class="text-gray-500 sm:text-sm font-medium">$</span>
-                                </div>
-                                {{ form.price }}
-                            </div>
-                            {% if form.price.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.price.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-
-                        <!-- Pricing Details -->
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-percentage text-orange-500"></i>
-                                Sale Price
-                            </label>
-                            <div class="relative mt-1 rounded-lg shadow-sm">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span class="text-gray-500 sm:text-sm font-medium">$</span>
-                                </div>
-                                {{ form.sale_price }}
-                            </div>
-                            {% if form.sale_price.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.sale_price.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-coins text-yellow-500"></i>
-                                Cost Price
-                            </label>
-                            <div class="relative mt-1 rounded-lg shadow-sm">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span class="text-gray-500 sm:text-sm font-medium">$</span>
-                                </div>
-                                {{ form.cost_price }}
-                            </div>
-                            {% if form.cost_price.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.cost_price.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-warehouse text-blue-500"></i>
-                                Stock Quantity *
-                            </label>
-                            <div class="mt-1">
-                                {{ form.stock_quantity }}
-                            </div>
-                            {% if form.stock_quantity.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.stock_quantity.errors.0 }}</p>
-                            {% endif %}
-                            {% if variant.stock_quantity %}
-                            <p class="text-xs {% if variant.stock_quantity <= variant.min_stock_level %}text-red-600 font-semibold{% else %}text-green-600{% endif %}">
-                                {% if variant.stock_quantity <= variant.min_stock_level %}
-                                <i class="fas fa-exclamation-triangle"></i> Low Stock
-                                {% else %}
-                                <i class="fas fa-check-circle"></i> In Stock
+                                {% if form.name.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.name.errors|join:", " }}</div>
                                 {% endif %}
-                            </p>
-                            {% endif %}
+                            </div>
+                            <div>
+                                <label class="form-label">Model Code</label>
+                                {{ form.model_code }}
+                                {% if form.model_code.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.model_code.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
                         </div>
-
-                        <!-- Inventory & Specs -->
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-bell text-purple-500"></i>
-                                Min Stock Alert
-                            </label>
-                            <div class="mt-1">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div>
+                                <label class="form-label">Price</label>
+                                {{ form.price }}
+                                {% if form.price.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.price.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="form-label">Sale Price</label>
+                                {{ form.sale_price }}
+                                {% if form.sale_price.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.sale_price.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="form-label">Cost Price</label>
+                                {{ form.cost_price }}
+                                {% if form.cost_price.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.cost_price.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div>
+                                <label class="form-label">Stock Quantity</label>
+                                {{ form.stock_quantity }}
+                                {% if form.stock_quantity.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.stock_quantity.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="form-label">Min Stock Level</label>
                                 {{ form.min_stock_level }}
+                                {% if form.min_stock_level.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.min_stock_level.errors|join:", " }}</div>
+                                {% endif %}
                             </div>
-                            {% if form.min_stock_level.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.min_stock_level.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-shipping-fast text-teal-500"></i>
-                                Stock Availability
-                            </label>
-                            <div class="mt-1">
+                            <div>
+                                <label class="form-label">Availability</label>
                                 {{ form.availability }}
+                                {% if form.availability.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.availability.errors|join:", " }}</div>
+                                {% endif %}
                             </div>
-                            {% if form.availability.errors %}
-                            <p class="text-xs text-red-600 mt-1">{{ form.availability.errors.0 }}</p>
-                            {% endif %}
                         </div>
                         
-                        <div class="space-y-1">
-                            <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i class="fas fa-toggle-on text-indigo-500"></i>
-                                Active Status
-                            </label>
-                            <div class="mt-1">
-                                {{ form.is_active }}
+                        <div class="mt-4">
+                            <label class="form-label">Specifications (JSON format)</label>
+                            <div class="specifications-container">
+                                <textarea 
+                                    name="{{ form.specifications.name }}" 
+                                    class="form-control specifications-textarea"
+                                    placeholder="Enter specifications in JSON format..."
+                                    rows="4"
+                                    oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
+                                >{{ form.specifications.value|default:"" }}</textarea>
                             </div>
+                            <p class="text-xs text-gray-500 italic">Format: Key: Value (one per line)</p>
+                            {% if form.specifications.errors %}
+                            <p class="text-xs text-red-600 mt-1">{{ form.specifications.errors.0 }}</p>
+                            {% endif %}
                         </div>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2" title="One per line, e.g. Color: Red">
-                            <i class="fas fa-list text-indigo-500"></i>
-                            Variant Specifications
-                            <i class="fas fa-question-circle text-gray-400 text-xs cursor-help"></i>
-                        </label>
-                        <div class="mt-1 font-mono text-sm bg-gray-50 rounded-lg p-2">
-                            {{ form.specifications }}
-                        </div>
-                        <p class="text-xs text-gray-500 italic">Format: Key: Value (one per line)</p>
-                        {% if form.specifications.errors %}
-                        <p class="text-xs text-red-600 mt-1">{{ form.specifications.errors.0 }}</p>
-                        {% endif %}
-                    </div>
                 </div>
             </div>
 
@@ -296,28 +429,56 @@
                         </div>
                         
                     <!-- Add New Image -->
-                    <div class="bg-white border border-dashed border-gray-300 rounded-lg p-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-dashed border-blue-200 rounded-2xl p-8 shadow-sm">
                         <div class="text-center">
-                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                            <p class="text-sm text-gray-600 mb-3">Add New Image</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Image File</label>
-                                    <input type="file" name="{{ image_formset.empty_form.image.name }}" accept="image/*" class="form-control">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Alt Text</label>
-                                    <input type="text" name="{{ image_formset.empty_form.alt_text.name }}" placeholder="Describe the image" class="form-control">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Display Order</label>
-                                    <input type="number" name="{{ image_formset.empty_form.display_order.name }}" value="0" min="0" class="form-control">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Main Image</label>
-                                    <input type="checkbox" name="{{ image_formset.empty_form.is_main_image.name }}" class="form-check-input">
-                                </div>
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                <i class="fas fa-cloud-upload-alt text-white text-2xl"></i>
                             </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Upload New Image</h3>
+                            <p class="text-sm text-gray-600 mb-6">Add an image to showcase this variant</p>
+                            
+                            <!-- Separate Form for New Image Upload -->
+                            <form method="post" enctype="multipart/form-data" action="{% url 'add_variant_image' product.slug variant.id %}" class="space-y-4">
+                                {% csrf_token %}
+                                <input type="hidden" name="variant_id" value="{{ variant.id }}">
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Image File</label>
+                                        <div class="relative">
+                                            <input type="file" name="image" accept="image/*" class="form-control file:file:bg-blue-50 file:file:border-blue-200 file:file:text-blue-700 hover:file:bg-blue-100" required>
+                                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                <i class="fas fa-image text-blue-400 text-4xl opacity-50"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Alt Text</label>
+                                        <input type="text" name="alt_text" placeholder="Describe the image for accessibility" class="form-control" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Display Order</label>
+                                        <input type="number" name="display_order" value="0" min="0" class="form-control" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Main Image</label>
+                                        <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                                            <input type="checkbox" name="is_main_image" class="form-check-input">
+                                            <label class="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2">
+                                                <i class="fas fa-star text-blue-500"></i>
+                                                Set as primary image
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-center mt-6">
+                                    <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-600 transition-all duration-200 transform hover:scale-105">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Add Image
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -325,6 +486,51 @@
             
             <!-- Form Actions -->
             <div class="bg-gradient-to-r from-gray-50 to-indigo-50 px-8 py-6 border-t border-gray-200">
+                <!-- Display Form Errors -->
+                {% if form.errors %}
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        <h4 class="font-semibold text-red-800">Please fix the following errors:</h4>
+                    </div>
+                    <ul class="text-sm text-red-700 space-y-1">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                {% if image_formset.errors %}
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        <h4 class="font-semibold text-red-800">Image Upload Errors:</h4>
+                    </div>
+                    <ul class="text-sm text-red-700 space-y-1">
+                        {% for form in image_formset %}
+                            {% if form.errors %}
+                            {% if form.instance.pk %}
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>Image {{ forloop.parentloop.counter0 }} - {{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% elif request.FILES %}
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>New Image - {{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4 w-full sm:w-auto">
                         <a href="{% url 'product_variant_manage' product.slug %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm">
@@ -389,4 +595,21 @@
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 </style>
+<script>
+function showExtraFields(input) {
+    const extraFields = document.getElementById('extra-fields');
+    if (input.files && input.files.length > 0) {
+        extraFields.style.display = 'block';
+    } else {
+        extraFields.style.display = 'none';
+        // Clear the fields when no file selected
+        const altText = extraFields.querySelector('input[name="{{ image_formset.empty_form.alt_text.name }}"]');
+        const displayOrder = extraFields.querySelector('input[name="{{ image_formset.empty_form.display_order.name }}"]');
+        const isMainImage = extraFields.querySelector('input[name="{{ image_formset.empty_form.is_main_image.name }}"]');
+        if (altText) altText.value = '';
+        if (displayOrder) displayOrder.value = '0';
+        if (isMainImage) isMainImage.checked = false;
+    }
+}
+</script>
 {% endblock %}

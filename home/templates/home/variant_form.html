@@ -1,374 +1,679 @@
 {% extends 'home/base.html' %}
+{% load static %}
 
 {% block title %}{{ title }} - Samsung Dealer{% endblock %}
 
 {% block extra_css %}
 <style>
-    body {
-        background: linear-gradient(135deg, #f9fafb 0%, #ffffff 50%, #eef2ff 100%) !important;
+    .variant-management-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+    }
+    
+    .management-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .management-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .management-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .management-section {
+        padding: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .management-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+    
+    .section-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .variant-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .variant-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        border-color: #667eea;
+    }
+    
+    .variant-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .variant-info {
+        flex: 1;
+    }
+    
+    .variant-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+    
+    .variant-subtitle {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0.25rem 0 0 0;
+    }
+    
+    .variant-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .variant-body {
+        padding: 1.5rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        background: #f9fafb;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-secondary:hover {
+        background: #4b5563;
+        transform: translateY(-1px);
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .status-active {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .status-inactive {
+        background: #6b7280;
+        color: white;
+    }
+    
+    .dashboard-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .dashboard-breadcrumb a {
+        color: #6b7280;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    
+    .dashboard-breadcrumb a:hover {
+        color: #667eea;
+    }
+    
+    .dashboard-breadcrumb .separator {
+        color: #d1d5db;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .stat-item {
+        background: #f8fafc;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .price-input-group {
+        position: relative;
+    }
+    
+    .price-input-group::before {
+        content: '$';
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-weight: 500;
+        z-index: 1;
+    }
+    
+    .price-input-group input {
+        padding-left: 2rem;
+    }
+    
+    .specifications-textarea {
+        min-height: 120px;
+        max-height: 400px;
+        resize: vertical;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    
+    .specifications-container {
+        position: relative;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen" style="background: linear-gradient(135deg, #f9fafb 0%, #ffffff 50%, #eef2ff 100%);">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-        <!-- Header Section -->
-        <div class="mb-8">
+<div class="variant-management-page">
+    <!-- Header -->
+    <div class="management-header">
+        <div class="container mx-auto px-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
-                        <i class="fas fa-cubes text-indigo-600"></i>
-                        {{ title }}
-                    </h1>
-                    <p class="mt-2 text-gray-600">Manage product variants, pricing, and inventory for <span class="font-semibold text-indigo-600">{{ product.name }}</span></p>
+                    <h1 class="text-2xl font-bold mb-2">{{ title }}</h1>
+                    <div class="dashboard-breadcrumb">
+                        <a href="{% url 'home' %}">Home</a>
+                        <span class="separator">/</span>
+                        <a href="{% url 'product_list' %}">Products</a>
+                        <span class="separator">/</span>
+                        <span>{{ product.name }}</span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="{% url 'product_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm">
-                        <i class="fas fa-arrow-left mr-2"></i>
-                        Back to Products
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'product_create' %}" class="btn-secondary">
+                        <i class="fas fa-plus"></i>
+                        Add Product
+                    </a>
+                    <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
+                        <i class="fas fa-eye"></i>
+                        View Product
                     </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Product Info Card -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 mb-8 text-white shadow-xl">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <i class="fas fa-box text-2xl"></i>
-                        <h2 class="text-xl font-semibold">Product Details</h2>
-                    </div>
-                    <p class="text-lg font-medium">{{ product.name }}</p>
-                    <p class="text-indigo-100 text-sm mt-1">{{ product.short_description|default:"No description available" }}</p>
-                </div>
-                <div class="text-right">
-                    <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                        <p class="text-sm text-indigo-100">Total Variants</p>
-                        <p class="text-2xl font-bold">{{ variant_formset|length }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    <form method="post" enctype="multipart/form-data" novalidate class="space-y-8">
-        {% csrf_token %}
-
-        <!-- Product Variants Formset -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-            <div class="bg-gradient-to-r from-gray-50 to-indigo-50 border-b border-gray-200 px-8 py-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-indigo-600 rounded-lg p-2">
-                            <i class="fas fa-cubes text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Product Variants</h3>
-                            <p class="text-sm text-gray-600">Pricing, inventory, and specifications</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            <i class="fas fa-circle text-green-500 mr-1" style="font-size: 8px;"></i>
-                            {{ variant_formset|length }} Variants
-                        </span>
-                    </div>
-                </div>
-            </div>
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
             
-            <div class="px-6 py-6">
-                {{ variant_formset.management_form }}
-                <div class="space-y-10">
-                    {% for variant_form in variant_formset %}
-                    <div class="relative bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-200 border-l-4 {% if variant_form.instance.is_active %}border-l-green-500{% else %}border-l-gray-300{% endif %}">
-                        <!-- Hidden ID field -->
-                        {{ variant_form.id }}
-                        
-                        <!-- Variant Header -->
-                        <div class="absolute top-4 right-4 flex items-center space-x-3">
-                            <div class="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded-full shadow-sm border border-gray-200">
-                                {{ variant_form.is_active }}
-                                <label for="{{ variant_form.is_active.id_for_label }}" class="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-1">
-                                    <i class="fas fa-toggle-{% if variant_form.instance.is_active %}on text-green-600{% else %}off text-gray-400{% endif %}"></i>
-                                    Active
-                                </label>
-                            </div>
-                            
-                            {% if variant_form.instance.pk %}
-                            <a href="{% url 'product_variant_edit' product.slug variant_form.instance.pk %}" class="inline-flex items-center text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors cursor-pointer border border-indigo-200">
-                                <i class="fas fa-edit mr-1"></i>
-                                <span class="text-sm font-medium">Edit</span>
-                            </a>
-                            
-                            {% if variant_formset.can_delete %}
-                            <div class="flex items-center text-red-600 bg-red-50 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors cursor-pointer border border-red-200">
-                                {{ variant_form.DELETE }}
-                                <label for="{{ variant_form.DELETE.id_for_label }}" class="ml-2 text-sm font-medium cursor-pointer flex items-center gap-1">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </label>
-                            </div>
-                            {% endif %}
-                            {% endif %}
+            <!-- Product Info Card -->
+            <div class="management-card">
+                <div class="variant-header">
+                    <div class="variant-info">
+                        <h2 class="variant-title">{{ product.name }}</h2>
+                        <p class="variant-subtitle">{{ product.short_description|default:"No description available" }}</p>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Total Variants</div>
+                            <div class="stat-value">{{ variant_formset|length }}</div>
                         </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Active Variants</div>
+                            <div class="stat-value">{{ variant_formset|length }}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Total Stock</div>
+                            <div class="stat-value">{{ total_stock }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 pt-4">
-                            <!-- Basic Details -->
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-tag text-indigo-500"></i>
-                                    Variant Name *
-                                </label>
-                                <div class="mt-1">
-                                    {{ variant_form.name }}
-                                </div>
-                                <p class="text-xs text-gray-500 italic">e.g., 55-inch, Mystic Black</p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Variants Section -->
+                <div class="management-card">
+                    <div class="management-section">
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-cubes"></i>
                             </div>
-                            
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-barcode text-indigo-500"></i>
-                                    Model Code (SKU) *
-                                </label>
-                                <div class="mt-1">
-                                    {{ variant_form.model_code }}
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-dollar-sign text-green-500"></i>
-                                    Base Price *
-                                </label>
-                                <div class="relative mt-1 rounded-lg shadow-sm">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <span class="text-gray-500 sm:text-sm font-medium">$</span>
+                            <h2 class="section-title">Product Variants</h2>
+                        </div>
+                        
+                        {{ variant_formset.management_form }}
+                        <div class="space-y-6">
+                            {% for variant_form in variant_formset %}
+                            <div class="variant-card {% if not variant_form.instance.pk %}variant-new-form{% endif %}">
+                                {{ variant_form.id }}
+                                
+                                <!-- Variant Header -->
+                                <div class="variant-header">
+                                    <div class="variant-info">
+                                        <h3 class="variant-title">{{ variant_form.name.value|default:"New Variant" }}</h3>
+                                        <p class="variant-subtitle">{{ variant_form.model_code.value|default:"No model code" }}</p>
                                     </div>
-                                    {{ variant_form.price }}
-                                </div>
-                            </div>
-
-                            <!-- Pricing Details -->
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-percentage text-orange-500"></i>
-                                    Sale Price
-                                </label>
-                                <div class="relative mt-1 rounded-lg shadow-sm">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <span class="text-gray-500 sm:text-sm font-medium">$</span>
+                                    <div class="variant-actions">
+                                        {% if variant_form.instance.pk %}
+                                        <div class="status-badge {% if variant_form.instance.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                            {% if variant_form.instance.is_active %}Active{% else %}Inactive{% endif %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if variant_form.instance.pk %}
+                                        <a href="{% url 'product_variant_edit' product.slug variant_form.instance.pk %}" class="btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                            Edit
+                                        </a>
+                                        {% endif %}
+                                        
+                                        {% if variant_formset.can_delete and variant_form.instance.pk %}
+                                        <button type="button" onclick="deleteVariant('{{ variant_form.instance.pk }}', '{{ variant_form.instance.name|default:"New Variant" }}')" class="btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                            Delete
+                                        </button>
+                                        {% endif %}
                                     </div>
-                                    {{ variant_form.sale_price }}
                                 </div>
-                            </div>
-                            
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-coins text-yellow-500"></i>
-                                    Cost Price
-                                </label>
-                                <div class="relative mt-1 rounded-lg shadow-sm">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <span class="text-gray-500 sm:text-sm font-medium">$</span>
+                                
+                                <!-- Variant Form Fields -->
+                                <div class="variant-body">
+                                    {% if not variant_form.instance.pk %}
+                                    <!-- New Variant Header -->
+                                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-plus-circle text-blue-600"></i>
+                                            <h4 class="text-sm font-semibold text-blue-800">Add New Variant</h4>
+                                        </div>
+                                        <p class="text-xs text-blue-600 mt-1">Fill in the details below to create a new product variant</p>
                                     </div>
-                                    {{ variant_form.cost_price }}
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-warehouse text-blue-500"></i>
-                                    Stock Quantity *
-                                </label>
-                                <div class="mt-1">
-                                    {{ variant_form.stock_quantity }}
-                                </div>
-                                {% if variant_form.instance.stock_quantity %}
-                                <p class="text-xs {% if variant_form.instance.stock_quantity <= variant_form.instance.min_stock_level %}text-red-600 font-semibold{% else %}text-green-600{% endif %}">
-                                    {% if variant_form.instance.stock_quantity <= variant_form.instance.min_stock_level %}
-                                    <i class="fas fa-exclamation-triangle"></i> Low Stock
-                                    {% else %}
-                                    <i class="fas fa-check-circle"></i> In Stock
                                     {% endif %}
-                                </p>
-                                {% endif %}
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Variant Name *</label>
+                                            {{ variant_form.name }}
+                                            {% if variant_form.name.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.name.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Model Code (SKU) *</label>
+                                            {{ variant_form.model_code }}
+                                            {% if variant_form.model_code.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.model_code.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Base Price *</label>
+                                            <div class="price-input-group">
+                                                {{ variant_form.price }}
+                                            </div>
+                                            {% if variant_form.price.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.price.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Sale Price</label>
+                                            <div class="price-input-group">
+                                                {{ variant_form.sale_price }}
+                                            </div>
+                                            {% if variant_form.sale_price.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.sale_price.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Cost Price</label>
+                                            <div class="price-input-group">
+                                                {{ variant_form.cost_price }}
+                                            </div>
+                                            {% if variant_form.cost_price.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.cost_price.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Stock Quantity *</label>
+                                            {{ variant_form.stock_quantity }}
+                                            {% if variant_form.stock_quantity.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.stock_quantity.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Min Stock Level</label>
+                                            {{ variant_form.min_stock_level }}
+                                            {% if variant_form.min_stock_level.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.min_stock_level.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Availability</label>
+                                            {{ variant_form.availability }}
+                                            {% if variant_form.availability.errors and variant_form.instance.pk %}
+                                                <div class="text-red-500 text-sm mt-1">{{ variant_form.availability.errors|join:", " }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Specifications (JSON format)</label>
+                                        <div class="specifications-container">
+                                            <textarea 
+                                                name="{{ variant_form.specifications.name }}" 
+                                                class="form-control specifications-textarea"
+                                                placeholder="Enter specifications in JSON format..."
+                                                rows="4"
+                                                oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
+                                            >{{ variant_form.specifications.value|default:"" }}</textarea>
+                                        </div>
+                                        <p class="text-xs text-gray-500 italic">Format: Key: Value (one per line)</p>
+                                        {% if variant_form.specifications.errors and variant_form.instance.pk %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.specifications.errors|join:", " }}</div>
+                                            {% endif %}
+                                    </div>
+                                </div>
                             </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
 
-                            <!-- Inventory & Specs -->
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-bell text-purple-500"></i>
-                                    Min Stock Alert
-                                </label>
-                                <div class="mt-1">
-                                    {{ variant_form.min_stock_level }}
-                                </div>
+                <!-- Form Actions -->
+                <div class="management-card">
+                    <div class="management-section">
+                        <div class="flex items-center justify-between">
+                            <div class="text-gray-600">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <span class="text-sm">Use the form above to add new variants or manage existing ones. Each variant can have its own specifications and pricing.</span>
                             </div>
-                            
-                            <div class="space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-shipping-fast text-teal-500"></i>
-                                    Stock Availability
-                                </label>
-                                <div class="mt-1">
-                                    {{ variant_form.availability }}
-                                </div>
+                            <div class="flex items-center gap-4">
+                                <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
+                                    <i class="fas fa-eye"></i>
+                                    View Product
+                                </a>
+                                <button type="submit" class="btn-success">
+                                    <i class="fas fa-save"></i>
+                                    Save Variants
+                                </button>
                             </div>
-                            
-                            <div class="md:col-span-1 space-y-1">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2" title="One per line, e.g. Color: Red">
-                                    <i class="fas fa-list text-indigo-500"></i>
-                                    Variant Specifications
-                                    <i class="fas fa-question-circle text-gray-400 text-xs cursor-help"></i>
-                                </label>
-                                <div class="mt-1 font-mono text-sm bg-gray-50 rounded-lg p-2">
-                                    {{ variant_form.specifications }}
-                                </div>
-                                <p class="text-xs text-gray-500 italic">Format: Key: Value (one per line)</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Variant Images Section -->
-                        <div class="mt-6 pt-6 border-t border-gray-200">
-                            <div class="flex items-center justify-between mb-4">
-                                <label class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                    <i class="fas fa-images text-indigo-500"></i>
-                                    Variant Images
-                                </label>
-                                <span class="text-xs text-gray-500">Upload images specific to this variant</span>
-                            </div>
-                            
-                            {% if variant_form.instance.pk %}
-                                <!-- Existing images for this variant -->
-                                <div class="space-y-3 mb-4">
-                                    {% for img in variant_form.instance.images.all %}
-                                    <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                        <img src="{{ img.image.url }}" alt="{{ img.alt_text }}" class="w-16 h-16 object-cover rounded-lg">
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-gray-900">{{ img.alt_text|default:"No alt text" }}</p>
-                                            <p class="text-xs text-gray-500">
-                                                {% if img.is_main_image %}<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Main Image</span>{% endif %}
-                                                Order: {{ img.display_order }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            
-                            <!-- Add new image form -->
-                            <div class="bg-white border border-dashed border-gray-300 rounded-lg p-4">
-                                <div class="text-center">
-                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                    <p class="text-sm text-gray-600 mb-3">Drop images here or click to upload</p>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-1">Image File</label>
-                                            <input type="file" name="variant_images-{{ forloop.counter0 }}-image" accept="image/*" class="form-control">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-1">Alt Text</label>
-                                            <input type="text" name="variant_images-{{ forloop.counter0 }}-alt_text" placeholder="Describe the image" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            
-            <!-- Form Actions -->
-            <div class="bg-gradient-to-r from-gray-50 to-indigo-50 px-8 py-6 border-t border-gray-200">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-4 w-full sm:w-auto">
-                        <a href="{% url 'product_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm">
-                            <i class="fas fa-times mr-2"></i>
-                            Cancel
-                        </a>
-                        <button type="button" onclick="window.location.href='{% url 'product_detail' product.slug %}'" class="inline-flex items-center px-4 py-2 border border-indigo-300 rounded-lg text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-all duration-200">
-                            <i class="fas fa-eye mr-2"></i>
-                            View Product
-                        </button>
-                    </div>
-                    <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-3 text-sm font-semibold text-white shadow-lg hover:from-indigo-500 hover:to-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 transform hover:scale-105">
-                        <i class="fas fa-save mr-2"></i>
-                        {{ button_text }}
-                    </button>
-                </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
-<!-- Enhanced Styles -->
-<style>
-    /* Modern form styling */
-    .form-container input[type="text"], 
-    .form-container input[type="number"], 
-    .form-container select, 
-    .form-container textarea {
-        display: block;
-        width: 100%;
-        border-radius: 0.5rem;
-        border: 1px solid #d1d5db;
-        padding: 0.625rem 0.75rem;
-        color: #111827;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        transition: all 0.2s;
-        font-size: 0.875rem;
+<script>
+function deleteVariant(variantId, variantName) {
+    if (confirm(`Are you sure you want to delete the variant "${variantName}"? This action cannot be undone.`)) {
+        // Find the variant card and remove it immediately for better UX
+        const variantCard = event.target.closest('.variant-card');
+        
+        // Show loading state
+        const deleteButton = event.target;
+        deleteButton.style.opacity = '0.5';
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Deleting...';
+        deleteButton.disabled = true;
+        
+        // Send AJAX request
+        fetch(`/products/{{ product.slug }}/variants/${variantId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Success - remove the variant card with animation
+                variantCard.style.transition = 'all 0.3s ease';
+                variantCard.style.transform = 'translateX(-100%)';
+                variantCard.style.opacity = '0';
+                
+                setTimeout(() => {
+                    variantCard.remove();
+                    // Update variant count
+                    updateVariantCount();
+                }, 300);
+                
+                // Show success message
+                showNotification(data.message, 'success');
+            } else {
+                // Error - restore button and show error
+                deleteButton.style.opacity = '1';
+                deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                deleteButton.disabled = false;
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            deleteButton.style.opacity = '1';
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+            deleteButton.disabled = false;
+            showNotification('An error occurred while trying to delete the variant. Please try again.', 'error');
+        });
     }
+}
+
+function updateVariantCount() {
+    // Update the variant count in the header
+    const variantCards = document.querySelectorAll('.variant-card');
+    const count = variantCards.length;
+    const countElements = document.querySelectorAll('.stat-value');
+    if (countElements.length >= 1) {
+        countElements[0].textContent = count;
+    }
+}
+
+function showNotification(message, type) {
+    // Create a simple notification
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
     
-    .form-container input[type="text"]:focus, 
-    .form-container input[type="number"]:focus, 
-    .form-container select:focus, 
-    .form-container textarea:focus {
-        outline: none;
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
+    document.body.appendChild(notification);
     
-    /* Price inputs with dollar sign */
-    input[name$="-price"], 
-    input[name$="-sale_price"], 
-    input[name$="-cost_price"] {
-        padding-left: 2.5rem !important;
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        notification.style.transition = 'opacity 0.3s ease';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-    
-    /* Enhanced checkbox styling */
-    input[type="checkbox"] {
-        height: 1rem;
-        width: 1rem;
-        border-radius: 0.25rem;
-        border: 1px solid #d1d5db;
-        color: #4f46e5;
-        cursor: pointer;
-    }
-    
-    input[type="checkbox"]:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-    
-    /* Hover effects for form sections */
-    .variant-card:hover {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        transform: translateY(-0.25rem);
-    }
-    
-    /* Stock status indicators */
-    .stock-low {
-        background-color: #fef2f2;
-        border-color: #fecaca;
-        color: #b91c1c;
-    }
-    
-    .stock-good {
-        background-color: #f0fdf4;
-        border-color: #bbf7d0;
-        color: #15803d;
-    }
-</style>
+    return cookieValue;
+}
+</script>
 {% endblock %}

@@ -150,6 +150,15 @@ class ProductVariantForm(forms.ModelForm):
         return specs_dict
 
 class ProductVariantImageForm(forms.ModelForm):
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image:
+            # Remove filename length restriction - allow long filenames
+            # Django's default limit is 100 characters, we'll override this
+            if len(image.name) > 255:  # Set a more reasonable limit
+                raise forms.ValidationError(f'Filename "{image.name}" is too long. Maximum 255 characters allowed.')
+        return image
+    
     class Meta:
         model = ProductVariantImage
         fields = ['image', 'alt_text', 'is_main_image', 'display_order']

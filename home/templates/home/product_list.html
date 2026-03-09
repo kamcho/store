@@ -96,7 +96,7 @@
 {% block content %}
 
     <!-- ══════════ PAGE HEADER ══════════ -->
-    <div class="bg-gradient-to-b from-slate-50 to-white pt-6 pb-6">
+    <div class="pt-6 pb-6">
         <div class="container mx-auto px-6">
             <!-- Breadcrumb -->
             <div class="flex items-center gap-2 text-sm text-slate-400 mb-4">
@@ -241,11 +241,11 @@
                     <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden group shadow-sm">
                         <!-- Image -->
                         <a href="{% url 'product_detail' product.slug %}" class="block">
-                            <div class="h-56 bg-gradient-to-b from-white to-slate-50/80 p-6 flex items-center justify-center relative overflow-hidden">
+                            <div class="h-56 p-6 flex items-center justify-center relative overflow-hidden">
                                 {% with main_image=product.images.all|dictsort:"is_main_image"|last %}
                                 {% if product.images.all %}
                                 <img src="{{ main_image.image.url }}" alt="{{ product.name }}"
-                                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm"
+                                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                                     height="224" width="224">
                                 {% else %}
                                 <div class="w-24 h-24 rounded-2xl bg-slate-100 flex items-center justify-center">

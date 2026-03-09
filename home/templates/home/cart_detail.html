@@ -95,19 +95,19 @@
                                 </p>
                                 <!-- Mobile Price -->
                                 <p class="text-sm font-bold text-slate-700 mt-2 md:hidden">
-                                    KSH {{ item.variant.price|floatformat:0 }}
+                                    KSH {{ item.unit_price|floatformat:0 }}
                                 </p>
                             </div>
                         </div>
 
                         <!-- Price (Desktop) -->
                         <div class="hidden md:flex md:col-span-2 items-center justify-center">
-                            <span class="text-sm font-bold text-slate-700">KSH {{ item.variant.price|floatformat:0 }}</span>
+                            <span class="text-sm font-bold text-slate-700">KSH {{ item.unit_price|floatformat:0 }}</span>
                         </div>
 
                         <!-- Quantity -->
                         <div class="md:col-span-2 flex items-center justify-center">
-                            <form action="{% url 'update_cart' item.product.id %}" method="POST" class="flex items-center">
+                            <form action="{% url 'update_cart' item.variant.id %}" method="POST" class="flex items-center">
                                 {% csrf_token %}
                                 <div class="flex items-center border border-slate-200 rounded-xl overflow-hidden">
                                     <button type="button" onclick="this.parentNode.querySelector('input').stepDown(); this.closest('form').submit();"
@@ -127,7 +127,7 @@
                         <!-- Subtotal & Remove -->
                         <div class="md:col-span-2 flex items-center justify-between md:justify-end gap-4">
                             <span class="text-sm font-extrabold text-slate-900">KSH {{ item.subtotal|floatformat:0 }}</span>
-                            <a href="{% url 'remove_from_cart' item.product.id %}"
+                            <a href="{% url 'remove_from_cart' item.variant.id %}"
                                 class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all"
                                 title="Remove item">
                                 <i class="fas fa-trash-alt text-xs"></i>
@@ -182,9 +182,9 @@
                                 msg += '━━━━━━━━━━━━━━━━━━━━\n\n';
 
                                 {% for item in cart_items %}
-                                msg += '📦 *{{ item.product.name|escapejs }}*\n';
-                                msg += '   ID: #{{ item.product.id }}\n';
-                                msg += '   Price: KSH {{ item.variant.price|floatformat:0 }}\n';
+                                msg += '📦 *{{ item.product.name|escapejs }}* ({{ item.variant.name|escapejs }})\n';
+                                msg += '   Variant ID: #{{ item.variant.id }}\n';
+                                msg += '   Price: KSH {{ item.unit_price|floatformat:0 }}\n';
                                 msg += '   Qty: {{ item.quantity }}\n';
                                 msg += '   Subtotal: KSH {{ item.subtotal|floatformat:0 }}\n';
                                 msg += '   {{ item.product.short_description|truncatewords:10|escapejs }}\n\n';

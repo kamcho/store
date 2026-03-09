@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from home.views import (
     home, product_list, product_create, product_edit, 
-    product_delete, product_detail, product_variant_manage, product_variant_edit, add_to_cart, 
+    product_delete, product_detail, product_variant_manage, product_variant_edit, delete_variant, add_variant_image, add_to_cart, 
     cart_detail, remove_from_cart, update_cart,
     user_login, user_logout, ai_chat,
     contact_submit, notifications_list, notification_mark_read
@@ -37,6 +37,8 @@ urlpatterns = [
     path('products/<slug:slug>/edit/', product_edit, name='product_edit'),
     path('products/<slug:slug>/variants/', product_variant_manage, name='product_variant_manage'),
     path('products/<slug:slug>/variants/<int:variant_id>/edit/', product_variant_edit, name='product_variant_edit'),
+    path('products/<slug:slug>/variants/<int:variant_id>/delete/', delete_variant, name='delete_variant'),
+    path('products/<slug:slug>/variants/<int:variant_id>/add-image/', add_variant_image, name='add_variant_image'),
     path('products/<slug:slug>/delete/', product_delete, name='product_delete'),
     
     # Notifications URLs
@@ -46,9 +48,11 @@ urlpatterns = [
 
     # Cart URLs
     path('cart/', cart_detail, name='cart_detail'),
+    # add_to_cart keeps product_id in the URL; variant_id is provided via POST data
     path('cart/add/<int:product_id>/', add_to_cart, name='add_to_cart'),
-    path('cart/remove/<int:product_id>/', remove_from_cart, name='remove_from_cart'),
-    path('cart/update/<int:product_id>/', update_cart, name='update_cart'),
+    # remove/update operate on concrete variant ids stored in the cart
+    path('cart/remove/<int:variant_id>/', remove_from_cart, name='remove_from_cart'),
+    path('cart/update/<int:variant_id>/', update_cart, name='update_cart'),
     
     # API URLs
     path('api/chat/', ai_chat, name='ai_chat'),

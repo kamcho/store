@@ -4,322 +4,491 @@
 
 {% block extra_css %}
 <style>
-    body {
-        background: linear-gradient(135deg, #f9fafb 0%, #ffffff 50%, #eef2ff 100%) !important;
+    /* Product form page: premium scoped design (overrides Bootstrap/defaults) */
+    .product-form-page {
+        --pf-radius: 12px;
+        --pf-radius-lg: 16px;
+        --pf-blue: #1428A0;
+        --pf-blue-dark: #0b1d5c;
+        --pf-blue-ring: rgba(20, 40, 160, 0.2);
+        --pf-border: #e2e8f0;
+        --pf-slate: #64748b;
+        --pf-slate-dark: #334155;
+    }
+
+    .product-form-page .form-container {
+        background: #fff;
+        border-radius: var(--pf-radius-lg);
+        padding: 1.75rem 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 10px 20px -10px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--pf-border);
+    }
+
+    .product-form-page .section-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--pf-slate-dark);
+        margin: 0 0 1.25rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--pf-border);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .product-form-page .section-title i {
+        color: var(--pf-blue);
+    }
+
+    .product-form-page .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--pf-slate-dark);
+        margin-bottom: 0.375rem;
+    }
+
+    .product-form-page .form-row {
+        margin-bottom: 1.25rem;
+    }
+
+    .product-form-page .form-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .product-form-page input.form-control,
+    .product-form-page select.form-select,
+    .product-form-page textarea.form-control {
+        width: 100%;
+        display: block;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        color: #1e293b;
+        background: #fff;
+        border: 2px solid var(--pf-border);
+        border-radius: var(--pf-radius);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-form-page input.form-control::placeholder,
+    .product-form-page textarea.form-control::placeholder {
+        color: var(--pf-slate);
+    }
+
+    .product-form-page input.form-control:focus,
+    .product-form-page select.form-select:focus,
+    .product-form-page textarea.form-control:focus {
+        outline: none;
+        border-color: var(--pf-blue);
+        box-shadow: 0 0 0 4px var(--pf-blue-ring);
+    }
+
+    .product-form-page textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .product-form-page input[type="file"].form-control {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .product-form-page .form-check-input {
+        width: 1.125rem;
+        height: 1.125rem;
+        margin: 0;
+        accent-color: var(--pf-blue);
+        cursor: pointer;
+    }
+
+    .product-form-page .invalid-feedback {
+        font-size: 0.8125rem;
+        color: #dc2626;
+        margin-top: 0.25rem;
+    }
+
+    .product-form-page [type="submit"].btn-primary,
+    .product-form-page .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(135deg, var(--pf-blue), #0047AB);
+        border: none;
+        border-radius: var(--pf-radius);
+        box-shadow: 0 4px 14px rgba(20, 40, 160, 0.35);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-form-page .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(20, 40, 160, 0.4);
+    }
+
+    .product-form-page button[type="button"].bg-samsung-blue,
+    .product-form-page .bg-samsung-blue,
+    .product-form-page .product-form-btn-primary {
+        background-color: var(--pf-blue) !important;
+        color: #fff !important;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: var(--pf-radius);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(20, 40, 160, 0.25);
+        transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-form-page button[type="button"].bg-samsung-blue:hover,
+    .product-form-page .bg-samsung-blue:hover,
+    .product-form-page .product-form-btn-primary:hover {
+        background-color: var(--pf-blue-dark) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(20, 40, 160, 0.3);
+    }
+
+    .product-form-page a.border-slate-200 {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #475569;
+        background: #fff;
+        border: 2px solid var(--pf-border);
+        border-radius: var(--pf-radius);
+        text-decoration: none;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .product-form-page a.border-slate-200:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .product-form-page .product-form-card {
+        background: #f8fafc;
+        border: 1px solid var(--pf-border);
+        border-radius: var(--pf-radius);
+    }
+
+    .product-form-page .product-form-page-header-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 12px;
+        background: var(--pf-blue);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 14px rgba(20, 40, 160, 0.3);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen" style="background: linear-gradient(135deg, #f9fafb 0%, #ffffff 50%, #eef2ff 100%);">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-        <!-- Header Section -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between">
+<div class="product-form-page max-w-4xl mx-auto">
+    <!-- Page header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-3">
+                <span class="product-form-page-header-icon">
+                    <i class="fas fa-plus text-sm"></i>
+                </span>
+                {{ title }}
+            </h1>
+            <p class="mt-1.5 text-slate-600 text-sm">Add a new product with images and specifications.</p>
+        </div>
+        <a href="{% url 'product_list' %}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition-all no-underline">
+            <i class="fas fa-arrow-left text-slate-500"></i>
+            Back to Products
+        </a>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-6 p-4 rounded-xl text-sm font-medium {% if message.tags == 'error' %}bg-red-50 border border-red-100 text-red-800{% else %}bg-emerald-50 border border-emerald-100 text-emerald-800{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Form errors -->
+    {% if form.errors %}
+        <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-100">
+            <h3 class="text-red-800 font-semibold text-sm mb-2">Please fix the following errors:</h3>
+            <ul class="text-sm text-red-700 space-y-1">
+                {% for field, errors in form.errors.items %}
+                    <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if image_formset.errors %}
+        <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-100">
+            <h3 class="text-red-800 font-semibold text-sm mb-2">Image errors:</h3>
+            <ul class="text-sm text-red-700 space-y-1">
+                {% for form in image_formset %}
+                    {% if form.errors %}
+                        <li>Image {{ forloop.counter }}: {{ form.errors|join:", " }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if spec_formset.errors %}
+        <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-100">
+            <h3 class="text-red-800 font-semibold text-sm mb-2">Specification errors:</h3>
+            <ul class="text-sm text-red-700 space-y-1">
+                {% for form in spec_formset %}
+                    {% if form.errors %}
+                        <li>Spec {{ forloop.counter }}: {{ form.errors|join:", " }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Basic information -->
+        <div class="form-container">
+            <h2 class="section-title flex items-center gap-2">
+                <i class="fas fa-info-circle text-samsung-blue"></i>
+                Basic information
+            </h2>
+            <div class="form-row grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
-                        <i class="fas fa-plus-circle text-indigo-600"></i>
-                        {{ title }}
-                    </h1>
-                    <p class="mt-2 text-gray-600">Create a new product with images and specifications</p>
+                    <label class="form-label">Category</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <p class="invalid-feedback">{{ form.category.errors.0 }}</p>
+                    {% endif %}
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="{% url 'product_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm">
-                        <i class="fas fa-arrow-left mr-2"></i>
-                        Back to Products
-                    </a>
+                <div>
+                    <label class="form-label">Product name <span class="text-red-500">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <p class="invalid-feedback">{{ form.name.errors.0 }}</p>
+                    {% endif %}
                 </div>
+                <div>
+                    <label class="form-label">URL slug <span class="text-red-500">*</span></label>
+                    {{ form.slug }}
+                    {% if form.slug.errors %}
+                        <p class="invalid-feedback">{{ form.slug.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label">Warranty (months)</label>
+                    {{ form.warranty_period }}
+                    {% if form.warranty_period.errors %}
+                        <p class="invalid-feedback">{{ form.warranty_period.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Short description</label>
+                {{ form.short_description }}
+                {% if form.short_description.errors %}
+                    <p class="invalid-feedback">{{ form.short_description.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div class="form-row">
+                <label class="form-label">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="invalid-feedback">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div class="form-row">
+                <label class="form-label">Product features</label>
+                {{ form.features }}
+                <p class="mt-2 text-xs text-slate-500">Enter one feature per line. Example: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">Premium AMOLED Display</code>, <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">5000mAh Battery</code></p>
+                {% if form.features.errors %}
+                    <p class="invalid-feedback">{{ form.features.errors.0 }}</p>
+                {% endif %}
             </div>
         </div>
 
-        <!-- Error Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <!-- Form Errors Debug -->
-        {% if form.errors %}
-            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                <h3 class="text-red-700 font-semibold mb-2">Form Errors:</h3>
-                {% for field, errors in form.errors.items %}
-                    <div class="text-sm text-red-600">
-                        <strong>{{ field }}:</strong> {{ errors|join:", " }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if image_formset.errors %}
-            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                <h3 class="text-red-700 font-semibold mb-2">Image Formset Errors:</h3>
-                {% for form in image_formset %}
-                    {% if form.errors %}
-                        <div class="text-sm text-red-600">
-                            Image {{ forloop.counter }}: {{ form.errors|join:", " }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if spec_formset.errors %}
-            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                <h3 class="text-red-700 font-semibold mb-2">Specification Formset Errors:</h3>
-                {% for form in spec_formset %}
-                    {% if form.errors %}
-                        <div class="text-sm text-red-600">
-                            Spec {{ forloop.counter }}: {{ form.errors|join:", " }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <form method="post" enctype="multipart/form-data" class="space-y-8">
-            {% csrf_token %}
-
-            <!-- Basic Information -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-6">Basic Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                        {{ form.category }}
-                        {% if form.category.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
-                        {{ form.name }}
-                        {% if form.name.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Slug *</label>
-                        {{ form.slug }}
-                        {% if form.slug.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.slug.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Warranty Period</label>
-                        {{ form.warranty_period }}
-                        {% if form.warranty_period.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.warranty_period.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Short Description</label>
-                    {{ form.short_description }}
-                    {% if form.short_description.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.short_description.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    {{ form.description }}
-                    {% if form.description.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Product Features</label>
-                    {{ form.features }}
-                    <p class="mt-2 text-sm text-gray-500">
-                        <strong>Enter one feature per line:</strong><br>
-                        Example:<br>
-                        <code class="bg-gray-100 px-2 py-1 rounded text-xs">Premium Dynamic AMOLED 2X Display</code><br>
-                        <code class="bg-gray-100 px-2 py-1 rounded text-xs">Snapdragon 8 Gen 2 Processor</code><br>
-                        <code class="bg-gray-100 px-2 py-1 rounded text-xs">5000mAh Battery</code><br>
-                        <code class="bg-gray-100 px-2 py-1 rounded text-xs">5G Connectivity</code>
-                    </p>
-                    {% if form.features.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.features.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Product Images -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                <div class="bg-gradient-to-r from-gray-50 to-indigo-50 border-b border-gray-200 px-8 py-6">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-indigo-600 rounded-lg p-2">
-                            <i class="fas fa-images text-white"></i>
+        <!-- Product images -->
+        <div class="form-container">
+            <h2 class="section-title flex items-center gap-2">
+                <i class="fas fa-images text-samsung-blue"></i>
+                Product images
+            </h2>
+            {{ image_formset.management_form }}
+            <div class="space-y-4" id="images-form-container">
+                {% for image_form in image_formset %}
+                <div class="product-form-card p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                    {{ image_form.id }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Image</label>
+                            {{ image_form.image }}
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Product Images</h3>
-                            <p class="text-sm text-gray-600">Upload product images</p>
+                            <label class="form-label">Alt text</label>
+                            {{ image_form.alt_text }}
                         </div>
                     </div>
-                </div>
-                {{ image_formset.management_form }}
-                <div class="space-y-4" id="images-form-container">
-                    {% for image_form in image_formset %}
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        {{ image_form.id }}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Image</label>
-                                {{ image_form.image }}
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
-                                {{ image_form.alt_text }}
-                            </div>
-                        </div>
-                        <div class="mt-4 flex items-center">
+                    <div class="mt-4 flex flex-wrap items-center gap-6">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
                             {{ image_form.is_main_image }}
-                            <label class="ml-2 text-sm text-gray-700">Main Image</label>
+                            <span class="text-sm font-medium text-slate-700">Set as main image</span>
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-slate-700">Display order:</label>
+                            {{ image_form.display_order }}
                         </div>
                         {% if image_formset.can_delete and image_form.instance.pk %}
-                        <div class="mt-4 flex items-center">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
                             {{ image_form.DELETE }}
-                            <label class="ml-2 text-sm text-red-600">Delete</label>
-                        </div>
+                            <span class="text-sm font-medium text-red-600">Remove image</span>
+                        </label>
                         {% endif %}
                     </div>
-                    {% endfor %}
                 </div>
-                <div class="mt-4">
-                    <button type="button" onclick="addImageForm()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                        Add Image
-                    </button>
-                </div>
+                {% endfor %}
             </div>
+            <button type="button" onclick="addImageForm()" class="product-form-btn-primary mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-samsung-blue text-white text-sm font-semibold hover:bg-samsung-dark transition-all shadow-sm hover:shadow-md">
+                <i class="fas fa-plus"></i>
+                Add image
+            </button>
+        </div>
 
-            <!-- Specifications -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                <div class="bg-gradient-to-r from-gray-50 to-indigo-50 border-b border-gray-200 px-8 py-6">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-indigo-600 rounded-lg p-2">
-                            <i class="fas fa-list text-white"></i>
+        <!-- Specifications -->
+        <div class="form-container">
+            <h2 class="section-title flex items-center gap-2">
+                <i class="fas fa-list text-samsung-blue"></i>
+                Specifications
+            </h2>
+            {{ spec_formset.management_form }}
+            <div class="space-y-4" id="specs-form-container">
+                {% for spec_form in spec_formset %}
+                <div class="product-form-card p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                    {{ spec_form.id }}
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="form-label">Category</label>
+                            {{ spec_form.category }}
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Specifications</h3>
-                            <p class="text-sm text-gray-600">Technical specifications</p>
+                            <label class="form-label">Name</label>
+                            {{ spec_form.name }}
+                        </div>
+                        <div>
+                            <label class="form-label">Value</label>
+                            {{ spec_form.value }}
+                        </div>
+                        <div>
+                            <label class="form-label">Display order</label>
+                            {{ spec_form.display_order }}
                         </div>
                     </div>
-                </div>
-                {{ spec_formset.management_form }}
-                <div class="space-y-4" id="specs-form-container">
-                    {% for spec_form in spec_formset %}
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        {{ spec_form.id }}
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                                {{ spec_form.category }}
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                                {{ spec_form.name }}
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Value</label>
-                                {{ spec_form.value }}
-                            </div>
-                        </div>
-                        {% if spec_formset.can_delete and spec_form.instance.pk %}
-                        <div class="mt-4 flex items-center">
+                    {% if spec_formset.can_delete and spec_form.instance.pk %}
+                    <div class="mt-4">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
                             {{ spec_form.DELETE }}
-                            <label class="ml-2 text-sm text-red-600">Delete</label>
-                        </div>
-                        {% endif %}
+                            <span class="text-sm font-medium text-red-600">Remove</span>
+                        </label>
                     </div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
-                <div class="mt-4">
-                    <button type="button" onclick="addSpecForm()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                        Add Specification
-                    </button>
-                </div>
+                {% endfor %}
             </div>
+            <button type="button" onclick="addSpecForm()" class="product-form-btn-primary mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-samsung-blue text-white text-sm font-semibold hover:bg-samsung-dark transition-all shadow-sm hover:shadow-md">
+                <i class="fas fa-plus"></i>
+                Add specification
+            </button>
+        </div>
 
-            <!-- Options -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                <div class="bg-gradient-to-r from-gray-50 to-indigo-50 border-b border-gray-200 px-8 py-6">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-indigo-600 rounded-lg p-2">
-                            <i class="fas fa-cog text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Options</h3>
-                            <p class="text-sm text-gray-600">Product settings</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex items-center">
-                        {{ form.is_featured }}
-                        <label class="ml-2 text-sm text-gray-700">Featured Product</label>
-                    </div>
-                    <div class="flex items-center">
-                        {{ form.is_active }}
-                        <label class="ml-2 text-sm text-gray-700">Active</label>
-                    </div>
-                </div>
+        <!-- Options -->
+        <div class="form-container">
+            <h2 class="section-title flex items-center gap-2">
+                <i class="fas fa-cog text-samsung-blue"></i>
+                Options
+            </h2>
+            <div class="flex flex-wrap gap-8">
+                <label class="inline-flex items-center gap-3 cursor-pointer">
+                    {{ form.is_featured }}
+                    <span class="text-sm font-medium text-slate-700">Featured product</span>
+                </label>
+                <label class="inline-flex items-center gap-3 cursor-pointer">
+                    {{ form.is_active }}
+                    <span class="text-sm font-medium text-slate-700">Active (visible on site)</span>
+                </label>
             </div>
+        </div>
 
-            <!-- Submit -->
-            <div class="bg-gradient-to-r from-gray-50 to-indigo-50 rounded-2xl p-8 border border-gray-100">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <a href="{% url 'product_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm">
-                            <i class="fas fa-times mr-2"></i>
-                            Cancel
-                        </a>
-                    </div>
-                    <button type="submit" class="inline-flex justify-center items-center rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-3 text-sm font-semibold text-white shadow-lg hover:from-indigo-500 hover:to-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 transform hover:scale-105">
-                        <i class="fas fa-plus mr-2"></i>
-                        {{ button_text }}
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
+        <!-- Submit -->
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
+            <a href="{% url 'product_list' %}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 no-underline">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn-primary inline-flex items-center justify-center gap-2 px-8 py-3 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all">
+                <i class="fas fa-check"></i>
+                {{ button_text }}
+            </button>
+        </div>
+    </form>
 </div>
 
-<!-- Hidden Templates -->
+<!-- Hidden templates for dynamic forms -->
 <div id="empty-image-form" class="hidden">
-    <div class="border border-gray-200 rounded-lg p-4">
+    <div class="product-form-card p-4 rounded-xl border border-slate-200 bg-slate-50/50">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Image</label>
+                <label class="form-label">Image</label>
                 {{ image_formset.empty_form.image }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
+                <label class="form-label">Alt text</label>
                 {{ image_formset.empty_form.alt_text }}
             </div>
         </div>
-        <div class="mt-4 flex items-center">
+        <div class="mt-4 flex items-center gap-2">
             {{ image_formset.empty_form.is_main_image }}
-            <label class="ml-2 text-sm text-gray-700">Main Image</label>
+            <label class="text-sm font-medium text-slate-700">Set as main image</label>
+        </div>
+        <div class="mt-4 flex items-center gap-2">
+            <label class="text-sm font-medium text-slate-700">Display order:</label>
+            {{ image_formset.empty_form.display_order }}
         </div>
     </div>
 </div>
 
 <div id="empty-spec-form" class="hidden">
-    <div class="border border-gray-200 rounded-lg p-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="product-form-card p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <label class="form-label">Category</label>
                 {{ spec_formset.empty_form.category }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                <label class="form-label">Name</label>
                 {{ spec_formset.empty_form.name }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Value</label>
+                <label class="form-label">Value</label>
                 {{ spec_formset.empty_form.value }}
+            </div>
+            <div>
+                <label class="form-label">Display order</label>
+                {{ spec_formset.empty_form.display_order }}
             </div>
         </div>
     </div>
@@ -331,9 +500,7 @@ function addImageForm() {
     const formCount = parseInt(totalForms.value);
     const emptyForm = document.getElementById('empty-image-form');
     const newForm = emptyForm.innerHTML.replace(/__prefix__/g, formCount);
-    
-    const container = document.getElementById('images-form-container');
-    container.insertAdjacentHTML('beforeend', newForm);
+    document.getElementById('images-form-container').insertAdjacentHTML('beforeend', newForm);
     totalForms.value = formCount + 1;
 }
 
@@ -342,62 +509,24 @@ function addSpecForm() {
     const formCount = parseInt(totalForms.value);
     const emptyForm = document.getElementById('empty-spec-form');
     const newForm = emptyForm.innerHTML.replace(/__prefix__/g, formCount);
-    
-    const container = document.getElementById('specs-form-container');
-    container.insertAdjacentHTML('beforeend', newForm);
+    document.getElementById('specs-form-container').insertAdjacentHTML('beforeend', newForm);
     totalForms.value = formCount + 1;
 }
 
-// Auto-generate slug from name
 document.addEventListener('DOMContentLoaded', function() {
     const nameField = document.querySelector('input[name="name"]');
     const slugField = document.querySelector('input[name="slug"]');
-    
     if (nameField && slugField) {
         nameField.addEventListener('input', function() {
             if (!slugField.value) {
-                const slug = this.value.toLowerCase()
+                slugField.value = this.value.toLowerCase()
                     .replace(/[^a-z0-9\s-]/g, '')
                     .replace(/\s+/g, '-')
                     .replace(/-+/g, '-')
                     .replace(/^-|-$/g, '');
-                slugField.value = slug;
             }
         });
     }
 });
 </script>
-
-<style>
-input[type="text"], 
-input[type="number"], 
-input[type="file"], 
-select, 
-textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-input[type="text"]:focus, 
-input[type="number"]:focus, 
-select:focus, 
-textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-}
-</style>
 {% endblock %}
