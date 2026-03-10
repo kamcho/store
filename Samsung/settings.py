@@ -33,6 +33,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-changeme-in-pr
 # SECURITY WARNING: don't run with debug turned on in production!
 ENV = os.environ.get('ENV', 'dev').lower()
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+# if ENV == 'dev':
+#     DEBUG = True # Force True for local dev to avoid WhiteNoise manifest issues
 
 
 ALLOWED_HOSTS = ['arhythmically-unciliated-danna.ngrok-free.dev', '127.0.0.1', 'localhost','worldtechpartner.com', 'www.worldtechpartner.com']
@@ -167,7 +169,7 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 

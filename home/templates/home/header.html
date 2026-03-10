@@ -1,33 +1,40 @@
 {% load static %}
 
 <!-- ══════════ TOP CONTACT BAR ══════════ -->
-<div class="top-contact-bar bg-samsung-blue text-white text-center py-2 text-xs font-medium fixed top-0 w-full z-[60] h-10 flex items-center">
+<div
+    class="top-contact-bar bg-samsung-blue text-white text-center py-2 text-xs font-medium fixed top-0 w-full z-[60] h-10 flex items-center">
     <div class="max-w-[1600px] mx-auto w-full px-6 flex items-center justify-between">
         <div class="hidden sm:flex items-center gap-4 text-white/70">
-            <span class="flex items-center gap-1"><i class="fas fa-shipping-fast text-[10px]"></i> Free Delivery Nationwide</span>
+            <span class="flex items-center gap-1"><i class="fas fa-shipping-fast text-[10px]"></i> Free Delivery
+                Nationwide</span>
         </div>
-        <a href="tel:+254714044399" class="flex items-center gap-2 hover:text-white/80 transition-colors font-semibold no-underline">
+        <a href="tel:+254714044399"
+            class="flex items-center gap-2 hover:text-white/80 transition-colors font-semibold no-underline">
             <i class="fas fa-phone text-[10px]"></i> +254 714 044 399
         </a>
-        <a href="mailto:Worldtechsolution22@gmail.com" class="hidden md:flex items-center gap-2 hover:text-white/80 transition-colors text-xs no-underline">
+        <a href="mailto:Worldtechsolution22@gmail.com"
+            class="hidden md:flex items-center gap-2 hover:text-white/80 transition-colors text-xs no-underline">
             <i class="fas fa-envelope text-[10px]"></i> Worldtechsolution22@gmail.com
         </a>
         <div class="hidden sm:flex items-center gap-3 text-white/70">
-            <a href="https://wa.me/254714044399" target="_blank" class="hover:text-white transition-colors no-underline"><i class="fab fa-whatsapp"></i></a>
-            <a href="#" class="hover:text-white transition-colors no-underline"><i class="fab fa-facebook-f text-[10px]"></i></a>
-            <a href="#" class="hover:text-white transition-colors no-underline"><i class="fab fa-instagram text-[10px]"></i></a>
+            <a href="https://wa.me/254714044399" target="_blank"
+                class="hover:text-white transition-colors no-underline"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="hover:text-white transition-colors no-underline"><i
+                    class="fab fa-facebook-f text-[10px]"></i></a>
+            <a href="#" class="hover:text-white transition-colors no-underline"><i
+                    class="fab fa-instagram text-[10px]"></i></a>
         </div>
     </div>
 </div>
 
 <!-- ══════════ NAVIGATION ══════════ -->
-<nav id="navbar" class="fixed top-10 w-full z-50 transition-all duration-300 py-3 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-16 flex items-center">
+<nav id="navbar"
+    class="fixed top-10 w-full z-50 transition-all duration-300 py-3 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-16 flex items-center">
     <div class="max-w-[1600px] mx-auto w-full px-6">
         <div class="flex justify-between items-center gap-4">
-            <a href="{% url 'home' %}" class="text-xl font-bold flex items-center gap-2.5 text-slate-900 transition-colors duration-300 no-underline whitespace-nowrap flex-shrink-0">
-                <img src="/media/logos/logo-light.png" alt="World Tech Partners" class="h-9 w-auto" height="36" width="36"
-                    onerror="this.style.display='none'; this.nextElementSibling.classList.toggle('hidden-logo');">
-                <div class="logo-fallback w-9 h-9 rounded-lg bg-samsung-blue flex items-center justify-center hidden-logo">
+            <a href="{% url 'home' %}"
+                class="text-xl font-bold flex items-center gap-2.5 text-slate-900 transition-colors duration-300 no-underline whitespace-nowrap flex-shrink-0">
+                <div class="w-9 h-9 rounded-lg bg-samsung-blue flex items-center justify-center">
                     <i class="fas fa-mobile-alt text-white text-sm"></i>
                 </div>
                 <span class="whitespace-nowrap">World Tech Partners</span>
@@ -35,7 +42,8 @@
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-0.5">
-                <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'home' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Home</a>
+                <a href="{% url 'home' %}"
+                    class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'home' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Home</a>
                 <!-- Products Mega Menu -->
                 <div class="relative group px-1">
                     <a href="{% url 'product_list' %}"
@@ -43,7 +51,7 @@
                         Products <i
                             class="fas fa-chevron-down text-[10px] group-hover:rotate-180 transition-transform duration-300"></i>
                     </a>
-                
+
                     <!-- Dropdown Menu -->
                     <div
                         class="absolute top-full left-0 w-64 bg-white border border-slate-100 shadow-xl rounded-xl py-3 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-[70]">
@@ -56,7 +64,7 @@
                                 <i class="fas fa-chevron-right text-[10px]"></i>
                                 {% endif %}
                             </a>
-                
+
                             {% if cat.subcategories.exists %}
                             <!-- Subcategories side menu -->
                             <div
@@ -70,7 +78,7 @@
                                         <i class="fas fa-chevron-right text-[10px]"></i>
                                         {% endif %}
                                     </a>
-                
+
                                     {% if sub.subcategories.exists %}
                                     <!-- Leaf items -->
                                     <div
@@ -98,26 +106,33 @@
                     </div>
                 </div>
 
-                <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}" class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Services</a>
-                <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}" class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Reviews</a>
-                <a href="{% if request.resolver_match.url_name == 'home' %}#contact{% else %}{% url 'home' %}#contact{% endif %}" class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Contact</a>
-                
+                <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}"
+                    class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Services</a>
+                <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}"
+                    class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Reviews</a>
+                <a href="{% if request.resolver_match.url_name == 'home' %}#contact{% else %}{% url 'home' %}#contact{% endif %}"
+                    class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Contact</a>
+
                 {% if user.is_staff %}
                 <div class="w-px h-6 bg-slate-200 mx-1.5 flex-shrink-0"></div>
-                <a href="{% url 'product_create' %}" class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'product_create' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm flex items-center gap-1.5 no-underline whitespace-nowrap">
+                <a href="{% url 'product_create' %}"
+                    class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'product_create' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm flex items-center gap-1.5 no-underline whitespace-nowrap">
                     <i class="fas fa-plus-circle"></i> Add Product
                 </a>
-                <a href="{% url 'notifications_list' %}" class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'notifications_list' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm flex items-center gap-1.5 no-underline whitespace-nowrap">
+                <a href="{% url 'notifications_list' %}"
+                    class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'notifications_list' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm flex items-center gap-1.5 no-underline whitespace-nowrap">
                     <i class="fas fa-bell"></i> Notifications
                 </a>
                 {% endif %}
 
                 <div class="w-px h-6 bg-slate-200 mx-1.5 flex-shrink-0"></div>
 
-                <a href="{% url 'cart_detail' %}" class="relative px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'cart_detail' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm flex items-center gap-1.5 no-underline whitespace-nowrap">
+                <a href="{% url 'cart_detail' %}"
+                    class="relative px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'cart_detail' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm flex items-center gap-1.5 no-underline whitespace-nowrap">
                     <i class="fas fa-shopping-bag"></i> Cart
                     {% if request.session.cart %}
-                    <span class="absolute -top-1 right-0 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{{ request.session.cart|length }}</span>
+                    <span
+                        class="absolute -top-1 right-0 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{{ request.session.cart|length }}</span>
                     {% endif %}
                 </a>
 
@@ -125,27 +140,34 @@
                     class="ml-1 px-5 py-2.5 bg-samsung-blue text-white font-semibold rounded-xl hover:bg-samsung-dark transition-all duration-300 text-sm shadow-sm hover:shadow-md hover:shadow-samsung-blue/20 no-underline">
                     Shop Now
                 </a>
-                
+
                 <div class="flex items-center ml-2">
                     {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="p-2 text-slate-400 hover:text-red-500 transition-colors no-underline" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+                    <a href="{% url 'logout' %}"
+                        class="p-2 text-slate-400 hover:text-red-500 transition-colors no-underline" title="Logout"><i
+                            class="fas fa-sign-out-alt"></i></a>
                     {% else %}
-                    <a href="{% url 'login' %}" class="p-2 text-slate-400 hover:text-samsung-blue transition-colors no-underline" title="Login"><i class="fas fa-sign-in-alt"></i></a>
+                    <a href="{% url 'login' %}"
+                        class="p-2 text-slate-400 hover:text-samsung-blue transition-colors no-underline"
+                        title="Login"><i class="fas fa-sign-in-alt"></i></a>
                     {% endif %}
                 </div>
             </div>
 
             <!-- Mobile Menu Button -->
-            <button class="md:hidden text-slate-700 text-xl p-2 rounded-lg hover:bg-slate-100 transition-colors" onclick="toggleMobileMenu()">
+            <button class="md:hidden text-slate-700 text-xl p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                onclick="toggleMobileMenu()">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-t border-slate-100 shadow-xl overflow-y-auto max-h-[80vh]">
+    <div id="mobile-menu"
+        class="hidden md:hidden absolute top-full left-0 w-full bg-white border-t border-slate-100 shadow-xl overflow-y-auto max-h-[80vh]">
         <div class="flex flex-col p-5 space-y-1">
-            <a href="{% url 'home' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Home</a>
+            <a href="{% url 'home' %}"
+                class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Home</a>
             <!-- Mobile Products Hierarchy -->
             <div class="space-y-1">
                 <div
@@ -162,7 +184,8 @@
                     <div class="space-y-1">
                         <div
                             class="flex items-center justify-between px-4 py-2 text-slate-600 font-semibold text-sm rounded-lg hover:bg-slate-100 transition-colors group">
-                            <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="flex-grow no-underline text-inherit">{{ cat.name }}</a>
+                            <a href="{% url 'product_list' %}?category={{ cat.slug }}"
+                                class="flex-grow no-underline text-inherit">{{ cat.name }}</a>
                             {% if cat.subcategories.exists %}
                             <button
                                 onclick="this.closest('.group').nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')"
@@ -174,60 +197,73 @@
                         {% if cat.subcategories.exists %}
                         <div class="hidden pl-4 space-y-1">
                             {% for sub in cat.subcategories.all %}
-                                <div class="space-y-1">
-                                    <div
-                                        class="flex items-center justify-between px-4 py-2 text-slate-500 font-medium text-sm rounded-lg hover:bg-slate-100 transition-colors group">
-                                        <a href="{% url 'product_list' %}?category={{ sub.slug }}" class="flex-grow no-underline text-inherit">{{ sub.name  }}</a>
-                                        {% if sub.subcategories.exists %}
-                                        <button
-                                            onclick="this.closest('.group').nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')"
-                                            class="p-2 -mr-2">
-                                            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
-                                        </button>
-                                        {% endif %}
-                                    </div>
+                            <div class="space-y-1">
+                                <div
+                                    class="flex items-center justify-between px-4 py-2 text-slate-500 font-medium text-sm rounded-lg hover:bg-slate-100 transition-colors group">
+                                    <a href="{% url 'product_list' %}?category={{ sub.slug }}"
+                                        class="flex-grow no-underline text-inherit">{{ sub.name }}</a>
                                     {% if sub.subcategories.exists %}
-                                    <div class="hidden pl-4 space-y-1">
-                                        {% for leaf in sub.subcategories.all %}
-                                        <a href="{% url 'product_list' %}?category={{ leaf.slug }}"
-                                            class="block px-4 py-2 text-slate-500 text-sm hover:text-samsung-blue no-underline">{{ leaf.name }}</a>
-                                        {% endfor %}
-                                    </div>
+                                    <button
+                                        onclick="this.closest('.group').nextElementSibling.classList.toggle('hidden'); this.querySelector('i').classList.toggle('rotate-180')"
+                                        class="p-2 -mr-2">
+                                        <i
+                                            class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                                    </button>
                                     {% endif %}
                                 </div>
+                                {% if sub.subcategories.exists %}
+                                <div class="hidden pl-4 space-y-1">
+                                    {% for leaf in sub.subcategories.all %}
+                                    <a href="{% url 'product_list' %}?category={{ leaf.slug }}"
+                                        class="block px-4 py-2 text-slate-500 text-sm hover:text-samsung-blue no-underline">{{
+                                        leaf.name }}</a>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
                             {% endfor %}
                         </div>
                         {% endif %}
-                            </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
-            <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Services</a>
-            <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Reviews</a>
-            <a href="{% if request.resolver_match.url_name == 'home' %}#contact{% else %}{% url 'home' %}#contact{% endif %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Contact</a>
-            <a href="{% url 'cart_detail' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 no-underline">
+            <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}"
+                class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Services</a>
+            <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}"
+                class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Reviews</a>
+            <a href="{% if request.resolver_match.url_name == 'home' %}#contact{% else %}{% url 'home' %}#contact{% endif %}"
+                class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Contact</a>
+            <a href="{% url 'cart_detail' %}"
+                class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 no-underline">
                 <i class="fas fa-shopping-bag text-slate-400"></i> Cart
-                {% if request.session.cart %}<span class="ml-1 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{{ request.session.cart|length }}</span>{% endif %}
+                {% if request.session.cart %}<span
+                    class="ml-1 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{{ request.session.cart|length
+                    }}</span>{% endif %}
             </a>
-            
+
             {% if user.is_staff %}
             <div class="border-t border-slate-100 my-2 pt-2">
-                <a href="{% url 'product_create' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 no-underline">
+                <a href="{% url 'product_create' %}"
+                    class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 no-underline">
                     <i class="fas fa-plus-circle text-samsung-blue"></i> Add Product
                 </a>
-                <a href="{% url 'notifications_list' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 no-underline">
+                <a href="{% url 'notifications_list' %}"
+                    class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 no-underline">
                     <i class="fas fa-bell text-samsung-blue"></i> Notifications
                 </a>
             </div>
             {% endif %}
-            
+
             <div class="border-t border-slate-100 my-2 pt-2">
                 {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors no-underline">
+                <a href="{% url 'logout' %}"
+                    class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors no-underline">
                     <i class="fas fa-sign-out-alt mr-2 text-slate-400"></i> Logout
                 </a>
                 {% else %}
-                <a href="{% url 'login' %}" class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">
+                <a href="{% url 'login' %}"
+                    class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">
                     <i class="fas fa-sign-in-alt mr-2 text-slate-400"></i> Sign In
                 </a>
                 {% endif %}
@@ -241,7 +277,7 @@
         const menu = document.getElementById('mobile-menu');
         const icon = document.querySelector('button[onclick="toggleMobileMenu()"] i');
         const body = document.body;
-        
+
         if (menu && icon) {
             menu.classList.toggle('hidden');
             if (!menu.classList.contains('hidden')) {
