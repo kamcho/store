@@ -9,11 +9,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.cache import cache_page
 import json
 from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
 from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
 from .forms_login import CustomLoginForm
 
+@cache_page(60 * 150)  # Cache for 15 minutes
 def home(request):
     # Hero product: first featured product, or newest active product
     hero_product = Product.objects.filter(
@@ -24,23 +26,17 @@ def home(request):
             is_active=True
         ).select_related('category').prefetch_related('images', 'variants').first()
 
-    # Featured products for the hero cards (up to 12)
+    # Featured products for the hero cards (up to 10 random products)
     featured_products = Product.objects.filter(is_active=True).exclude(
         pk=hero_product.pk if hero_product else 0
-    ).select_related('category').prefetch_related('images', 'variants').order_by('-is_featured', '-created_at')[:12]
+    ).select_related('category').prefetch_related('images', 'variants').order_by('?')[:6]
 
     # Custom sections as requested by the user
     # Pair of (Section Display Name, Category Slug)
     section_configs = [
-        ("Mobile & Wearables", "mobile-wearables"),
+        ("Smartphones", "smartphones"),
         ("TV & Audio", "tv-audio"),
-        ("Home Appliances", "home-appliances"),
-        ("Computing & Storage", "computing-storage"),
-        ("Earbuds", "earbuds-galaxy-buds"),
-        ("Smart Watches", "smart-watches"),
-        ("Cameras & Imaging", "cameras-imaging"),
-        ("Smart Home & IoT", "smart-home-iot"),
-        ("Home Entertainment", "tv-audio"), # Re-using TV & Audio or could be a different slug if available
+        ("Home & Living", "home-appliances"),
     ]
 
     homepage_sections = []
@@ -80,7 +76,7 @@ def home(request):
     # Recent arrivals (newest products)
     recent_arrivals = Product.objects.filter(
         is_active=True
-    ).select_related('category').prefetch_related('images', 'variants').order_by('-created_at')[:8]
+    ).select_related('category').prefetch_related('images', 'variants').order_by('-created_at')[:4]
 
     context = {
         'hero_product': hero_product,
