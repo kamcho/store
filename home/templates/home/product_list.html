@@ -6,16 +6,29 @@
 {% block extra_css %}
 <style>
     /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f8fafc; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f8fafc;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
 
     /* Product card lift */
     .product-card {
         transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         border-color: #e2e8f0;
     }
+
     .product-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.08);
@@ -26,10 +39,12 @@
     .cat-link {
         transition: all 0.25s ease;
     }
+
     .cat-link:hover {
         background: #f1f5f9;
         color: #1428A0;
     }
+
     .cat-link.active {
         background: #1428A0;
         color: #fff;
@@ -41,22 +56,27 @@
         border-color: #1428A0;
         box-shadow: 0 0 0 3px rgba(20, 40, 160, 0.1);
     }
+
     /* Category Submenu */
     .cat-submenu {
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
     }
+
     .cat-submenu.open {
         max-height: 1000px;
         transition: max-height 0.4s ease-in-out;
     }
+
     .cat-toggle i {
         transition: transform 0.3s ease;
     }
+
     .cat-toggle.open i {
         transform: rotate(180deg);
     }
+
     /* Sidebar Sticky & Scroll */
     .sticky-sidebar {
         max-height: calc(100vh - 8rem);
@@ -64,9 +84,20 @@
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 transparent;
     }
-    .sticky-sidebar::-webkit-scrollbar { width: 4px; }
-    .sticky-sidebar::-webkit-scrollbar-track { background: transparent; }
-    .sticky-sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .sticky-sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sticky-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sticky-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
     /* Sidebar Sticky & Scroll */
     .sticky-sidebar {
         max-height: calc(100vh - 120px) !important;
@@ -77,9 +108,20 @@
         top: 120px !important;
         z-index: 40 !important;
     }
-    .sticky-sidebar::-webkit-scrollbar { width: 4px; }
-    .sticky-sidebar::-webkit-scrollbar-track { background: transparent; }
-    .sticky-sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .sticky-sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sticky-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sticky-sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
     /* Sidebar Internal Scroll */
     .sidebar-inner {
         max-height: calc(100vh - 130px);
@@ -87,35 +129,46 @@
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 transparent;
     }
-    .sidebar-inner::-webkit-scrollbar { width: 4px; }
-    .sidebar-inner::-webkit-scrollbar-track { background: transparent; }
-    .sidebar-inner::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .sidebar-inner::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar-inner::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar-inner::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 
-    <!-- ══════════ PAGE HEADER ══════════ -->
-    <div class="pt-6 pb-6">
-        <div class="container mx-auto px-6">
-            <!-- Breadcrumb -->
-            <div class="flex items-center gap-2 text-sm text-slate-400 mb-4">
-                <a href="{% url 'home' %}" class="hover:text-samsung-blue transition-colors">Home</a>
-                <i class="fas fa-chevron-right text-[8px]"></i>
-                <span class="text-slate-600 font-medium">Products</span>
-            </div>
-            <h1 class="text-3xl md:text-4xl font-black text-slate-900 mb-2">
-                <span class="font-light">Our </span>
-                <span class="text-samsung-blue">Products</span>
-            </h1>
-            <p class="text-slate-500 text-sm max-w-lg">Explore our premium collection of Samsung devices and accessories.</p>
+<!-- ══════════ PAGE HEADER ══════════ -->
+<div class="pt-6 pb-6">
+    <div class="container mx-auto px-6">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-sm text-slate-400 mb-4">
+            <a href="{% url 'home' %}" class="hover:text-samsung-blue transition-colors">Home</a>
+            <i class="fas fa-chevron-right text-[8px]"></i>
+            <span class="text-slate-600 font-medium">Products</span>
         </div>
+        <h1 class="text-3xl md:text-4xl font-black text-slate-900 mb-2">
+            <span class="font-light">Our </span>
+            <span class="text-samsung-blue">Products</span>
+        </h1>
+        <p class="text-slate-500 text-sm max-w-lg">Explore our premium collection of Samsung devices and accessories.
+        </p>
     </div>
+</div>
 
-    <!-- ══════════ MAIN CONTENT ══════════ -->
-    <div class="py-8">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col lg:flex-row gap-8">
+<!-- ══════════ MAIN CONTENT ══════════ -->
+<div class="py-8">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-8">
 
             <!-- Sidebar -->
             <aside class="lg:w-64 flex-shrink-0 lg:sticky lg:top-[120px] lg:h-fit z-40 sticky-sidebar">
@@ -136,15 +189,17 @@
                                         <span>{{ cat.name }}</span>
                                     </a>
                                     {% if cat.subcategories.exists %}
-                                    <button class="cat-toggle p-2 text-slate-400 hover:text-samsung-blue transition-colors"
+                                    <button
+                                        class="cat-toggle p-2 text-slate-400 hover:text-samsung-blue transition-colors"
                                         data-target="submenu-{{ cat.id }}">
                                         <i class="fas fa-chevron-down text-[10px]"></i>
                                     </button>
                                     {% endif %}
                                 </div>
-                            
+
                                 {% if cat.subcategories.exists %}
-                                <div id="submenu-{{ cat.id }}" class="cat-submenu pl-3 space-y-1 border-l border-slate-100 ml-2">
+                                <div id="submenu-{{ cat.id }}"
+                                    class="cat-submenu pl-3 space-y-1 border-l border-slate-100 ml-2">
                                     {% for sub in cat.subcategories.all %}
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between group">
@@ -153,28 +208,30 @@
                                                 <span>{{ sub.name }}</span>
                                             </a>
                                             {% if sub.subcategories.exists %}
-                                            <button class="cat-toggle p-1.5 text-slate-400 hover:text-samsung-blue transition-colors"
+                                            <button
+                                                class="cat-toggle p-1.5 text-slate-400 hover:text-samsung-blue transition-colors"
                                                 data-target="submenu-{{ sub.id }}">
                                                 <i class="fas fa-chevron-down text-[8px]"></i>
                                             </button>
                                             {% endif %}
                                         </div>
-                            
+
                                         {% if sub.subcategories.exists %}
-                                        <div id="submenu-{{ sub.id }}" class="cat-submenu pl-3 space-y-1 border-l border-slate-50 ml-2">
+                                        <div id="submenu-{{ sub.id }}"
+                                            class="cat-submenu pl-3 space-y-1 border-l border-slate-50 ml-2">
                                             {% for leaf in sub.subcategories.all %}
                                             <a href="?category={{ leaf.slug }}&search={{ search_query }}&sort={{ sort_by }}"
                                                 class="cat-link block px-3 py-1 text-[10px] font-medium {% if selected_category == leaf.slug %}active{% else %}text-slate-500{% endif %} rounded-md">
                                                 {{ leaf.name }}
                                             </a>
                                             {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                            </div>
-                                            {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -201,9 +258,9 @@
                         <input type="hidden" name="category" value="{{ selected_category }}">
                         <input type="hidden" name="sort" value="{{ sort_by }}">
                         <div class="relative flex-1">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                            <input type="text" name="search" value="{{ search_query }}"
-                                placeholder="Search products..."
+                            <i
+                                class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" name="search" value="{{ search_query }}" placeholder="Search products..."
                                 class="search-input w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm transition-all">
                         </div>
                         <button type="submit"
@@ -211,7 +268,8 @@
                             Search
                         </button>
                     </form>
-                    <select class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 font-medium cursor-pointer hover:border-samsung-blue transition-colors"
+                    <select
+                        class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 font-medium cursor-pointer hover:border-samsung-blue transition-colors"
                         onchange="window.location.href=this.value">
                         <option value="?category={{ selected_category }}&search={{ search_query }}&sort=newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
                         <option value="?category={{ selected_category }}&search={{ search_query }}&sort=price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low → High</option>
@@ -238,7 +296,8 @@
                 <!-- Product Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                     {% for product in page_obj %}
-                    <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden group shadow-sm">
+                    <div
+                        class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden group shadow-sm">
                         <!-- Image -->
                         <a href="{% url 'product_detail' product.slug %}" class="block">
                             <div class="h-56 p-6 flex items-center justify-center relative overflow-hidden">
@@ -246,7 +305,7 @@
                                 {% if product.images.all %}
                                 <img src="{{ main_image.image.url }}" alt="{{ product.name }}"
                                     class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                    height="224" width="224">
+                                    loading="lazy" height="224" width="224">
                                 {% else %}
                                 <div class="w-24 h-24 rounded-2xl bg-slate-100 flex items-center justify-center">
                                     <i class="fas fa-mobile-alt text-3xl text-slate-300"></i>
@@ -255,19 +314,22 @@
                                 {% endwith %}
 
                                 {% if product.is_featured %}
-                                <span class="absolute top-3 left-3 bg-samsung-blue text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                <span
+                                    class="absolute top-3 left-3 bg-samsung-blue text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                                     Featured
                                 </span>
                                 {% endif %}
 
                                 {% if product.get_discount_percentage > 0 %}
-                                <span class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+                                <span
+                                    class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
                                     -{{ product.get_discount_percentage }}%
                                 </span>
                                 {% endif %}
 
                                 <!-- Wishlist button -->
-                                <button class="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors z-10">
+                                <button
+                                    class="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors z-10">
                                     <i class="far fa-heart text-sm"></i>
                                 </button>
                             </div>
@@ -279,7 +341,8 @@
                                 {{ product.category.name|default:"Samsung" }}
                             </div>
                             <a href="{% url 'product_detail' product.slug %}" class="block">
-                                <h3 class="text-base font-bold text-slate-900 mb-1 group-hover:text-samsung-blue transition-colors line-clamp-1">
+                                <h3
+                                    class="text-base font-bold text-slate-900 mb-1 group-hover:text-samsung-blue transition-colors line-clamp-1">
                                     {{ product.name }}
                                 </h3>
                             </a>
@@ -300,10 +363,12 @@
 
                             {% if user.is_authenticated %}
                             <div class="mt-3 pt-3 border-t border-slate-100 flex gap-3">
-                                <a href="{% url 'product_edit' product.slug %}" class="text-xs text-slate-400 hover:text-samsung-blue transition-colors">
+                                <a href="{% url 'product_edit' product.slug %}"
+                                    class="text-xs text-slate-400 hover:text-samsung-blue transition-colors">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="{% url 'product_delete' product.slug %}" class="text-xs text-slate-400 hover:text-red-500 transition-colors">
+                                <a href="{% url 'product_delete' product.slug %}"
+                                    class="text-xs text-slate-400 hover:text-red-500 transition-colors">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
                             </div>
@@ -325,23 +390,24 @@
 
                     {% for num in page_obj.paginator.page_range %}
                     {% if page_obj.number == num %}
-                    <span class="px-4 py-2.5 rounded-xl bg-samsung-blue text-white text-sm font-bold shadow-md shadow-samsung-blue/20">
+                    <span
+                        class="px-4 py-2.5 rounded-xl bg-samsung-blue text-white text-sm font-bold shadow-md shadow-samsung-blue/20">
                         {{ num }}
                     </span>
-                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <a href="?page={{ num }}&category={{ selected_category }}&search={{ search_query }}&sort={{ sort_by }}"
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
+                        href="?page={{ num }}&category={{ selected_category }}&search={{ search_query }}&sort={{ sort_by }}"
                         class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:border-samsung-blue hover:text-samsung-blue transition-all">
                         {{ num }}
-                    </a>
-                    {% endif %}
-                    {% endfor %}
+                        </a>
+                        {% endif %}
+                        {% endfor %}
 
-                    {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}&category={{ selected_category }}&search={{ search_query }}&sort={{ sort_by }}"
-                        class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:border-samsung-blue hover:text-samsung-blue transition-all">
-                        Next <i class="fas fa-chevron-right text-[10px] ml-1"></i>
-                    </a>
-                    {% endif %}
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}&category={{ selected_category }}&search={{ search_query }}&sort={{ sort_by }}"
+                            class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:border-samsung-blue hover:text-samsung-blue transition-all">
+                            Next <i class="fas fa-chevron-right text-[10px] ml-1"></i>
+                        </a>
+                        {% endif %}
                 </div>
                 {% endif %}
 
