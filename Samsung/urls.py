@@ -19,6 +19,7 @@ from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
+from django.http import HttpResponse
 from home.views import (
     home, product_list, product_create, product_edit, 
     product_delete, product_detail, product_variant_manage, product_variant_edit, delete_variant, set_main_image, delete_variant_image, add_to_cart, 
@@ -36,6 +37,7 @@ sitemaps = {
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('favicon.ico', lambda x: HttpResponse(status=204)),
     path('', home, name='home'),
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),

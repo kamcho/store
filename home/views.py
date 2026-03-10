@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import cache_page
 import json
+import random
 from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
 from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
 from .forms_login import CustomLoginForm
@@ -26,10 +27,18 @@ def home(request):
             is_active=True
         ).select_related('category').prefetch_related('images', 'variants').first()
 
-    # Featured products for the hero cards (up to 10 random products)
-    featured_products = Product.objects.filter(is_active=True).exclude(
+    # Get IDs of all active products except the hero one
+    all_featured_ids = list(Product.objects.filter(is_active=True).exclude(
         pk=hero_product.pk if hero_product else 0
-    ).select_related('category').prefetch_related('images', 'variants').order_by('?')[:6]
+    ).values_list('id', flat=True))
+    
+    # Randomly sample 6 IDs in Python (much faster than order_by('?') in SQL)
+    sampled_ids = random.sample(all_featured_ids, min(len(all_featured_ids), 6))
+    
+    # Fetch those specific products
+    featured_products = Product.objects.filter(id__in=sampled_ids).select_related('category').prefetch_related('images', 'variants')
+    # Re-shuffle because __in=sampled_ids doesn't preserve order
+    featured_products = sorted(featured_products, key=lambda x: sampled_ids.index(x.id))
 
     # Custom sections as requested by the user
     # Pair of (Section Display Name, Category Slug)
