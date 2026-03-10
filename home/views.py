@@ -913,3 +913,25 @@ def notification_mark_read(request, pk):
         return JsonResponse({'status': 'success'})
     
     return redirect('notifications_list')
+def handler404(request, exception):
+    """Custom 404 error handler: redirect to home with message"""
+    messages.error(request, "The page you are looking for does not exist.")
+    return redirect('home')
+
+def handler500(request):
+    """Custom 500 error handler: avoid redirect loops"""
+    from django.http import HttpResponse
+    return HttpResponse("""
+        <h1>500 - Server Error</h1>
+        <p>Something went wrong on our end. Please <a href="/">click here</a> to go back to the homepage.</p>
+    """, status=500)
+
+def handler403(request, exception=None):
+    """Custom 403 error handler: redirect to home with message"""
+    messages.error(request, "You do not have permission to access that page.")
+    return redirect('home')
+
+def handler400(request, exception=None):
+    """Custom 400 error handler: redirect to home with message"""
+    messages.error(request, "There was a problem with your request.")
+    return redirect('home')

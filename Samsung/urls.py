@@ -25,6 +25,13 @@ from home.views import (
     user_login, user_logout, ai_chat,variant_image_manage,
     contact_submit, notifications_list, notification_mark_read
 )
+from django.contrib.sitemaps.views import sitemap
+from home.sitemaps import StaticViewSitemap, ProductSitemap
+
+sitemaps = {
+    'static': StaticViewSitemap,
+    'products': ProductSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -58,7 +65,15 @@ urlpatterns = [
     
     # API URLs
     path('api/chat/', ai_chat, name='ai_chat'),
+    
+    # Sitemap
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
+
+handler404 = 'home.views.handler404'
+handler500 = 'home.views.handler500'
+handler403 = 'home.views.handler403'
+handler400 = 'home.views.handler400'
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
