@@ -337,7 +337,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="form-label">Image</label>
-                            {{ image_form.image }}
+                            <div class="flex items-center gap-3">
+                                <div class="w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                                    {% if image_form.instance.image %}
+                                        <img class="js-image-preview w-full h-full object-cover" src="{{ image_form.instance.image.url }}" alt="Preview">
+                                    {% else %}
+                                        <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview">
+                                        <i class="fas fa-image text-slate-300"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1">
+                                    {{ image_form.image }}
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label class="form-label">Alt text</label>
@@ -380,11 +392,9 @@
                 {% for spec_form in spec_formset %}
                 <div class="product-form-card p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                     {{ spec_form.id }}
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="form-label">Category</label>
-                            {{ spec_form.category }}
-                        </div>
+                    {{ spec_form.category }}
+                    {{ spec_form.display_order }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="form-label">Name</label>
                             {{ spec_form.name }}
@@ -392,10 +402,6 @@
                         <div>
                             <label class="form-label">Value</label>
                             {{ spec_form.value }}
-                        </div>
-                        <div>
-                            <label class="form-label">Display order</label>
-                            {{ spec_form.display_order }}
                         </div>
                     </div>
                     {% if spec_formset.can_delete and spec_form.instance.pk %}
@@ -453,7 +459,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="form-label">Image</label>
-                {{ image_formset.empty_form.image }}
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                        <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview">
+                        <i class="fas fa-image text-slate-300"></i>
+                    </div>
+                    <div class="flex-1">
+                        {{ image_formset.empty_form.image }}
+                    </div>
+                </div>
             </div>
             <div>
                 <label class="form-label">Alt text</label>
@@ -473,11 +487,9 @@
 
 <div id="empty-spec-form" class="hidden">
     <div class="product-form-card p-4 rounded-xl border border-slate-200 bg-slate-50/50">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="form-label">Category</label>
-                {{ spec_formset.empty_form.category }}
-            </div>
+        {{ spec_formset.empty_form.category }}
+        {{ spec_formset.empty_form.display_order }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="form-label">Name</label>
                 {{ spec_formset.empty_form.name }}
@@ -486,15 +498,31 @@
                 <label class="form-label">Value</label>
                 {{ spec_formset.empty_form.value }}
             </div>
-            <div>
-                <label class="form-label">Display order</label>
-                {{ spec_formset.empty_form.display_order }}
-            </div>
         </div>
     </div>
 </div>
 
 <script>
+function wireImagePreviews(root) {
+    (root || document).querySelectorAll('#images-form-container input[type="file"]').forEach((input) => {
+        if (input.dataset.previewWired === '1') return;
+        input.dataset.previewWired = '1';
+
+        input.addEventListener('change', function () {
+            const card = input.closest('.product-form-card');
+            if (!card) return;
+            const img = card.querySelector('img.js-image-preview');
+            if (!img) return;
+
+            const file = input.files && input.files[0];
+            if (!file) return;
+
+            img.src = URL.createObjectURL(file);
+            img.classList.remove('hidden');
+        });
+    });
+}
+
 function addImageForm() {
     const totalForms = document.getElementById('id_images-TOTAL_FORMS');
     const formCount = parseInt(totalForms.value);
@@ -502,6 +530,7 @@ function addImageForm() {
     const newForm = emptyForm.innerHTML.replace(/__prefix__/g, formCount);
     document.getElementById('images-form-container').insertAdjacentHTML('beforeend', newForm);
     totalForms.value = formCount + 1;
+    wireImagePreviews(document);
 }
 
 function addSpecForm() {
@@ -514,6 +543,7 @@ function addSpecForm() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    wireImagePreviews(document);
     const nameField = document.querySelector('input[name="name"]');
     const slugField = document.querySelector('input[name="slug"]');
     if (nameField && slugField) {

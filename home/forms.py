@@ -78,11 +78,28 @@ class ProductSpecificationForm(forms.ModelForm):
         model = ProductSpecification
         fields = ['category', 'name', 'value', 'display_order']
         widgets = {
-            'category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Display, Processor, Camera'}),
+            # Hidden: not needed in the UI, we default it to "General" if not provided.
+            'category': forms.HiddenInput(),
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Screen Size, CPU Type'}),
             'value': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 6.7 inches, Snapdragon 888'}),
-            'display_order': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            # Hidden: auto-managed
+            'display_order': forms.HiddenInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Make category optional in the form; we will normalize it in clean().
+        self.fields["category"].required = False
+
+        # Provide sensible defaults for new specs
+        if not self.instance or not getattr(self.instance, "pk", None):
+            self.initial.setdefault("category", "General")
+            self.initial.setdefault("display_order", 0)
+
+    def clean_category(self):
+        value = (self.cleaned_data.get("category") or "").strip()
+        return value or "General"
 
 ProductImageFormSet = inlineformset_factory(
     Product, ProductImage,

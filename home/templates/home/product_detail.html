@@ -193,6 +193,7 @@
                     {% for variant in product.variants.all %}
                     <button type="button"
                         class="variant-btn px-4 py-2.5 rounded-xl border-2 {% if forloop.first %}border-samsung-blue bg-samsung-blue/5 text-samsung-blue{% else %}border-slate-100 text-slate-600 hover:border-slate-200{% endif %} text-sm font-bold transition-all"
+                        data-variant-id="{{ variant.id }}"
                         data-price="{{ variant.price|floatformat:0 }}"
                         data-sale-price="{{ variant.sale_price|default:''|floatformat:0 }}"
                         data-discount="{{ variant.get_discount_percentage }}" data-model="{{ variant.model_code }}"
@@ -451,7 +452,7 @@
 
     // Variant Selection
     let currentVariantName = "{% with v=product.variants.first %}{{ v.name }}{% endwith %}";
-    let currentVariantPrice = "{% with v=product.variants.first %}KSH {{ v.price|floatformat:0 }}{% endwith %}";
+    let currentVariantPrice = "{% with v=product.variants.first %}{% if v.sale_price %}KSH {{ v.sale_price|floatformat:0 }}{% else %}KSH {{ v.price|floatformat:0 }}{% endif %}{% endwith %}";
     let currentVariantModel = "{% with v=product.variants.first %}{{ v.model_code }}{% endwith %}";
 
     function selectVariant(btn, variantId) {
@@ -520,5 +521,30 @@
 
     // Initialize WhatsApp link
     updateWhatsAppLink();
+
+    // If offer_price was passed in the URL, preselect the matching variant by sale price.
+    (function preselectVariantFromOfferPrice() {
+        const offerPriceRaw = "{% if offer_price %}{{ offer_price }}{% endif %}";
+        if (!offerPriceRaw) return;
+
+        // Normalize to a plain integer/number string (handle commas/spaces just in case)
+        const normalizedOffer = String(offerPriceRaw).replace(/[,\s]/g, "");
+        const offerNum = Number(normalizedOffer);
+        if (!Number.isFinite(offerNum)) return;
+
+        const buttons = Array.from(document.querySelectorAll(".variant-btn"));
+        if (!buttons.length) return;
+
+        const match = buttons.find((b) => {
+            const sale = (b.dataset.salePrice || "").replace(/[,\s]/g, "");
+            const saleNum = Number(sale);
+            return Number.isFinite(saleNum) && saleNum === offerNum;
+        });
+
+        if (match) {
+            const vid = match.dataset.variantId;
+            selectVariant(match, vid);
+        }
+    })();
 </script>
 {% endblock %}

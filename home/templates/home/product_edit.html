@@ -175,35 +175,21 @@
 
 {% block content %}
 <div class="product-edit-page">
-    <!-- Header -->
-    <div class="edit-header">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold mb-2">{{ title }}</h1>
-                    <div class="dashboard-breadcrumb">
-                        <a href="{% url 'home' %}">Home</a>
-                        <span class="separator">/</span>
-                        <a href="{% url 'product_list' %}">Products</a>
-                        <span class="separator">/</span>
-                        <span>{{ product.name }}</span>
-                    </div>
-                </div>
-                <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
-                    <i class="fas fa-eye"></i>
-                    View Product
-                </a>
-            </div>
-        </div>
-    </div>
+
 
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-4xl mx-auto">
             
             <!-- Product Info Card -->
+             <br><br>
             <div class="product-info">
                 <h3>{{ product.name }}</h3>
                 <p>{{ product.short_description|default:"No short description available" }}</p>
+
+                <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
+                    <i class="fas fa-eye"></i>
+                    View Product
+                </a>
             </div>
 
             <form method="post" enctype="multipart/form-data" id="product-edit-form">
@@ -300,7 +286,19 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="form-label">Image</label>
-                                        {{ image_form.image }}
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-14 h-14 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
+                                                {% if image_form.instance.image %}
+                                                    <img class="js-image-preview w-full h-full object-cover" src="{{ image_form.instance.image.url }}" alt="Preview">
+                                                {% else %}
+                                                    <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview">
+                                                    <i class="fas fa-image text-gray-300"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-1">
+                                                {{ image_form.image }}
+                                            </div>
+                                        </div>
                                         {% if image_form.image.errors %}
                                             <div class="text-red-500 text-sm mt-1">{{ image_form.image.errors|join:", " }}</div>
                                         {% endif %}
@@ -360,14 +358,9 @@
                             {% for spec_form in spec_formset %}
                             <div class="bg-gray-50 p-4 rounded-lg border">
                                 {{ spec_form.id }}
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <label class="form-label">Category</label>
-                                        {{ spec_form.category }}
-                                        {% if spec_form.category.errors %}
-                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.category.errors|join:", " }}</div>
-                                        {% endif %}
-                                    </div>
+                                {{ spec_form.category }}
+                                {{ spec_form.display_order }}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="form-label">Name</label>
                                         {{ spec_form.name }}
@@ -380,13 +373,6 @@
                                         {{ spec_form.value }}
                                         {% if spec_form.value.errors %}
                                             <div class="text-red-500 text-sm mt-1">{{ spec_form.value.errors|join:", " }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Display order</label>
-                                        {{ spec_form.display_order }}
-                                        {% if spec_form.display_order.errors %}
-                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.display_order.errors|join:", " }}</div>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -443,7 +429,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="form-label">Image</label>
-                {{ image_formset.empty_form.image }}
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
+                        <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview">
+                        <i class="fas fa-image text-gray-300"></i>
+                    </div>
+                    <div class="flex-1">
+                        {{ image_formset.empty_form.image }}
+                    </div>
+                </div>
             </div>
             <div>
                 <label class="form-label">Alt text</label>
@@ -463,11 +457,9 @@
 
 <div id="empty-spec-form" class="hidden">
     <div class="bg-gray-50 p-4 rounded-lg border">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="form-label">Category</label>
-                {{ spec_formset.empty_form.category }}
-            </div>
+        {{ spec_formset.empty_form.category }}
+        {{ spec_formset.empty_form.display_order }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="form-label">Name</label>
                 {{ spec_formset.empty_form.name }}
@@ -476,15 +468,31 @@
                 <label class="form-label">Value</label>
                 {{ spec_formset.empty_form.value }}
             </div>
-            <div>
-                <label class="form-label">Display order</label>
-                {{ spec_formset.empty_form.display_order }}
-            </div>
         </div>
     </div>
 </div>
 
 <script>
+function wireImagePreviews(root) {
+    (root || document).querySelectorAll('#images-form-container input[type="file"]').forEach((input) => {
+        if (input.dataset.previewWired === '1') return;
+        input.dataset.previewWired = '1';
+
+        input.addEventListener('change', function () {
+            const card = input.closest('.bg-gray-50');
+            if (!card) return;
+            const img = card.querySelector('img.js-image-preview');
+            if (!img) return;
+
+            const file = input.files && input.files[0];
+            if (!file) return;
+
+            img.src = URL.createObjectURL(file);
+            img.classList.remove('hidden');
+        });
+    });
+}
+
 function addImageForm() {
     const totalForms = document.getElementById('id_images-TOTAL_FORMS');
     const formCount = parseInt(totalForms.value);
@@ -497,6 +505,7 @@ function addImageForm() {
     container.appendChild(formDiv.firstElementChild);
     
     totalForms.value = formCount + 1;
+    wireImagePreviews(container);
 }
 
 function addSpecForm() {
@@ -512,5 +521,9 @@ function addSpecForm() {
     
     totalForms.value = formCount + 1;
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    wireImagePreviews(document);
+});
 </script>
 {% endblock %}

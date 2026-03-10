@@ -1,24 +1,22 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}World Tech Partners | Certified Samsung Products East Africa{% endblock %}</title>
-    <meta name="description"
-        content="Shop the latest Samsung smartphones, TVs, appliances, and more at World Tech Partners. Your certified source for premium Samsung electronics in East Africa.">
-    <meta name="keywords"
-        content="Samsung, smartphones, televisions, home appliances, laptops, tablets, East Africa, electronics store">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
-
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            {% block title %}World Tech Partners | Certified Samsung Products East Africa{% endblock %}
+        </title>
+        <meta name="description"
+              content="Shop the latest Samsung smartphones, TVs, appliances, and more at World Tech Partners. Your certified source for premium Samsung electronics in East Africa.">
+        <meta name="keywords"
+              content="Samsung, smartphones, televisions, home appliances, laptops, tablets, East Africa, electronics store">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+        <style>
         :root {
             --samsung-blue: #1428A0;
             --samsung-light-blue: #4A90E2;
@@ -624,120 +622,114 @@
         .dark-logo {
             display: none;
         }
-    </style>
-    {% block extra_css %}{% endblock %}
-</head>
-
-<body> {% include 'home/header.html' %}
-    <!-- Messages -->
-    {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </style>
+        {% block extra_css %}{% endblock %}
+    </head>
+    <body>
+        {% include 'home/header.html' %}
+        <!-- Messages -->
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                         role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- Main Content -->
+        <div class="main-container pt-28 md:pt-[115px] px-3 sm:px-6">
+            {% block content %}{% endblock %}
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Main Content -->
-    <div class="main-container pt-28 md:pt-[115px] px-6">
-        {% block content %}{% endblock %}
-    </div>
-
-
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    <!-- ══════════════════════════════════════════════ FOOTER ══════════════════════════════════════════════ -->
-    <footer class="bg-slate-900 text-white mt-16">
-        <div class="container mx-auto px-6 py-14">
-            <!-- Footer Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-                <!-- Location -->
-                <div>
-                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">LOCATION</h4>
-                    <p class="text-slate-400 leading-relaxed text-sm">
-                        53 Address,<br>
-                        Nakuru,<br>
-                        Nakuru, Kenya
-                    </p>
-                </div>
-
-                <!-- Follow Us -->
-                <div>
-                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">FOLLOW US</h4>
-                    <ul class="space-y-4">
-                        <li>
-                            <a href="#"
-                                class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
-                                <i class="fab fa-facebook-f w-5 text-center"></i> Facebook
+        <!-- ══════════════════════════════════════════════ FOOTER ══════════════════════════════════════════════ -->
+        <footer class="bg-slate-900 text-white mt-16">
+            <div class="container mx-auto px-6 py-14">
+                <!-- Footer Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                    <!-- Location -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">LOCATION</h4>
+                        <p class="text-slate-400 leading-relaxed text-sm">
+                            53 Address,
+                            <br>
+                            Nakuru,
+                            <br>
+                            Nakuru, Kenya
+                        </p>
+                    </div>
+                    <!-- Follow Us -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">FOLLOW US</h4>
+                        <ul class="space-y-4">
+                            <li>
+                                <a href="#"
+                                   class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
+                                    <i class="fab fa-facebook-f w-5 text-center"></i> Facebook
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
+                                    <i class="fab fa-twitter w-5 text-center"></i> Twitter
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
+                                    <i class="fab fa-instagram w-5 text-center"></i> Instagram
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Call Us -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">CALL US</h4>
+                        <div class="space-y-4">
+                            <a href="tel:+254714044399"
+                               class="block text-slate-400 hover:text-white transition-colors text-sm">
+                                <span class="block text-[10px] text-slate-500 uppercase mb-1">Primary / WhatsApp</span>
+                                +254 714 044 399
                             </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
-                                <i class="fab fa-twitter w-5 text-center"></i> Twitter
+                            <a href="tel:+254790739933"
+                               class="block text-slate-400 hover:text-white transition-colors text-sm">
+                                <span class="block text-[10px] text-slate-500 uppercase mb-1">Secondary</span>
+                                +254 790 739 933
                             </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm">
-                                <i class="fab fa-instagram w-5 text-center"></i> Instagram
+                        </div>
+                    </div>
+                    <!-- Write A Line -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">WRITE A LINE</h4>
+                        <div class="space-y-4">
+                            <a href="mailto:Worldtechsolution22@gmail.com"
+                               class="block text-slate-400 hover:text-white transition-colors text-sm">
+                                <span class="block text-[10px] text-slate-500 uppercase mb-1">Primary</span>
+                                Worldtechsolution22@gmail.com
                             </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Call Us -->
-                <div>
-                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">CALL US</h4>
-                    <div class="space-y-4">
-                        <a href="tel:+254714044399"
-                            class="block text-slate-400 hover:text-white transition-colors text-sm">
-                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Primary / WhatsApp</span>
-                            +254 714 044 399
-                        </a>
-                        <a href="tel:+254790739933"
-                            class="block text-slate-400 hover:text-white transition-colors text-sm">
-                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Secondary</span>
-                            +254 790 739 933
-                        </a>
+                            <a href="mailto:info@worldtechpartner.com"
+                               class="block text-slate-400 hover:text-white transition-colors text-sm">
+                                <span class="block text-[10px] text-slate-500 uppercase mb-1">Secondary</span>
+                                info@worldtechpartner.com
+                            </a>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Write A Line -->
-                <div>
-                    <h4 class="text-sm font-bold mb-6 uppercase tracking-wider text-white">WRITE A LINE</h4>
-                    <div class="space-y-4">
-                        <a href="mailto:Worldtechsolution22@gmail.com"
-                            class="block text-slate-400 hover:text-white transition-colors text-sm">
-                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Primary</span>
-                            Worldtechsolution22@gmail.com
-                        </a>
-                        <a href="mailto:info@worldtechpartner.com"
-                            class="block text-slate-400 hover:text-white transition-colors text-sm">
-                            <span class="block text-[10px] text-slate-500 uppercase mb-1">Secondary</span>
-                            info@worldtechpartner.com
-                        </a>
+                <!-- Bottom Bar -->
+                <div class="pt-7 border-t border-white/10">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+                        <p class="text-slate-400 text-sm">© 2024 World Tech Partners. All rights reserved.</p>
+                        <div class="flex gap-5 text-xs">
+                            <a href="#" class="text-slate-400 hover:text-white transition-colors">Privacy Policy</a>
+                            <a href="#" class="text-slate-400 hover:text-white transition-colors">Terms of Service</a>
+                            <a href="#" class="text-slate-400 hover:text-white transition-colors">Cookie Policy</a>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Bottom Bar -->
-            <div class="pt-7 border-t border-white/10">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-3">
-                    <p class="text-slate-400 text-sm">© 2024 World Tech Partners. All rights reserved.</p>
-                    <div class="flex gap-5 text-xs">
-                        <a href="#" class="text-slate-400 hover:text-white transition-colors">Privacy Policy</a>
-                        <a href="#" class="text-slate-400 hover:text-white transition-colors">Terms of Service</a>
-                        <a href="#" class="text-slate-400 hover:text-white transition-colors">Cookie Policy</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script>
+        </footer>
+        <script>
         // ─── Mobile Menu ───
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
@@ -792,12 +784,10 @@
                 });
             }
         });
-    </script>
-
-    <!-- WhatsApp Floating Button -->
-    {% include 'home/whatsapp_floating_button.html' %}
-
-    {% block extra_js %}{% endblock %}
-</body>
-
+        </script>
+        <!-- WhatsApp Floating Button -->
+        {% include 'home/whatsapp_floating_button.html' %}
+        {% block extra_js %}
+        {% endblock %}
+    </body>
 </html>

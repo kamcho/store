@@ -25,7 +25,8 @@ from home.views import (
     product_delete, product_detail, product_variant_manage, product_variant_edit, delete_variant, set_main_image, delete_variant_image, add_to_cart, 
     cart_detail, remove_from_cart, update_cart, add_variant_image_upload,
     user_login, user_logout, ai_chat,variant_image_manage,
-    contact_submit, notifications_list, notification_mark_read
+    contact_submit, notifications_list, notification_mark_read,
+    flash_sales, flash_sale_remove
 )
 from django.contrib.sitemaps.views import sitemap
 from home.sitemaps import StaticViewSitemap, ProductSitemap
@@ -42,6 +43,8 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
     path('products/', product_list, name='product_list'),
+    path('flash-sales/', flash_sales, name='flash_sales'),
+    path('flash-sales/remove/<int:variant_id>/', flash_sale_remove, name='flash_sale_remove'),
     path('products/create/', product_create, name='product_create'),
     path('products/<slug:slug>/', product_detail, name='product_detail'),
     path('products/<slug:slug>/edit/', product_edit, name='product_edit'),

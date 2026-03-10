@@ -16,7 +16,6 @@ from .models import Product, ProductCategory, ProductImage, ProductSpecification
 from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
 from .forms_login import CustomLoginForm
 
-@cache_page(60 * 150)  # Cache for 15 minutes
 def home(request):
     # Hero product: first featured product, or newest active product
     hero_product = Product.objects.filter(
@@ -81,6 +80,18 @@ def home(request):
         variants__is_active=True,
         variants__sale_price__isnull=False
     ).distinct().select_related('category').prefetch_related('images', 'variants')[:8]
+
+    # Attach display pricing for templates that expect product.sale_price / product.price.
+    # We take the best (lowest) sale_price among active variants with a sale_price.
+    for p in flash_sale_products:
+        sale_variant = (
+            p.variants.filter(is_active=True, sale_price__isnull=False, sale_price__gt=0)
+            .order_by("sale_price")
+            .first()
+        )
+        if sale_variant:
+            p.sale_price = sale_variant.sale_price
+            p.price = sale_variant.price
 
     # Recent arrivals (newest products)
     recent_arrivals = Product.objects.filter(
@@ -153,6 +164,58 @@ def product_list(request):
     }
     
     return render(request, 'home/product_list.html', context)
+
+
+def flash_sales(request):
+    """
+    Flash Sales page.
+
+    Shows product *variations* (ProductVariant) where sale_price has a value.
+    """
+    variants = (
+        ProductVariant.objects.filter(
+            is_active=True,
+            product__is_active=True,
+            sale_price__isnull=False,
+            sale_price__gt=0,
+        )
+        .select_related("product", "product__category")
+        .prefetch_related("product__images")
+        .order_by("-updated_at", "-created_at")
+    )
+
+    paginator = Paginator(variants, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj": page_obj,
+        "title": "Flash Sales",
+    }
+    return render(request, "home/flash_sales.html", context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def flash_sale_remove(request, variant_id):
+    """
+    Remove a variant from flash sale by clearing its sale_price.
+    """
+    variant = get_object_or_404(
+        ProductVariant,
+        id=variant_id,
+        is_active=True,
+        product__is_active=True,
+    )
+    variant.sale_price = None
+    variant.save(update_fields=["sale_price"])
+
+    messages.success(
+        request,
+        f'"{variant.product.name} - {variant.name}" has been removed from flash sale.',
+    )
+
+    return redirect(request.META.get("HTTP_REFERER", reverse("flash_sales")))
 
 @login_required
 def product_create(request):
