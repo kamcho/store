@@ -1,7 +1,7 @@
-{% extends 'home/base.html' %}
+{% extends "home/base.html" %}
 {% load static %}
 
-{% block title %}{{ product.name }} - World Tech Partners{% endblock %}
+{% block title %}{{ product.name }} - World Tech Partners{% endblock title %}
 
 {% block extra_css %}
 <style>
@@ -56,7 +56,7 @@
         border-color: #cbd5e1;
     }
 </style>
-{% endblock %}
+{% endblock extra_css %}
 
 {% block content %}
 
@@ -244,29 +244,30 @@
                             id="specs-icon"></i>
                     </button>
                     <div class="accordion-body open" id="specs-body">
-                        <div class="px-5 pb-5 space-y-2.5">
-                            {% if product.specifications.exists or variant.variant_specifications.exists %}
-                            <!-- Shared Specs -->
-                            {% for spec in product.specifications.all %}
-                            <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
-                                <span class="text-xs text-slate-400 font-medium">{{ spec.name }}</span>
-                                <span class="text-xs text-slate-800 font-semibold"><i style="color: #1428A0;" class="fas fa-check"></i></span>
-                            </div>
-                            {% endfor %}
-                            <!-- Variant Specific Specs (Container for JS) -->
-                            <div id="variant-specs-container">
-                                {% with first_v=product.variants.first %}
-                                {% for spec in first_v.variant_specifications.all %}
-                                <div
-                                    class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
-                                    <span class="text-xs text-slate-400 font-medium">{{ spec.name }}</span>
-                                    <span class="text-xs text-slate-800 font-semibold">{{ spec.value }}</span>
+                        <div class="px-5 pb-5 space-y-4">
+                            {% if specifications %}
+                            {% regroup specifications by category as spec_groups %}
+                            {% for group in spec_groups %}
+                            <div class="spec-group">
+                                <h4
+                                    class="text-[10px] font-bold uppercase tracking-widest text-samsung-blue/60 mb-2 bg-slate-50/80 px-2 py-1 rounded inline-block">
+                                    {{ group.grouper }}
+                                </h4>
+                                <div class="space-y-1">
+                                    {% for spec in group.list %}
+                                    <div class="flex items-baseline gap-4 py-2 border-b border-slate-50 last:border-0">
+                                        <span class="text-xs text-slate-400 font-medium w-32 flex-shrink-0">{{ spec.name }}</span>
+                                        <span class="text-xs text-slate-800 font-semibold">{{ spec.value }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                                 </div>
                                 {% endfor %}
-                                {% endwith %}
-                            </div>
                             {% else %}
-                            <p class="text-xs text-slate-400 italic">Specifications are being updated.</p>
+                                <div class="text-center py-4">
+                                    <i class="fas fa-info-circle text-slate-300 mb-2"></i>
+                                    <p class="text-xs text-slate-400 italic">Specifications are being updated.</p>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
@@ -322,7 +323,7 @@
 
             <!-- CTA Buttons -->
             <div class="flex gap-3">
-                <form action="{% url 'add_to_cart' product.id %}" method="POST" class="flex-1">
+                <form action="{% url 'add_to_cart' product.id %}" method="post" class="flex-1">
                     {% csrf_token %}
                     {% with first_variant=product.variants.first %}
                     <input type="hidden" name="variant_id" id="selected-variant-id" value="{{ first_variant.id }}">
@@ -547,4 +548,4 @@
         }
     })();
 </script>
-{% endblock %}
+{% endblock content %}

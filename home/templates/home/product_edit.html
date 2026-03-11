@@ -1,7 +1,7 @@
-{% extends 'home/base.html' %}
+{% extends "home/base.html" %}
 {% load static %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title }}{% endblock title %}
 
 {% block extra_css %}
 <style>
@@ -170,13 +170,49 @@
         color: #6b7280;
         font-size: 0.875rem;
     }
+
+    /* AI Assistant Card */
+    .ai-assistant-card {
+        background: linear-gradient(135deg, #f0f7ff 0%, #e0efff 100%);
+        border: 2px dashed #93c5fd;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .ai-assistant-card .ai-badge {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background: #2563eb;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 2px 10px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+
+    .ai-prompt-box {
+        background: white;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        padding: 1rem;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: #1e40af;
+        margin-top: 0.75rem;
+        white-space: pre-wrap;
+    }
 </style>
-{% endblock %}
+{% endblock extra_css %}
 
 {% block content %}
 <div class="product-edit-page">
-
-
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-4xl mx-auto">
             
@@ -184,12 +220,55 @@
              <br><br>
             <div class="product-info">
                 <h3>{{ product.name }}</h3>
-                <p>{{ product.short_description|default:"No short description available" }}</p>
+                <p>{{ product.description|default:"No description available"|truncatewords:20 }}</p>
 
                 <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
                     <i class="fas fa-eye"></i>
                     View Product
                 </a>
+            </div>
+
+            <!-- AI Prompt Assistant -->
+            <div class="ai-assistant-card">
+                <span class="ai-badge">AI Content Assistant</span>
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-magic text-blue-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-blue-900 font-bold mb-1">Update Product Data with AI</h3>
+                        <p class="text-blue-700/70 text-sm mb-3">Copy this prompt and paste it into ChatGPT to get standardized
+                            features and specifications for your product.</p>
+            
+                        <div class="relative">
+                            <div id="ai-prompt-text" class="ai-prompt-box text-blue-800">Please generate detailed product content
+                                for a "<span id="ai-product-name-placeholder">{{ product.name }}</span>" in the following format:
+            
+                                [DESCRIPTION]
+                                2-3 paragraphs of compelling, professional sales copy.
+            
+                                [FEATURES]
+                                (One per line, list up to 8 key features)
+                                Example:
+                                Premium Build Quality
+                                Advanced Cooling System
+            
+                                [SPECIFICATIONS]
+                                (Format: Category | Name | Value - one per line)
+                                Example:
+                                Display | Screen Size | 6.7 inches
+                                Performance | Processor | Snapdragon 8 Gen 3
+                                Battery | Capacity | 5000mAh</div>
+            
+                            <button type="button" onclick="copyAIPrompt()"
+                                class="absolute top-2 right-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                                title="Copy Prompt">
+                                <i class="fas fa-copy text-sm"></i>
+                                <span class="ml-1.5 text-xs font-bold">Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <form method="post" enctype="multipart/form-data" id="product-edit-form">
@@ -222,13 +301,6 @@
                             </div>
                         </div>
                         
-                        <div class="mt-4">
-                            <label class="form-label">Short Description</label>
-                            {{ form.short_description }}
-                            {% if form.short_description.errors %}
-                                <div class="text-red-500 text-sm mt-1">{{ form.short_description.errors|join:", " }}</div>
-                            {% endif %}
-                        </div>
                         
                         <div class="mt-4">
                             <label class="form-label">Full Description</label>
@@ -289,9 +361,10 @@
                                         <div class="flex items-center gap-3">
                                             <div class="w-14 h-14 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
                                                 {% if image_form.instance.image %}
-                                                    <img class="js-image-preview w-full h-full object-cover" src="{{ image_form.instance.image.url }}" alt="Preview">
+                                                    <img class="js-image-preview w-full h-full object-cover" src="{{ image_form.instance.image.url }}" alt="Preview"
+                                                        width="56" height="56">
                                                 {% else %}
-                                                    <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview">
+                                                    <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview" width="56" height="56">
                                                     <i class="fas fa-image text-gray-300"></i>
                                                 {% endif %}
                                             </div>
@@ -353,46 +426,16 @@
                             <h2 class="edit-section-title">Specifications</h2>
                         </div>
                         
-                        {{ spec_formset.management_form }}
-                        <div class="space-y-4" id="specs-form-container">
-                            {% for spec_form in spec_formset %}
-                            <div class="bg-gray-50 p-4 rounded-lg border">
-                                {{ spec_form.id }}
-                                {{ spec_form.category }}
-                                {{ spec_form.display_order }}
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="form-label">Name</label>
-                                        {{ spec_form.name }}
-                                        {% if spec_form.name.errors %}
-                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.name.errors|join:", " }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Value</label>
-                                        {{ spec_form.value }}
-                                        {% if spec_form.value.errors %}
-                                            <div class="text-red-500 text-sm mt-1">{{ spec_form.value.errors|join:", " }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% if spec_formset.can_delete and spec_form.instance.pk %}
-                                <div class="mt-4">
-                                    <label class="inline-flex items-center gap-2 cursor-pointer">
-                                        {{ spec_form.DELETE }}
-                                        <span class="text-sm font-medium text-red-600">Remove</span>
-                                    </label>
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="mt-4">
-                            <button type="button" onclick="addSpecForm()" class="btn-secondary">
-                                <i class="fas fa-plus"></i>
-                                Add Specification
-                            </button>
+                        <div class="form-row">
+                            <label class="form-label">Bulk Specifications</label>
+                            {{ form.specifications_raw }}
+                            <p class="mt-2 text-xs text-slate-500">Format: <code
+                                    class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">Category | Name | Value</code> (one per line).<br>
+                                Example: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">Display | Resolution | 4K UHD</code>
+                            </p>
+                            {% if form.specifications_raw.errors %}
+                            <div class="text-red-500 text-sm mt-1">{{ form.specifications_raw.errors.0 }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -431,7 +474,7 @@
                 <label class="form-label">Image</label>
                 <div class="flex items-center gap-3">
                     <div class="w-14 h-14 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
-                        <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview">
+                        <img class="js-image-preview w-full h-full object-cover hidden" src="" alt="Preview" width="56" height="56">
                         <i class="fas fa-image text-gray-300"></i>
                     </div>
                     <div class="flex-1">
@@ -455,22 +498,6 @@
     </div>
 </div>
 
-<div id="empty-spec-form" class="hidden">
-    <div class="bg-gray-50 p-4 rounded-lg border">
-        {{ spec_formset.empty_form.category }}
-        {{ spec_formset.empty_form.display_order }}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="form-label">Name</label>
-                {{ spec_formset.empty_form.name }}
-            </div>
-            <div>
-                <label class="form-label">Value</label>
-                {{ spec_formset.empty_form.value }}
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 function wireImagePreviews(root) {
@@ -508,22 +535,37 @@ function addImageForm() {
     wireImagePreviews(container);
 }
 
-function addSpecForm() {
-    const totalForms = document.getElementById('id_specifications-TOTAL_FORMS');
-    const formCount = parseInt(totalForms.value);
-    const emptyForm = document.getElementById('empty-spec-form');
-    const newForm = emptyForm.innerHTML.replace(/__prefix__/g, formCount);
-    
-    const container = document.getElementById('specs-form-container');
-    const formDiv = document.createElement('div');
-    formDiv.innerHTML = newForm;
-    container.appendChild(formDiv.firstElementChild);
-    
-    totalForms.value = formCount + 1;
-}
 
-document.addEventListener('DOMContentLoaded', function () {
-    wireImagePreviews(document);
-});
+            document.addEventListener('DOMContentLoaded', function () {
+                wireImagePreviews(document);
+            });
+        </script>
+    <script>
+        function copyAIPrompt() {
+            const promptText = document.getElementById('ai-prompt-text').innerText;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = event.currentTarget;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check text-sm text-green-100"></i> <span class="ml-1.5 text-xs font-bold text-green-100">Copied!</span>';
+                btn.classList.remove('bg-blue-600');
+                btn.classList.add('bg-green-600');
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('bg-green-600');
+                btn.classList.add('bg-blue-600');
+            }, 2000);
+        });
+    }
+
+                // Dynamic product name update in prompt
+                const nameField = document.querySelector('input[name="name"]');
+                if (nameField) {
+                    nameField.addEventListener('input', (e) => {
+                        const promptBox = document.getElementById('ai-prompt-text');
+                        const newName = e.target.value || "[Product Name/Model]";
+                        promptBox.innerHTML = promptBox.innerHTML.replace(/\"(.*?)\"/, `"${newName}"`);
+                    });
+            }
 </script>
-{% endblock %}
+{% endblock content %}

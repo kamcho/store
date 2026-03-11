@@ -1,7 +1,7 @@
-{% extends 'home/base.html' %}
+{% extends "home/base.html" %}
 {% load static %}
 
-{% block title %}{{ title }} - Samsung Dealer{% endblock %}
+{% block title %}{{ title }} - Samsung Dealer{% endblock title %}
 
 {% block extra_css %}
 <style>
@@ -277,29 +277,42 @@
     }
 
     .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 1rem;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
     }
 
     .stat-item {
+        background: white;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .stat-item:hover {
         background: #f8fafc;
-        padding: 0.75rem;
-        border-radius: 8px;
-        border-left: 3px solid #667eea;
+        border-color: #667eea;
+        transform: translateY(-1px);
     }
 
     .stat-label {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
         color: #6b7280;
-        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
     }
 
     .stat-value {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1f2937;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: #667eea;
     }
 
     .price-input-group {
@@ -334,9 +347,10 @@
         position: relative;
     }
 </style>
-{% endblock %}
+{% endblock extra_css %}
 
 {% block content %}
+<br><br><br>
 <div class="variant-management-page">
     <!-- Header -->
     <div class="management-header">
@@ -371,24 +385,22 @@
 
             <!-- Product Info Card -->
             <div class="management-card">
-                <div class="variant-header">
+                <div class="variant-header flex-col items-start gap-4">
                     <div class="variant-info">
-                        <h2 class="variant-title">{{ product.name }}</h2>
-                        <p class="variant-subtitle">{{ product.short_description|default:"No description available" }}
-                        </p>
+                        <h2 class="variant-title text-xl">{{ product.name }}</h2>
                     </div>
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <div class="stat-label">Total Variants</div>
-                            <div class="stat-value">{{ variant_formset|length }}</div>
+                            <span class="stat-label">Total Variants</span>
+                            <span class="stat-value">{{ total_variants }}</span>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-label">Active Variants</div>
-                            <div class="stat-value">{{ variant_formset|length }}</div>
+                            <span class="stat-label">Active Variants</span>
+                            <span class="stat-value">{{ active_variants }}</span>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-label">Total Stock</div>
-                            <div class="stat-value">{{ total_stock }}</div>
+                            <span class="stat-label">Total Stock</span>
+                            <span class="stat-value">{{ total_stock }}</span>
                         </div>
                     </div>
                 </div>
@@ -396,6 +408,21 @@
 
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
+
+                <!-- Error Summary -->
+                {% if variant_formset.errors %}
+                <div class="management-card bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        <h4 class="text-red-800 font-semibold">Please correct the errors indicated below.</h4>
+                    </div>
+                    {% if variant_formset.non_form_errors %}
+                    <div class="mt-2 text-sm text-red-700">
+                        {{ variant_formset.non_form_errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
 
                 <!-- Variants Section -->
                 <div class="management-card">
@@ -418,8 +445,7 @@
                                     <div class="variant-info">
                                         <h3 class="variant-title">{{ variant_form.name.value|default:"New Variant" }}
                                         </h3>
-                                        <p class="variant-subtitle">{{ variant_form.model_code.value|default:"No model
-                                            code" }}</p>
+                                        <p class="variant-subtitle">{{ variant_form.model_code.value|default:"No model code" }}</p>
                                     </div>
                                     <div class="variant-actions">
                                         {% if variant_form.instance.pk %}
@@ -439,8 +465,7 @@
 
                                         {% if variant_formset.can_delete and variant_form.instance.pk %}
                                         <button type="button"
-                                            onclick="deleteVariant('{{ variant_form.instance.pk }}', '{{ variant_form.instance.name|default:"
-                                            New Variant" }}')" class="btn-danger">
+                                            onclick="deleteVariant('{{ variant_form.instance.pk }}', '{{ variant_form.instance.name|default:'New Variant'|escapejs }}')" class="btn-danger">
                                             <i class="fas fa-trash"></i>
                                             Delete
                                         </button>
@@ -466,17 +491,15 @@
                                         <div class="form-group">
                                             <label class="form-label">Variant Name *</label>
                                             {{ variant_form.name }}
-                                            {% if variant_form.name.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.name.errors|join:", "
-                                                }}</div>
+                                            {% if variant_form.name.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.name.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Model Code (SKU) *</label>
                                             {{ variant_form.model_code }}
-                                            {% if variant_form.model_code.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{
-                                                variant_form.model_code.errors|join:", " }}</div>
+                                            {% if variant_form.model_code.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.model_code.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -487,9 +510,8 @@
                                             <div class="price-input-group">
                                                 {{ variant_form.price }}
                                             </div>
-                                            {% if variant_form.price.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.price.errors|join:",
-                                                " }}</div>
+                                            {% if variant_form.price.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.price.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="form-group">
@@ -497,9 +519,8 @@
                                             <div class="price-input-group">
                                                 {{ variant_form.sale_price }}
                                             </div>
-                                            {% if variant_form.sale_price.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{
-                                                variant_form.sale_price.errors|join:", " }}</div>
+                                            {% if variant_form.sale_price.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.sale_price.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="form-group">
@@ -507,9 +528,8 @@
                                             <div class="price-input-group">
                                                 {{ variant_form.cost_price }}
                                             </div>
-                                            {% if variant_form.cost_price.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{
-                                                variant_form.cost_price.errors|join:", " }}</div>
+                                            {% if variant_form.cost_price.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.cost_price.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -518,46 +538,30 @@
                                         <div class="form-group">
                                             <label class="form-label">Stock Quantity *</label>
                                             {{ variant_form.stock_quantity }}
-                                            {% if variant_form.stock_quantity.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{
-                                                variant_form.stock_quantity.errors|join:", " }}</div>
+                                            {% if variant_form.stock_quantity.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.stock_quantity.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Min Stock Level</label>
                                             {{ variant_form.min_stock_level }}
-                                            {% if variant_form.min_stock_level.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{
-                                                variant_form.min_stock_level.errors|join:", " }}</div>
+                                            {% if variant_form.min_stock_level.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.min_stock_level.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Availability</label>
                                             {{ variant_form.availability }}
-                                            {% if variant_form.availability.errors and variant_form.instance.pk %}
-                                            <div class="text-red-500 text-sm mt-1">{{
-                                                variant_form.availability.errors|join:", " }}</div>
+                                            {% if variant_form.availability.errors %}
+                                            <div class="text-red-500 text-sm mt-1">{{ variant_form.availability.errors|join:", " }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">Specifications (JSON format)</label>
-                                        <div class="specifications-container">
-                                            {{ variant_form.specifications }}
-                                            <p class="text-xs text-gray-500 italic mt-2">Format: Key: Value (one per
-                                                line)</p>
-                                        </div>
-                                        {% if variant_form.specifications.errors and variant_form.instance.pk %}
-                                        <div class="text-red-500 text-sm mt-1">{{
-                                            variant_form.specifications.errors|join:", " }}</div>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="form-group" style="margin-top: 1rem;">
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div class="form-group mt-4">
+                                        <div class="flex items-center gap-2">
                                             {{ variant_form.is_active }}
-                                            <label class="form-label" style="margin-bottom: 0;">Active</label>
+                                            <label class="form-label mb-0">Active</label>
                                         </div>
                                         <p class="text-xs text-gray-500 italic mt-1">Uncheck to hide this variant from
                                             the storefront</p>
@@ -576,7 +580,7 @@
                             <div class="text-gray-600">
                                 <i class="fas fa-info-circle mr-2"></i>
                                 <span class="text-sm">Use the form above to add new variants or manage existing ones.
-                                    Each variant can have its own specifications and pricing.</span>
+                                    Each variant can have its own pricing and stock level.</span>
                             </div>
                             <div class="flex items-center gap-4">
                                 <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">
@@ -599,16 +603,12 @@
 <script>
     function deleteVariant(variantId, variantName) {
         if (confirm(`Are you sure you want to delete the variant "${variantName}"? This action cannot be undone.`)) {
-            // Find the variant card and remove it immediately for better UX
-            const variantCard = event.target.closest('.variant-card');
-
-            // Show loading state
-            const deleteButton = event.target;
+            const variantCard = event.currentTarget.closest('.variant-card');
+            const deleteButton = event.currentTarget;
             deleteButton.style.opacity = '0.5';
             deleteButton.innerHTML = '<i class="fas fa-trash"></i> Deleting...';
             deleteButton.disabled = true;
 
-            // Send AJAX request
             fetch(`/products/{{ product.slug }}/variants/${variantId}/delete/`, {
                 method: 'POST',
                 headers: {
@@ -619,21 +619,17 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Success - remove the variant card with animation
                         variantCard.style.transition = 'all 0.3s ease';
                         variantCard.style.transform = 'translateX(-100%)';
                         variantCard.style.opacity = '0';
 
                         setTimeout(() => {
                             variantCard.remove();
-                            // Update variant count
-                            updateVariantCount();
+                            window.location.reload();
                         }, 300);
 
-                        // Show success message
                         showNotification(data.message, 'success');
                     } else {
-                        // Error - restore button and show error
                         deleteButton.style.opacity = '1';
                         deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
                         deleteButton.disabled = false;
@@ -645,42 +641,61 @@
                     deleteButton.style.opacity = '1';
                     deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
                     deleteButton.disabled = false;
-                    showNotification('An error occurred while trying to delete the variant. Please try again.', 'error');
+                    showNotification('An error occurred while deleting the variant.', 'error');
                 });
         }
     }
 
-    function updateVariantCount() {
-        // Update the variant count in the header
-        const variantCards = document.querySelectorAll('.variant-card');
-        const count = variantCards.length;
-        const countElements = document.querySelectorAll('.stat-value');
-        if (countElements.length >= 1) {
-            countElements[0].textContent = count;
-        }
-    }
-
     function showNotification(message, type) {
-        // Create a simple notification
         const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
         notification.innerHTML = `
-        <div class="flex items-center gap-2">
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-
+            <div class="flex items-center gap-2">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
         document.body.appendChild(notification);
-
-        // Auto-remove after 3 seconds
         setTimeout(() => {
             notification.style.transition = 'opacity 0.3s ease';
             notification.style.opacity = '0';
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
+
+    // Auto-update SKU based on name
+    document.addEventListener('input', function (e) {
+        if (e.target && e.target.name && e.target.name.endsWith('-name')) {
+            const nameInput = e.target;
+            const modelCodeInput = document.querySelector(`[name="${nameInput.name.replace('-name', '-model_code')}"]`);
+            
+            if (modelCodeInput && !modelCodeInput.value) {
+                const productName = "{{ product.name }}";
+                const variantName = nameInput.value;
+                let sku = productName;
+                if (variantName) {
+                    sku += "-" + variantName;
+                }
+                
+                modelCodeInput.placeholder = sku.toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/[\s_]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .toUpperCase();
+            }
+        }
+    });
+
+    // Initialize SKU on blur if empty
+    document.addEventListener('blur', function (e) {
+        if (e.target && e.target.name && e.target.name.endsWith('-name')) {
+            const nameInput = e.target;
+            const modelCodeInput = document.querySelector(`[name="${nameInput.name.replace('-name', '-model_code')}"]`);
+            if (modelCodeInput && !modelCodeInput.value && modelCodeInput.placeholder && modelCodeInput.placeholder !== "Unique SKU code") {
+                modelCodeInput.value = modelCodeInput.placeholder;
+            }
+        }
+    }, true);
 
     function getCookie(name) {
         let cookieValue = null;
@@ -697,4 +712,4 @@
         return cookieValue;
     }
 </script>
-{% endblock %}
+{% endblock content %}

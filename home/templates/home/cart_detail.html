@@ -186,8 +186,7 @@
                                 msg += '   Variant ID: #{{ item.variant.id }}\n';
                                 msg += '   Price: KSH {{ item.unit_price|floatformat:0 }}\n';
                                 msg += '   Qty: {{ item.quantity }}\n';
-                                msg += '   Subtotal: KSH {{ item.subtotal|floatformat:0 }}\n';
-                                msg += '   {{ item.product.short_description|truncatewords:10|escapejs }}\n\n';
+                                msg += '   Subtotal: KSH {{ item.subtotal|floatformat:0 }}\n\n';
                                 {% endfor %}
 
                                 msg += '━━━━━━━━━━━━━━━━━━━━\n';

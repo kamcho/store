@@ -12,11 +12,22 @@ class ProductForm(forms.ModelForm):
         required=False,
         help_text="Enter one feature per line"
     )
+
+    specifications_raw = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control', 
+            'rows': 8, 
+            'placeholder': 'Format: Category | Name | Value (one per line)\n\nDisplay | Screen Size | 6.8 inches\nPerformance | Processor | Snapdragon 8 Gen 3\nMemory | RAM | 12GB'
+        }),
+        required=False,
+        help_text="Enter one specification per line in the format: Category | Name | Value"
+    )
+    
     
     class Meta:
         model = Product
         fields = [
-            'category', 'name', 'slug', 'description', 'short_description',
+            'category', 'name', 'slug', 'description', 'features',
             'warranty_period', 'is_featured', 'is_active'
         ]
         widgets = {
@@ -24,7 +35,6 @@ class ProductForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter product name'}),
             'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'product-url-slug'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Detailed product description'}),
-            'short_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Brief description for listings'}),
             'warranty_period': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'placeholder': '12'}),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -53,6 +63,14 @@ class ProductForm(forms.ModelForm):
             features = self.instance.get_features_list()
             if features:
                 self.initial['features'] = "\n".join(features)
+            
+            # Load specifications into raw field
+            specs = self.instance.specifications.all().order_by('display_order', 'category', 'name')
+            if specs.exists():
+                specs_lines = []
+                for spec in specs:
+                    specs_lines.append(f"{spec.category} | {spec.name} | {spec.value}")
+                self.initial['specifications_raw'] = "\n".join(specs_lines)
 
     def clean_features(self):
         data = self.cleaned_data.get('features')
@@ -61,6 +79,53 @@ class ProductForm(forms.ModelForm):
             features_list = [line.strip() for line in data.splitlines() if line.strip()]
             return features_list
         return data
+
+    def save(self, commit=True):
+        product = super().save(commit=commit)
+        
+        # When saving the form, we also process the raw specifications field
+        if commit:
+            self._save_specifications(product)
+            
+        return product
+
+    def _save_specifications(self, product):
+        raw_specs = self.cleaned_data.get('specifications_raw', '')
+        if not isinstance(raw_specs, str):
+            return
+
+        # Parse the raw specifications
+        new_specs_data = []
+        for line in raw_specs.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            
+            parts = [p.strip() for p in line.split('|')]
+            if len(parts) >= 3:
+                category, name, value = parts[0], parts[1], parts[2]
+            elif len(parts) == 2:
+                category, name, value = "General", parts[0], parts[1]
+            else:
+                category, name, value = "General", parts[0], ""
+            
+            new_specs_data.append({
+                'category': category,
+                'name': name,
+                'value': value
+            })
+
+        # To keep it simple, we clear existing and recreate
+        # In a high-traffic app we might want to be more surgical
+        from .models import ProductSpecification
+        product.specifications.all().delete()
+        
+        for i, spec_data in enumerate(new_specs_data):
+            ProductSpecification.objects.create(
+                product=product,
+                display_order=i,
+                **spec_data
+            )
 
 class ProductImageForm(forms.ModelForm):
     class Meta:
@@ -118,18 +183,9 @@ ProductSpecificationFormSet = inlineformset_factory(
 from .models import ProductVariant
 
 class ProductVariantForm(forms.ModelForm):
-    specifications = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'form-control', 
-            'rows': 3, 
-            'placeholder': 'Color: Red\nStorage: 128GB'
-        })
-    )
-
     class Meta:
         model = ProductVariant
-        fields = ['name', 'model_code', 'price', 'sale_price', 'cost_price', 'stock_quantity', 'min_stock_level', 'availability', 'specifications', 'is_active']
+        fields = ['name', 'model_code', 'price', 'sale_price', 'cost_price', 'stock_quantity', 'min_stock_level', 'availability', 'is_active']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 55-inch'}),
             'model_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Unique SKU code'}),
@@ -144,27 +200,37 @@ class ProductVariantForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk and self.instance.specifications:
-            if isinstance(self.instance.specifications, dict):
-                specs_text = "\n".join([f"{k}: {v}" for k, v in self.instance.specifications.items()])
-                self.initial['specifications'] = specs_text
+        self.fields['name'].required = True
+        self.fields['model_code'].required = True
+        self.fields['price'].required = True
+        self.fields['stock_quantity'].required = True
 
-    def clean_specifications(self):
-        data = self.cleaned_data.get('specifications')
-        if not data:
-            return {}
+    def clean_model_code(self):
+        model_code = self.cleaned_data.get('model_code')
+        if not model_code:
+            raise forms.ValidationError("Model code (SKU) is required.")
         
-        specs_dict = {}
-        for line in data.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            if ':' in line:
-                key, value = line.split(':', 1)
-                specs_dict[key.strip()] = value.strip()
-            else:
-                specs_dict[line] = ""
-        return specs_dict
+        # Check uniqueness across all variants except current one
+        sku_exists = ProductVariant.objects.filter(model_code=model_code)
+        if self.instance.pk:
+            sku_exists = sku_exists.exclude(pk=self.instance.pk)
+        
+        if sku_exists.exists():
+            raise forms.ValidationError(f"The SKU '{model_code}' is already in use by another variant.")
+        return model_code
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price is not None and price < 0:
+            raise forms.ValidationError("Price cannot be negative.")
+        return price
+
+    def clean_stock_quantity(self):
+        stock = self.cleaned_data.get('stock_quantity')
+        if stock is not None and stock < 0:
+            raise forms.ValidationError("Stock quantity cannot be negative.")
+        return stock
+
 
 class ProductVariantImageForm(forms.ModelForm):
     def clean_image(self):

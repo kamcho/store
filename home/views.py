@@ -13,11 +13,11 @@ from django.views.decorators.cache import cache_page
 import json
 import random
 from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
-from .forms import ProductForm, ProductImageFormSet, ProductSpecificationFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
+from .forms import ProductForm, ProductImageFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
 from .forms_login import CustomLoginForm
 
 
-@cache_page(60 * 60 * 24)
+# @cache_page(60 * 60 * 24)
 def home(request):
     # Hero product: first featured product, or newest active product
     hero_product = Product.objects.filter(
@@ -99,6 +99,24 @@ def home(request):
     recent_arrivals = Product.objects.filter(
         is_active=True
     ).select_related('category').prefetch_related('images', 'variants').order_by('-created_at')[:4]
+
+    # Attach pricing to all product lists for the homepage
+    def attach_pricing(product_queryset):
+        for p in product_queryset:
+            # Get the variant with the lowest price (if multiple exist) or first active
+            cheapest_variant = p.variants.filter(is_active=True).order_by('price').first()
+            if cheapest_variant:
+                p.price = cheapest_variant.price
+                p.sale_price = cheapest_variant.sale_price
+                # If sale price is not set, insure we don't accidentally inherit it from another object
+            else:
+                p.price = None
+                p.sale_price = None
+
+    attach_pricing(recent_arrivals)
+    attach_pricing(featured_products)
+    for section in homepage_sections:
+        attach_pricing(section['products'])
 
     context = {
         'hero_product': hero_product,
@@ -224,7 +242,6 @@ def product_create(request):
     if request.method == 'POST':
         form = ProductForm(request.POST)
         image_formset = ProductImageFormSet(request.POST, request.FILES)
-        spec_formset = ProductSpecificationFormSet(request.POST)
         
         # Debug: Print form errors
         print("=== FORM VALIDATION DEBUG ===")
@@ -238,26 +255,15 @@ def product_create(request):
             for i, img_form in enumerate(image_formset):
                 if img_form.errors:
                     print(f"Image form {i} errors: {img_form.errors}")
-        
-        print(f"Spec formset valid: {spec_formset.is_valid()}")
-        if not spec_formset.is_valid():
-            print(f"Spec formset errors: {spec_formset.errors}")
-            for i, spec_form in enumerate(spec_formset):
-                if spec_form.errors:
-                    print(f"Spec form {i} errors: {spec_form.errors}")
         print("=== END DEBUG ===")
         
         if form.is_valid():
             product = form.save()
             
-            # Only save formsets if they have valid data
+            # Only save image formset if it has valid data
             if image_formset.is_valid():
                 image_formset.instance = product
                 image_formset.save()
-            
-            if spec_formset.is_valid():
-                spec_formset.instance = product
-                spec_formset.save()
             
             messages.success(request, f'Product "{product.name}" has been created successfully! Add variations to proceed.')
             return redirect('product_variant_manage', slug=product.slug)
@@ -266,12 +272,10 @@ def product_create(request):
     else:
         form = ProductForm()
         image_formset = ProductImageFormSet()
-        spec_formset = ProductSpecificationFormSet()
     
     context = {
         'form': form,
         'image_formset': image_formset,
-        'spec_formset': spec_formset,
         'title': 'Create New Product',
         'button_text': 'Create Product & Add Variants',
     }
@@ -284,7 +288,6 @@ def product_edit(request, slug):
     if request.method == 'POST':
         form = ProductForm(request.POST, instance=product)
         image_formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
-        spec_formset = ProductSpecificationFormSet(request.POST, instance=product)
         
         # Debug: Check form validity
         print(f"Product form valid: {form.is_valid()}")
@@ -298,21 +301,9 @@ def product_edit(request, slug):
                 if not img_form.is_valid():
                     print(f"Image form {i} errors: {img_form.errors}")
         
-        print(f"Spec formset valid: {spec_formset.is_valid()}")
-        if not spec_formset.is_valid():
-            print(f"Spec formset errors: {spec_formset.errors}")
-        
-        if form.is_valid() and image_formset.is_valid() and spec_formset.is_valid():
-            # Debug: Check is_active field before and after save
-            print(f"Product is_active before save: {product.is_active}")
-            print(f"Form data is_active: {form.cleaned_data.get('is_active')}")
-            
+        if form.is_valid() and image_formset.is_valid():
             product = form.save()
-            
-            print(f"Product is_active after save: {product.is_active}")
-            
             image_formset.save()
-            spec_formset.save()
             messages.success(request, f'Product "{product.name}" has been updated successfully!')
             return redirect('product_variant_manage', slug=product.slug)
         else:
@@ -320,12 +311,10 @@ def product_edit(request, slug):
     else:
         form = ProductForm(instance=product)
         image_formset = ProductImageFormSet(instance=product)
-        spec_formset = ProductSpecificationFormSet(instance=product)
     
     context = {
         'form': form,
         'image_formset': image_formset,
-        'spec_formset': spec_formset,
         'product': product,
         'title': f'Edit Product: {product.name}',
         'button_text': 'Update Product & Next',
@@ -384,11 +373,20 @@ def product_variant_manage(request, slug):
     else:
         variant_formset = ProductVariantFormSet(instance=product)
         
+    # Calculate status for the header
+    variants_list = product.variants.all()
+    total_variants = variants_list.count()
+    active_variants = variants_list.filter(is_active=True).count()
+    total_stock = sum(v.stock_quantity for v in variants_list)
+    
     context = {
         'variant_formset': variant_formset,
         'product': product,
         'title': f'Manage Variants: {product.name}',
         'button_text': 'Save Variants',
+        'total_variants': total_variants,
+        'active_variants': active_variants,
+        'total_stock': total_stock,
     }
     return render(request, 'home/variant_form.html', context)
 
@@ -642,7 +640,8 @@ def product_detail(request, slug):
     ).exclude(id=product.id).select_related('category').prefetch_related('images')[:4]
     
     images = product.images.all()
-    specifications = product.specifications.all()
+    # Get shared specifications (those not tied to a specific variant)
+    specifications = product.specifications.all().order_by('category', 'display_order')
     
     context = {
         'product': product,

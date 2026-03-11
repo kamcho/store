@@ -34,7 +34,6 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     description = models.TextField()
-    short_description = models.CharField(max_length=500)
     
     # Product details
     warranty_period = models.PositiveIntegerField(help_text="Warranty in months", default=12)
@@ -177,6 +176,31 @@ class ProductVariant(models.Model):
 
     class Meta:
         ordering = ['price']
+
+    def save(self, *args, **kwargs):
+        if not self.model_code:
+            # Generate SKU: PRODUCT-NAME-VARIANT-NAME-NUMBER
+            from django.utils.text import slugify
+            import random
+            import string
+            
+            base_sku = slugify(self.product.name)
+            if self.name:
+                base_sku += f"-{slugify(self.name)}"
+            
+            base_sku = base_sku.upper()[:40]
+            
+            # Ensure uniqueness
+            sku = base_sku
+            counter = 1
+            while ProductVariant.objects.filter(model_code=sku).exists():
+                suffix = f"-{counter}"
+                sku = f"{base_sku[:50-len(suffix)]}{suffix}"
+                counter += 1
+            
+            self.model_code = sku
+            
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.product.name} - {self.name}"

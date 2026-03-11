@@ -4,20 +4,22 @@
 <div
     class="top-contact-bar bg-samsung-blue text-white text-center py-2 text-xs font-medium fixed top-0 w-full z-[60] h-10 flex items-center">
     <div class="max-w-[1600px] mx-auto w-full px-6 flex items-center justify-between">
-        <div class="hidden sm:flex items-center gap-4 text-white/70">
-            <span class="flex items-center gap-1"><i class="fas fa-shipping-fast text-[10px]"></i> Free Delivery
-                Nationwide</span>
+        <div class="flex items-center gap-3 text-white/70 overflow-hidden">
+            <span class="hidden sm:flex items-center gap-1"><i class="fas fa-shipping-fast text-[10px]"></i> Free
+                Delivery</span>
+            <span class="flex items-center gap-1 whitespace-nowrap"><i class="fas fa-map-marker-alt text-[10px]"></i> Baraka
+                Plaza GND Flr</span>
         </div>
-        <a href="tel:+254714044399"
+        <a href="tel:+254790739933"
             class="flex items-center gap-2 hover:text-white/80 transition-colors font-semibold no-underline">
-            <i class="fas fa-phone text-[10px]"></i> +254 714 044 399
+            <i class="fas fa-phone text-[10px]"></i> +254 790 739 933
         </a>
         <a href="mailto:Worldtechsolution22@gmail.com"
-            class="hidden md:flex items-center gap-2 hover:text-white/80 transition-colors text-xs no-underline">
+            class="hidden lg:flex items-center gap-2 hover:text-white/80 transition-colors text-xs no-underline">
             <i class="fas fa-envelope text-[10px]"></i> Worldtechsolution22@gmail.com
         </a>
         <div class="hidden sm:flex items-center gap-3 text-white/70">
-            <a href="https://wa.me/254714044399" target="_blank"
+            <a href="https://wa.me/254790739933" target="_blank"
                 class="hover:text-white transition-colors no-underline"><i class="fab fa-whatsapp"></i></a>
             <a href="#" class="hover:text-white transition-colors no-underline"><i
                     class="fab fa-facebook-f text-[10px]"></i></a>
@@ -45,18 +47,16 @@
                 <a href="{% url 'home' %}"
                     class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'home' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Home</a>
                 <!-- Products Mega Menu -->
-                <div class="relative group px-1">
-                    <a href="{% url 'product_list' %}"
-                        class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'product_list' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap flex items-center gap-1 group">
-                        Products <i
-                            class="fas fa-chevron-down text-[10px] group-hover:rotate-180 transition-transform duration-300"></i>
-                    </a>
+                <div class="relative px-1">
+                    <button onclick="this.nextElementSibling.classList.toggle('hidden')"
+                        class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'product_list' %}text-samsung-blue bg-samsung-blue/5{% else %}text-slate-600{% endif %} hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap flex items-center gap-1">
+                        Products <i class="fas fa-chevron-down text-[10px] transition-transform duration-300"></i>
+                    </button>
 
                     <!-- Dropdown Menu -->
-                    <div
-                        class="absolute top-full left-0 w-64 bg-white border border-slate-100 shadow-xl rounded-xl py-3 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-[70]">
+                    <div class="hidden absolute top-full left-0 w-64 bg-white border border-slate-100 shadow-xl rounded-xl py-3 z-[70]">
                         {% for cat in nav_categories %}
-                        <div class="relative group/sub">
+                        <div class="relative">
                             <a href="{% url 'product_list' %}?category={{ cat.slug }}"
                                 class="flex items-center justify-between px-5 py-2 text-sm text-slate-600 hover:text-samsung-blue hover:bg-slate-50 transition-colors no-underline">
                                 {{ cat.name }}
@@ -68,30 +68,12 @@
                             {% if cat.subcategories.exists %}
                             <!-- Subcategories side menu -->
                             <div
-                                class="absolute top-0 left-full w-60 bg-white border border-slate-100 shadow-xl rounded-xl py-3 opacity-0 invisible translate-x-1 group-hover/sub:opacity-100 group-hover/sub:visible group-hover/sub:translate-x-0 transition-all duration-300 z-[80]">
+                                class="hidden group-hover/sub:block absolute top-0 left-full w-60 bg-white border border-slate-100 shadow-xl rounded-xl py-3 z-[80]">
                                 {% for sub in cat.subcategories.all %}
-                                <div class="relative group/leaf">
-                                    <a href="{% url 'product_list' %}?category={{ sub.slug }}"
-                                        class="flex items-center justify-between px-5 py-2 text-sm text-slate-600 hover:text-samsung-blue hover:bg-slate-50 transition-colors no-underline">
-                                        {{ sub.name }}
-                                        {% if sub.subcategories.exists %}
-                                        <i class="fas fa-chevron-right text-[10px]"></i>
-                                        {% endif %}
+                                <a href="{% url 'product_list' %}?category={{ sub.slug }}"
+                                    class="block px-5 py-2 text-sm text-slate-600 hover:text-samsung-blue hover:bg-slate-50 transition-colors no-underline">
+                                    {{ sub.name }}
                                     </a>
-
-                                    {% if sub.subcategories.exists %}
-                                    <!-- Leaf items -->
-                                    <div
-                                        class="absolute top-0 left-full w-56 bg-white border border-slate-100 shadow-xl rounded-xl py-3 opacity-0 invisible translate-x-1 group-hover/leaf:opacity-100 group-hover/leaf:visible group-hover/leaf:translate-x-0 transition-all duration-300 z-[90]">
-                                        {% for leaf in sub.subcategories.all %}
-                                        <a href="{% url 'product_list' %}?category={{ leaf.slug }}"
-                                            class="block px-5 py-2 text-sm text-slate-600 hover:text-samsung-blue hover:bg-slate-50 transition-colors no-underline">
-                                            {{ leaf.name }}
-                                        </a>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
                                 {% endfor %}
                             </div>
                             {% endif %}
@@ -238,8 +220,7 @@
                 class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2 no-underline">
                 <i class="fas fa-shopping-bag text-slate-400"></i> Cart
                 {% if request.session.cart %}<span
-                    class="ml-1 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{{ request.session.cart|length
-                    }}</span>{% endif %}
+                    class="ml-1 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{{ request.session.cart|length }}</span>{% endif %}
             </a>
 
             {% if user.is_staff %}
