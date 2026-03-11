@@ -88,6 +88,10 @@
                     </div>
                 </div>
 
+                <a href="{% url 'flash_sales' %}"
+                    class="px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'flash_sales' %}text-red-500 bg-red-50{% else %}text-slate-600{% endif %} hover:text-red-500 hover:bg-red-50 font-medium transition-all text-sm no-underline whitespace-nowrap flex items-center gap-1.5">
+                    <i class="fas fa-bolt text-[10px]"></i> Flash Sales
+                </a>
                 <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}"
                     class="px-3 py-2 rounded-lg text-slate-600 hover:text-samsung-blue hover:bg-slate-100 font-medium transition-all text-sm no-underline whitespace-nowrap">Services</a>
                 <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}"
@@ -210,6 +214,10 @@
                     {% endfor %}
                 </div>
             </div>
+            <a href="{% url 'flash_sales' %}"
+                class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors no-underline flex items-center gap-2">
+                <i class="fas fa-bolt text-red-400 text-[10px]"></i> Flash Sales
+            </a>
             <a href="{% if request.resolver_match.url_name == 'home' %}#services{% else %}{% url 'home' %}#services{% endif %}"
                 class="px-4 py-3 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors no-underline">Services</a>
             <a href="{% if request.resolver_match.url_name == 'home' %}#testimonials{% else %}{% url 'home' %}#testimonials{% endif %}"

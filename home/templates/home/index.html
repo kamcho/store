@@ -188,12 +188,19 @@
 
     .feat-card-img {
         position: relative;
-        padding: 1.5rem;
+        padding: 0.75rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        aspect-ratio: 1;
+        aspect-ratio: 4/3;
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    @media (min-width: 640px) {
+        .feat-card-img {
+            padding: 1.5rem;
+            aspect-ratio: 1;
+        }
     }
 
     .feat-card-img::after {
@@ -539,11 +546,11 @@
                            class="text-sm font-semibold text-samsung-blue hover:underline">See
                         all →</a>
                     </div>
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6">
                         {% for product in featured_products|slice:":4" %}
-                            <a href="{% url 'product_detail' product.slug %}"
-                               class="feat-card group flex flex-col h-full">
-                                <div class="feat-card-img shrink-0">
+                            <div class="feat-card group flex flex-col h-full relative">
+                                <a href="{% url 'product_detail' product.slug %}" class="absolute inset-0 z-0"></a>
+                                <div class="feat-card-img shrink-0 border-b border-slate-50">
                                     {% if product.get_main_image %}
                                         <img src="{{ product.get_main_image.image.url }}"
                                              alt="{{ product.name }}"
@@ -557,19 +564,31 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                <div class="p-4 flex-1 flex flex-col">
+                                <div class="p-2.5 sm:p-4 flex-1 flex flex-col">
                                     <div class="text-[10px] font-bold uppercase tracking-wider text-samsung-blue/60 mb-1">{{ product.category.name|default:"Samsung" }}</div>
-                                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-samsung-blue transition-colors line-clamp-1 mb-2 flex-1">{{ product.name }}</h3>
-                                    <div class="mt-auto flex items-center gap-2">
-                                        {% if product.sale_price %}
-                                        <span class="text-sm font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                        <span class="text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
-                                        {% else %}
-                                            <span class="text-sm font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
+                                    <h3
+                                        class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-samsung-blue transition-colors line-clamp-1 mb-1 sm:mb-2 flex-1">
+                                        <a href="{% url 'product_detail' product.slug %}" class="relative z-10">{{ product.name }}</a>
+                                    </h3>
+                                    <div class="mt-auto flex items-center justify-between gap-1">
+                                        <div class="flex flex-col min-w-0">
+                                            {% if product.sale_price %}
+                                            <span class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                            <span class="text-[9px] sm:text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                            {% else %}
+                                            <span class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">KSH {{ product.price|floatformat:0 }}</span>
                                             {% endif %}
+                                        </div>
+                                        <form action="{% url 'add_to_cart' product.id %}" method="POST" class="relative z-20 shrink-0">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-samsung-blue text-white flex items-center justify-center hover:bg-samsung-dark transition-all duration-300 hover:scale-110 shadow-lg shadow-samsung-blue/20">
+                                                <i class="fas fa-cart-plus text-[10px] sm:text-xs"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
-                            </a>
+                                </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -577,10 +596,10 @@
         </div>
     </section>
     <!-- ══════════════════════════════════════════════ ABOUT / HISTORY ══════════════════════════════════════════════ -->
-    <section id="about" class="py-24 bg-slate-50 relative overflow-hidden reveal">
+    <section id="about" class="py-12 sm:py-24 bg-slate-50 relative overflow-hidden reveal">
         <div class="container mx-auto px-5 sm:px-8 relative z-10">
             <!-- Section Header -->
-            <div class="text-center mb-16">
+            <div class="text-center mb-8 sm:mb-16">
                 <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Our Journey</span>
                 <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
                     <span class="font-light">The</span>
@@ -633,10 +652,10 @@
         </div>
     </section>
     <!-- ══════════════════════════════════════════════ PRODUCTS BY CATEGORY ══════════════════════════════════════════════ -->
-    <section id="products" class="py-24 bg-white relative overflow-hidden reveal">
+    <section id="products" class="py-12 sm:py-24 bg-white relative overflow-hidden reveal">
         <div class="container mx-auto px-3 sm:px-6 relative z-10">
             <!-- Section Header -->
-            <div class="text-center mb-16">
+            <div class="text-center mb-8 sm:mb-16">
                 <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Samsung
                 Ecosystem</span>
                 <h2 class="text-3xl md:text-4xl text-slate-900 mb-4 whitespace-nowrap">
@@ -651,8 +670,8 @@
             </div>
             {% for section in homepage_sections %}
                 <!-- Category Section: {{ section.name }} -->
-                <div class="mb-32">
-                    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+                <div class="mb-14 sm:mb-32">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-10 gap-3 sm:gap-4">
                         <div class="space-y-2">
                             <span class="text-samsung-blue font-bold tracking-[0.2em] text-[10px] uppercase block">Collection</span>
                             <h3 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">{{ section.name }}</h3>
@@ -663,10 +682,11 @@
                             <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
                         </a>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6">
                         {% for product in section.products %}
-                            <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden group shadow-sm flex flex-col h-full">
-                                <div class="h-40 sm:h-56 overflow-hidden bg-slate-50 p-4 sm:p-6 flex items-center justify-center relative shrink-0">
+                            <div
+                                class="product-card bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden group shadow-sm flex flex-col h-full">
+                                <div class="h-28 sm:h-56 overflow-hidden bg-slate-50 p-2 sm:p-6 flex items-center justify-center relative shrink-0">
                                     {% if product.get_main_image %}
                                         <img src="{{ product.get_main_image.image.url }}"
                                              alt="{{ product.name }}"
@@ -681,13 +701,15 @@
                                     {% endif %}
                                     {% if product.sale_price %}
                                     <div
-                                        class="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                        class="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider">
                                         -{{ product.get_discount_percentage }}%</div>
                                     {% endif %}
                                 </div>
-                                <div class="p-3 sm:p-6 text-center flex-1 flex flex-col">
-                                    <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1 group-hover:text-samsung-blue transition-colors line-clamp-1 flex-1">{{ product.name }}</h3>
-                                    <div class="flex items-center justify-center gap-2 mb-4">
+                                <div class="p-2 sm:p-5 text-center flex-1 flex flex-col">
+                                    <h3
+                                        class="text-xs sm:text-base font-bold text-slate-900 mb-0.5 sm:mb-1 group-hover:text-samsung-blue transition-colors line-clamp-1 flex-1">
+                                        {{ product.name }}</h3>
+                                    <div class="flex items-center justify-center gap-1 sm:gap-2 mb-2 sm:mb-4">
                                         {% if product.sale_price %}
                                         <span class="text-sm sm:text-base font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
                                         <span class="text-[10px] text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
@@ -695,9 +717,16 @@
                                             <span class="text-sm sm:text-base font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
                                             {% endif %}
                                     </div>
-                                    <div class="mt-auto">
+                                    <div class="mt-auto flex items-center justify-center gap-2">
                                         <a href="{% url 'product_detail' product.slug %}"
-                                           class="inline-block px-4 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-samsung-blue transition-all duration-300 text-[10px] font-bold">Details</a>
+                                           class="inline-block px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all duration-300 text-[10px] font-bold">Details</a>
+                                        <form action="{% url 'add_to_cart' product.id %}" method="POST" class="inline">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-samsung-blue text-white hover:bg-samsung-dark transition-all duration-300 text-[10px] font-bold">
+                                               <i class="fas fa-cart-plus"></i> Add
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -717,10 +746,10 @@
     </section>
     <!-- ══════════════════════════════════════════════ SERVICES ══════════════════════════════════════════════ -->
     <section id="services"
-             class="py-24 bg-slate-50 relative overflow-hidden reveal">
+             class="py-12 sm:py-24 bg-slate-50 relative overflow-hidden reveal">
         <div class="container mx-auto px-3 sm:px-6 relative z-10">
             <!-- Section Header -->
-            <div class="text-center mb-14">
+            <div class="text-center mb-8 sm:mb-14">
                 <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Repair &
                 Support</span>
                 <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
@@ -814,10 +843,10 @@
     </section>
     <!-- ══════════════════════════════════════════════ TESTIMONIALS ══════════════════════════════════════════════ -->
     <section id="testimonials"
-             class="py-24 bg-white relative overflow-hidden reveal">
+             class="py-12 sm:py-24 bg-white relative overflow-hidden reveal">
         <div class="container mx-auto px-3 sm:px-6 relative z-10">
             <!-- Section Header -->
-            <div class="text-center mb-14">
+            <div class="text-center mb-8 sm:mb-14">
                 <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Reviews</span>
                 <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
                     <span class="font-light">What Our</span>
@@ -891,13 +920,13 @@
     </section>
     <!-- ══════════════════════════════════════════════ FLASH SALE ══════════════════════════════════════════════ -->
     {% if flash_sale_products %}
-        <section class="py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 relative overflow-hidden reveal">
+        <section class="py-10 sm:py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 relative overflow-hidden reveal">
             <!-- Decorative elements -->
             <div class="absolute top-0 right-0 w-72 h-72 bg-red-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
             <div class="absolute bottom-0 left-0 w-56 h-56 bg-orange-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
             <div class="container mx-auto px-3 sm:px-6 relative z-10">
                 <!-- Section Header -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 sm:mb-10 gap-3 sm:gap-4">
                     <div>
                         <div class="flex items-center gap-3 mb-2">
                             <span class="inline-flex items-center gap-2 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider animate-pulse">
@@ -917,17 +946,19 @@
                     </a>
                 </div>
                 <!-- Flash Sale Products Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6">
                     {% for product in flash_sale_products|slice:":4" %}
-                        <a href="{% url 'product_detail' product.slug %}?offer_price={{ product.sale_price|floatformat:0 }}"
-                           class="group block h-full">
-                            <div class="bg-white rounded-2xl border border-red-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-red-500/10 transition-all duration-300 hover:-translate-y-2 relative h-full flex flex-col">
+                        <div class="group block h-full relative">
+                            <a href="{% url 'product_detail' product.slug %}?offer_price={{ product.sale_price|floatformat:0 }}"
+                                class="absolute inset-0 z-0"></a>
+                            <div class="bg-white rounded-xl sm:rounded-2xl border border-red-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-red-500/10 transition-all duration-300 hover:-translate-y-2 relative h-full flex flex-col">
                                 <!-- Sale Badge -->
-                                <div class="absolute top-3 left-3 z-10 flex items-center gap-1.5">
-                                    <span class="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">-{{ product.get_discount_percentage }}%</span>
+                                <div class="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 flex items-center gap-1.5" style="padding: 10px;">
+                                    <span 
+                                        class="bg-red-500 text-white text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider">-{{ product.get_discount_percentage }}%</span>
                                 </div>
                                 <!-- Image -->
-                                <div class="h-48 p-5 flex items-center justify-center overflow-hidden shrink-0">
+                                <div class="h-28 sm:h-48 p-2 sm:p-5 flex items-center justify-center overflow-hidden shrink-0">
                                     {% if product.get_main_image %}
                                         <img src="{{ product.get_main_image.image.url }}"
                                              alt="{{ product.name }}"
@@ -939,21 +970,34 @@
                                     {% endif %}
                                 </div>
                                 <!-- Info -->
-                                <div class="p-4 border-t border-slate-50 flex-1 flex flex-col">
-                                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{{ product.category.name|default:"Samsung" }}</div>
-                                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-red-500 transition-colors line-clamp-1 mb-2 flex-1">{{ product.name }}</h3>
+                                <div class="p-2.5 sm:p-4 border-t border-slate-50 flex-1 flex flex-col">
+                                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5 sm:mb-1">{{ product.category.name|default:"Samsung" }}</div>
+                                    <h3
+                                        class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-red-500 transition-colors line-clamp-1 mb-1 sm:mb-2 flex-1">
+                                        <a href="{% url 'product_detail' product.slug %}?offer_price={{ product.sale_price|floatformat:0 }}"
+                                            class="relative z-10">{{ product.name }}</a>
+                                    </h3>
                                     <div class="mt-auto">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-lg font-extrabold text-red-500">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                            <span class="text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
-                                        </div>
-                                        <div class="mt-2 text-[10px] font-semibold text-red-400 flex items-center gap-1">
+                                        <div class="flex items-center justify-between gap-1">
+                                            <div class="flex flex-col min-w-0">
+                                                <span class="text-xs sm:text-base font-extrabold text-red-500 truncate">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                                <span class="text-[9px] sm:text-xs text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                            </div>
+                                            <form action="{% url 'add_to_cart' product.id %}" method="POST" class="relative z-20 shrink-0">
+                                                {% csrf_token %}
+                                                <button type="submit"
+                                                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all duration-300 hover:scale-110 shadow-lg shadow-red-500/20">
+                                                    <i class="fas fa-cart-plus text-[10px] sm:text-xs"></i>
+                                                </button>
+                                            </form>
+                                            </div>
+                                            <div class="mt-1 sm:mt-2 text-[8px] sm:text-[10px] font-semibold text-red-400 flex items-center gap-1">
                                             <i class="fas fa-fire text-[8px]"></i> Hot Deal — Don't miss out!
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     {% endfor %}
                 </div>
             </div>
@@ -961,13 +1005,13 @@
     {% endif %}
     <!-- ══════════════════════════════════════════════ RECENT ARRIVALS ══════════════════════════════════════════════ -->
     {% if recent_arrivals %}
-        <section class="py-20 bg-gradient-to-br from-emerald-50 via-white to-teal-50 relative overflow-hidden reveal">
+        <section class="py-10 sm:py-20 bg-gradient-to-br from-emerald-50 via-white to-teal-50 relative overflow-hidden reveal">
             <!-- Decorative elements -->
             <div class="absolute top-0 right-0 w-72 h-72 bg-emerald-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
             <div class="absolute bottom-0 left-0 w-56 h-56 bg-teal-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
             <div class="container mx-auto px-3 sm:px-6 relative z-10">
                 <!-- Section Header -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 sm:mb-10 gap-3 sm:gap-4">
                     <div>
                         <div class="flex items-center gap-3 mb-2">
                             <span class="inline-flex items-center gap-2 bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
@@ -986,17 +1030,19 @@
                     </a>
                 </div>
                 <!-- Recent Arrivals Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6">
                     {% for product in recent_arrivals|slice:":8" %}
-                        <a href="{% url 'product_detail' product.slug %}" class="group block h-full">
+                        <div class="group block h-full relative">
+                            <a href="{% url 'product_detail' product.slug %}" class="absolute inset-0 z-0"></a>
                             <div
-                                class="bg-white rounded-2xl border border-emerald-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 hover:-translate-y-2 relative h-full flex flex-col">
+                                class="bg-white rounded-xl sm:rounded-2xl border border-emerald-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 hover:-translate-y-2 relative h-full flex flex-col">
                                 <!-- New Badge -->
-                                <span class="absolute top-3 left-3 z-10 bg-emerald-500 text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                <!-- <span
+                                    class="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 bg-emerald-500 text-white text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
                                     <i class="fas fa-certificate text-[7px]"></i> New
-                                </span>
+                                </span> -->
                                 <!-- Image -->
-                                <div class="h-48 p-5 flex items-center justify-center overflow-hidden shrink-0">
+                                <div class="h-28 sm:h-48 p-2 sm:p-5 flex items-center justify-center overflow-hidden shrink-0">
                                     {% if product.get_main_image %}
                                         <img src="{{ product.get_main_image.image.url }}"
                                              alt="{{ product.name }}"
@@ -1008,20 +1054,32 @@
                                     {% endif %}
                                 </div>
                                 <!-- Info -->
-                                <div class="p-4 border-t border-slate-50 flex-1 flex flex-col">
-                                    <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-600/50 mb-1">{{ product.category.name|default:"Samsung" }}</div>
-                                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-emerald-500 transition-colors line-clamp-1 mb-2 flex-1">{{ product.name }}</h3>
-                                    <div class="flex items-center justify-between mt-auto">
-                                        {% if product.sale_price %}
-                                            <span class="text-base font-extrabold text-slate-900">KSH {{ product.sale_price|floatformat:0 }}</span>
-                                            <span class="text-[10px] text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
-                                        {% else %}
-                                            <span class="text-base font-extrabold text-slate-900">KSH {{ product.price|floatformat:0 }}</span>
-                                        {% endif %}
+                                <div class="p-2.5 sm:p-4 border-t border-slate-50 flex-1 flex flex-col">
+                                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-600/50 mb-0.5 sm:mb-1">{{ product.category.name|default:"Samsung" }}</div>
+                                    <h3
+                                        class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-emerald-500 transition-colors line-clamp-1 mb-1 sm:mb-2 flex-1">
+                                        <a href="{% url 'product_detail' product.slug %}" class="relative z-10">{{ product.name }}</a>
+                                    </h3>
+                                    <div class="flex items-center justify-between mt-auto gap-1">
+                                        <div class="flex flex-col min-w-0">
+                                            {% if product.sale_price %}
+                                            <span class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">KSH {{ product.sale_price|floatformat:0 }}</span>
+                                            <span class="text-[9px] sm:text-[10px] text-slate-400 line-through">{{ product.price|floatformat:0 }}</span>
+                                            {% else %}
+                                            <span class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">KSH {{ product.price|floatformat:0 }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <form action="{% url 'add_to_cart' product.id %}" method="POST" class="relative z-20 shrink-0">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-all duration-300 hover:scale-110 shadow-lg shadow-emerald-500/20">
+                                                <i class="fas fa-cart-plus text-[10px] sm:text-xs"></i>
+                                            </button>
+                                        </form>
                                     </div>
-                                </div>
+                                    </div>
                             </div>
-                        </a>
+                            </div>
                     {% endfor %}
                 </div>
             </div>
@@ -1029,7 +1087,7 @@
     {% endif %}
     <!-- ══════════════════════════════════════════════ CONTACT ══════════════════════════════════════════════ -->
     <section id="contact"
-             class="py-24 bg-slate-50 relative overflow-hidden reveal">
+             class="py-12 sm:py-24 bg-slate-50 relative overflow-hidden reveal">
         <div class="container mx-auto px-3 sm:px-6 relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
                 <!-- Left: Contact Info -->
