@@ -17,7 +17,7 @@ from .forms import ProductForm, ProductImageFormSet, ProductVariantForm, Product
 from .forms_login import CustomLoginForm
 
 
-# @cache_page(60 * 60 * 24)
+@cache_page(60 * 60 * 5)
 def home(request):
     # Hero product: first featured product, or newest active product
     hero_product = Product.objects.filter(
