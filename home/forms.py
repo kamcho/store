@@ -2,6 +2,21 @@ from django import forms
 from django.forms import inlineformset_factory
 from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
 
+class LeaveMessageForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['phone', 'message', 'cart_id']
+        widgets = {
+            'phone': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 transition-all outline-none text-sm font-medium',
+                'placeholder': 'Your Phone Number (e.g. 0712345678)'
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 transition-all outline-none text-sm font-medium min-h-[120px]',
+                'placeholder': 'Describe what you need or ask any question...'
+            }),
+        }
+
 class ProductForm(forms.ModelForm):
     features = forms.CharField(
         widget=forms.Textarea(attrs={

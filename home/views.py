@@ -13,7 +13,9 @@ from django.views.decorators.cache import cache_page
 import json
 import random
 from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
-from .forms import ProductForm, ProductImageFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm
+from .forms import ProductForm, ProductImageFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm, LeaveMessageForm
+from django.core.mail import send_mail
+from django.conf import settings
 from .forms_login import CustomLoginForm
 
 
@@ -735,10 +737,15 @@ def cart_detail(request):
         except ProductVariant.DoesNotExist:
             continue
             
+    if not request.session.session_key:
+        request.session.create()
+    cart_id = request.session.session_key[:8].upper() if request.session.session_key else "GUEST"
+    
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
         'title': 'Shopping Cart',
+        'cart_id': cart_id,
     }
     return render(request, 'home/cart_detail.html', context)
 
@@ -1004,3 +1011,64 @@ def handler400(request, exception=None):
     """Custom 400 error handler: redirect to home with message"""
     messages.error(request, "There was a problem with your request.")
     return redirect('home')
+
+def leave_message(request):
+    """
+    Handle 'Leave a Message' form submission from the cart detail page.
+    Saves the message to the database and sends an email to the company.
+    """
+    if request.method == 'POST':
+        form = LeaveMessageForm(request.POST)
+        if form.is_valid():
+            message_obj = form.save(commit=False)
+            
+            # Capture cart items from session
+            cart = request.session.get('cart', {})
+            items_data = []
+            email_items_summary = ""
+            
+            for variant_id, quantity in cart.items():
+                try:
+                    variant = ProductVariant.objects.select_related("product").get(id=variant_id)
+                    price = variant.sale_price if variant.sale_price else variant.price
+                    items_data.append({
+                        'product': variant.product.name,
+                        'variant': variant.name,
+                        'quantity': quantity,
+                        'price': float(price),
+                        'subtotal': float(price * quantity)
+                    })
+                    email_items_summary += f"- {variant.product.name} ({variant.name}) x {quantity} @ KSH {price}\n"
+                except ProductVariant.DoesNotExist:
+                    continue
+            
+            message_obj.cart_items = items_data
+            message_obj.save()
+            
+            # Send email
+            subject = f"New Inquiry (Cart: {message_obj.cart_id or 'N/A'}) from {message_obj.phone}"
+            body = f"Cart ID: {message_obj.cart_id or 'N/A'}\nPhone: {message_obj.phone}\n\n"
+            body += f"Cart Items:\n{email_items_summary if email_items_summary else 'No items in cart'}\n\n"
+            body += f"Message:\n{message_obj.message}"
+            
+            # Extract from_email, use default if not set
+            from_email = getattr(settings, 'EMAIL_HOST_USER', 'noreply@worldtechpartner.com')
+            to_email = getattr(settings, 'COMPANY_EMAIL', from_email)
+            
+            try:
+                send_mail(
+                    subject,
+                    body,
+                    from_email,
+                    [to_email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                # Log the error but don't break the user experience
+                print(f"Error sending email: {e}")
+            
+            messages.success(request, "Your message has been sent successfully!")
+            return redirect('cart_detail')
+        else:
+            messages.error(request, "Please correct the errors in the form.")
+    return redirect('cart_detail')

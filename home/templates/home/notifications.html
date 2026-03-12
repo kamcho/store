@@ -34,9 +34,31 @@
                                 <div class="text-xs text-slate-500">{{ msg.phone }}</div>
                             </td>
                             <td class="px-6 py-5">
-                                <p class="text-sm text-slate-600 line-clamp-2" title="{{ msg.message }}">
+                                <p class="text-sm text-slate-800 mb-3" title="{{ msg.message }}">
                                     {{ msg.message }}
                                 </p>
+                                {% if msg.cart_items %}
+                                <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                    <h4 class="text-[10px] font-bold text-samsung-blue uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                        <i class="fas fa-shopping-cart"></i> Cart Items Snapshot (ID: {{ msg.cart_id|default:"N/A" }})
+                                    </h4>
+                                    <div class="space-y-1.5">
+                                        {% for item in msg.cart_items %}
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="text-slate-600 font-medium">
+                                                <span class="text-slate-900 font-bold">{{ item.quantity }}x</span> {{ item.product }}
+                                                <span class="text-slate-400">({{ item.variant }})</span>
+                                            </span>
+                                            <span class="text-slate-900 font-bold">KSH {{ item.price|floatformat:0 }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% elif msg.cart_id %}
+                                <div class="mt-2 text-[10px] text-slate-400 italic">
+                                    Cart ID: {{ msg.cart_id }}
+                                </div>
+                                {% endif %}
                             </td>
                             <td class="px-6 py-5">
                                 {% if not msg.is_read %}

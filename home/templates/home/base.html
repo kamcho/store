@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>
-            {% block title %}World Tech Partners | Certified Samsung Products East Africa{% endblock %}
+            {% block title %}World Tech Partners | Certified Samsung Products East Africa{% endblock title %}
         </title>
         <meta name="description"
               content="Shop the latest Samsung smartphones, TVs, appliances, and more at World Tech Partners. Your certified source for premium Samsung electronics in East Africa.">
@@ -19,9 +19,9 @@
         <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
         <style>
         :root {
-            --samsung-blue: #1428A0;
+            --samsung-blue: #0c1233;
             --samsung-light-blue: #4A90E2;
-            --samsung-royal: #0047AB;
+            --samsung-royal: #041329;
             --samsung-sky: #1E90FF;
             --samsung-dark: #1A1A1A;
             --samsung-gray: #F5F5F5;
@@ -624,10 +624,10 @@
             display: none;
         }
         </style>
-        {% block extra_css %}{% endblock %}
+        {% block extra_css %}{% endblock extra_css %}
     </head>
     <body>
-        {% include 'home/header.html' %}
+        {% include "home/header.html" %}
         <!-- Messages -->
         {% if messages %}
             <div class="container mt-3">
@@ -642,7 +642,7 @@
         {% endif %}
         <!-- Main Content -->
         <div class="main-container pt-28 md:pt-[115px] px-3 sm:px-6">
-            {% block content %}{% endblock %}
+            {% block content %}{% endblock content %}
         </div>
         <!-- ══════════════════════════════════════════════ FOOTER ══════════════════════════════════════════════ -->
         <footer class="bg-slate-900 text-white mt-16">
@@ -785,9 +785,9 @@
         });
         </script>
         <!-- WhatsApp Floating Button -->
-        {% include 'home/whatsapp_floating_button.html' %}
+        {% include "home/whatsapp_floating_button.html" %}
         <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
         {% block extra_js %}
-        {% endblock %}
+        {% endblock extra_js %}
     </body>
 </html>

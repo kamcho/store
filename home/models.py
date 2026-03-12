@@ -235,17 +235,17 @@ class ProductVariantImage(models.Model):
 
 
 class ContactMessage(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
+    name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True)
     message = models.TextField()
+    cart_items = models.JSONField(default=list, blank=True, null=True)
     is_read = models.BooleanField(default=False)
+    cart_id = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Message from {self.name} ({self.email})"
-
-
+        return f"Message from {self.phone or self.name or self.email} at {self.created_at}"

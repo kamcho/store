@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant
+from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ContactMessage
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -71,3 +71,45 @@ class ProductVariantAdmin(admin.ModelAdmin):
     list_display = ('product', 'name', 'model_code', 'price', 'stock_quantity', 'is_active')
     list_filter = ('product', 'is_active', 'availability')
     search_fields = ('name', 'model_code', 'product__name')
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('phone', 'name', 'cart_id', 'created_at', 'is_read')
+    list_filter = ('is_read', 'created_at')
+    search_fields = ('phone', 'name', 'email', 'message', 'cart_id')
+    readonly_fields = ('created_at', 'display_cart_items')
+    
+    fieldsets = (
+        ('Customer Info', {
+            'fields': ('phone', 'name', 'email', 'cart_id')
+        }),
+        ('Message Content', {
+            'fields': ('message',)
+        }),
+        ('Cart Snapshot', {
+            'fields': ('display_cart_items',),
+            'description': 'These items were in the user\'s cart when this message was sent.'
+        }),
+        ('Status', {
+            'fields': ('is_read', 'created_at')
+        }),
+    )
+
+    def display_cart_items(self, obj):
+        from django.utils.safestring import mark_safe
+        if not obj.cart_items:
+            return "No items"
+        
+        html = '<table style="width:100%; border-collapse: collapse;">'
+        html += '<tr style="background:#f8f8f8;"><th style="padding:8px; border:1px solid #ddd;">Product</th><th style="padding:8px; border:1px solid #ddd;">Variant</th><th style="padding:8px; border:1px solid #ddd;">Qty</th><th style="padding:8px; border:1px solid #ddd;">Price</th></tr>'
+        for item in obj.cart_items:
+            html += f'<tr>'
+            html += f'<td style="padding:8px; border:1px solid #ddd;">{item.get("product")}</td>'
+            html += f'<td style="padding:8px; border:1px solid #ddd;">{item.get("variant")}</td>'
+            html += f'<td style="padding:8px; border:1px solid #ddd;">{item.get("quantity")}</td>'
+            html += f'<td style="padding:8px; border:1px solid #ddd;">KSH {item.get("price"):,.0f}</td>'
+            html += f'</tr>'
+        html += '</table>'
+        return mark_safe(html)
+    
+    display_cart_items.short_description = 'Cart Items Snapshot'

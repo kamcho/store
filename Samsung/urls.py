@@ -26,7 +26,7 @@ from home.views import (
     cart_detail, remove_from_cart, update_cart, add_variant_image_upload,
     user_login, user_logout, ai_chat,variant_image_manage,
     contact_submit, notifications_list, notification_mark_read,
-    flash_sales, flash_sale_remove
+    flash_sales, flash_sale_remove, leave_message
 )
 from django.contrib.sitemaps.views import sitemap
 from home.sitemaps import StaticViewSitemap, ProductSitemap
@@ -60,6 +60,7 @@ urlpatterns = [
     path('contact/submit/', contact_submit, name='contact_submit'),
     path('notifications/', notifications_list, name='notifications_list'),
     path('notifications/<int:pk>/read/', notification_mark_read, name='notification_mark_read'),
+    path('leave-message/', leave_message, name='leave_message'),
 
     # Cart URLs
     path('cart/', cart_detail, name='cart_detail'),
