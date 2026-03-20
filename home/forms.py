@@ -5,8 +5,16 @@ from .models import Product, ProductCategory, ProductImage, ProductSpecification
 class LeaveMessageForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
-        fields = ['phone', 'message', 'cart_id']
+        fields = ['name', 'email', 'phone', 'message', 'cart_id']
         widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 transition-all outline-none text-sm font-medium',
+                'placeholder': 'Your Full Name'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 transition-all outline-none text-sm font-medium',
+                'placeholder': 'Your Email Address'
+            }),
             'phone': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 transition-all outline-none text-sm font-medium',
                 'placeholder': 'Your Phone Number (e.g. 0712345678)'

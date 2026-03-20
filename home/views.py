@@ -952,7 +952,29 @@ def contact_submit(request):
     if request.method == 'POST':
         form = ContactMessageForm(request.POST)
         if form.is_valid():
-            form.save()
+            contact_msg = form.save()
+            
+            # Send email
+            subject = f"New Contact Page Message from {contact_msg.name}"
+            body = f"Name: {contact_msg.name}\n"
+            body += f"Email: {contact_msg.email}\n"
+            body += f"Phone: {contact_msg.phone or 'N/A'}\n\n"
+            body += f"Message:\n{contact_msg.message}"
+            
+            from_email = getattr(settings, 'EMAIL_HOST_USER', 'noreply@worldtechpartner.com')
+            to_email = getattr(settings, 'COMPANY_EMAIL', from_email)
+            
+            try:
+                send_mail(
+                    subject,
+                    body,
+                    from_email,
+                    [to_email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"Error sending contact email: {e}")
+            
             messages.success(request, 'Thank you! Your message has been sent successfully.')
             return redirect('home')
         else:
@@ -1046,8 +1068,11 @@ def leave_message(request):
             message_obj.save()
             
             # Send email
-            subject = f"New Inquiry (Cart: {message_obj.cart_id or 'N/A'}) from {message_obj.phone}"
-            body = f"Cart ID: {message_obj.cart_id or 'N/A'}\nPhone: {message_obj.phone}\n\n"
+            subject = f"New Inquiry (Cart: {message_obj.cart_id or 'N/A'}) from {message_obj.name or message_obj.phone}"
+            body = f"Customer Name: {message_obj.name or 'N/A'}\n"
+            body += f"Email: {message_obj.email or 'N/A'}\n"
+            body += f"Phone: {message_obj.phone}\n"
+            body += f"Cart ID: {message_obj.cart_id or 'N/A'}\n\n"
             body += f"Cart Items:\n{email_items_summary if email_items_summary else 'No items in cart'}\n\n"
             body += f"Message:\n{message_obj.message}"
             

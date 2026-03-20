@@ -535,9 +535,11 @@
                             {% for product in featured_products %}<div class="hero-dot" data-index="{{ forloop.counter }}"></div>{% endfor %}
                         </div>
                     {% endwith %}
-                </div>
-            {% endif %}
-               <!-- ══════════════════════════════════════════════ FLASH SALE ══════════════════════════════════════════════ -->
+        </div>
+    {% endif %}
+    </div>
+</section>
+    <!-- ══════════════════════════════════════════════ FLASH SALE ══════════════════════════════════════════════ -->
     {% if flash_sale_products %}
         <section id="flash-sale-section"
             class="py-10 sm:py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 relative overflow-hidden reveal">
@@ -706,7 +708,9 @@
             </div>
         </section>
     {% endif %}
-            <!-- Featured Products — Static Grid -->
+    <!-- ══════════════════════════════════════════════ MORE TO EXPLORE ══════════════════════════════════════════════ -->
+    <section class="py-12 bg-white reveal">
+        <div class="container mx-auto px-6">
             {% if featured_products %}
                 <div class="mt-10 mb-10 flex flex-wrap gap-5">
                     {% if flash_sale_products %}
