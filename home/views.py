@@ -204,29 +204,47 @@ def home(request):
     return render(request, 'home/index.html', context)
 
 def product_list(request):
-    products = Product.objects.filter(is_active=True).select_related('category').prefetch_related('images')
+    base_products = Product.objects.filter(is_active=True).select_related('category').prefetch_related('images')
     
-    # Get category filter
     category_slug = request.GET.get('category')
+    search_query = request.GET.get('search')
+    
+    category_applied = False
+    all_cat_ids = []
+    
     if category_slug and category_slug != 'None':
         category = get_object_or_404(ProductCategory, slug=category_slug)
-        
         def get_descendants(cat):
             descendants = [cat.id]
             for child in cat.subcategories.all():
                 descendants.extend(get_descendants(child))
             return descendants
-            
         all_cat_ids = get_descendants(category)
-        products = products.filter(category_id__in=all_cat_ids)
-    
-    # Get search query
-    search_query = request.GET.get('search')
+        category_applied = True
+
+    # Apply category filter initially
+    if category_applied:
+        cat_products = base_products.filter(category_id__in=all_cat_ids)
+    else:
+        cat_products = base_products
+
     if search_query:
-        products = products.filter(
-            name__icontains=search_query
-        )
-    
+        # Split search query for robust multiple-word fuzzy matching
+        terms = [t for t in search_query.split() if t.strip()]
+        search_q = Q()
+        for term in terms:
+            search_q &= (Q(name__icontains=term) | Q(description__icontains=term) | Q(category__name__icontains=term))
+            
+        combined = cat_products.filter(search_q)
+        
+        # Robust fallback: if category is selected but the search yields no results inside it, drop category constraint!
+        if category_applied and not combined.exists():
+            products = base_products.filter(search_q).distinct()
+        else:
+            products = combined.distinct()
+    else:
+        products = cat_products.distinct()
+        
     # Annotate with starting price for sorting and display
     products = products.annotate(starting_price=Min('variants__price'))
     
