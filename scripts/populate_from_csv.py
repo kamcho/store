@@ -9,7 +9,7 @@ from django.utils.text import slugify
 from home.models import ProductCategory, Product, ProductVariant, ProductImage, ProductSpecification
 
 # CSV file path - Now using the enriched version
-CSV_FILE = "samsung_full_products.csv"
+CSV_FILE = "scripts/samsung_full_products.csv"
 
 # Global system encoding for printing to console safely
 SYS_ENCODING = sys.stdout.encoding or 'utf-8'
@@ -138,7 +138,7 @@ def populate(wipe_existing=False):
                             defaults={
                                 'category': category,
                                 'description': description,
-                                'short_description': name[:245],
+                                # 'short_description': name[:245],
                                 'slug': slugify(name)[:50]
                             }
                         )

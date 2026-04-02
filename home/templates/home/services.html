@@ -1,0 +1,413 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block title %}Repair Services - World Tech Partners{% endblock title %}
+
+{% block extra_css %}
+<style>
+    .service-hero {
+        background: linear-gradient(135deg, var(--bg-primary) 0%, #eef2ff 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .before-after-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px -15px var(--shadow);
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .comparison-slider {
+        position: relative;
+        width: 100%;
+        height: 450px;
+        cursor: ew-resize;
+        user-select: none;
+    }
+    
+    .comparison-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .comparison-before {
+        z-index: 1;
+        clip-path: inset(0 50% 0 0); /* Start showed on left */
+    }
+    
+    .comparison-after {
+        z-index: 0;
+    }
+    
+    .comparison-handle {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 4px;
+        background: white;
+        z-index: 10;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    
+    .comparison-handle::after {
+        content: '\21D4';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 48px;
+        height: 48px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--samsung-blue);
+        font-weight: 900;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        border: 2px solid var(--samsung-blue);
+        transition: all 0.2s ease;
+    }
+
+    .comparison-slider:hover .comparison-handle::after {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .service-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .service-card:hover {
+        transform: translateY(-12px);
+        border-color: var(--samsung-blue);
+        box-shadow: 0 25px 50px -12px rgba(20, 40, 160, 0.1);
+    }
+
+    .shimmer {
+        background: linear-gradient(90deg, var(--bg-primary) 25%, var(--bg-secondary) 50%, var(--bg-primary) 75%);
+        background-size: 200% 100%;
+        animation: shimmer-effect 1.5s infinite linear;
+    }
+
+    @keyframes shimmer-effect {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    .glass-label {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<main>
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 bg-[#0c1233] overflow-hidden">
+        <!-- Ambient Glowing Backgrounds -->
+        <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none z-0"></div>
+        <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/20 rounded-full blur-[120px] translate-y-1/3 -translate-x-1/3 pointer-events-none z-0"></div>
+        
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <span class="inline-block px-5 py-2 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-black uppercase tracking-[0.2em] mb-8 backdrop-blur-sm shadow-[0_0_20px_rgba(59,130,246,0.1)]">Authorized Repair Partner</span>
+            <h1 class="text-5xl lg:text-7xl font-black text-white mb-8 tracking-tight leading-[1.1]">
+                Give Your Galaxy a <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">Second Life.</span>
+            </h1>
+            <p class="text-slate-400 text-lg lg:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+                As Nakuru's premier authorized service center, we provide professional repairs using genuine parts and factory-certified technicians. Precision guaranteed.
+            </p>
+            <div class="flex flex-wrap justify-center gap-6">
+                <a href="#booking" class="px-10 py-5 bg-white text-[#0c1233] font-black rounded-full shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-105 transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-3">
+                    Book a Repair
+                    <i class="fas fa-chevron-right text-[10px]"></i>
+                </a>
+                <a href="#showcase" class="px-10 py-5 bg-white/5 text-white font-bold rounded-full border border-white/10 hover:bg-white/10 backdrop-blur-md transition-all text-sm uppercase tracking-wider">
+                    View Our Work
+                </a>
+                {% if user.is_staff %}
+                <a href="{% url 'service_create' %}" class="px-10 py-5 bg-emerald-500/20 text-emerald-400 font-bold rounded-full border border-emerald-500/30 hover:bg-emerald-500/30 backdrop-blur-md transition-all text-sm tracking-wider flex items-center gap-2">
+                    <i class="fas fa-plus-circle"></i> Add Repair Log
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="py-24 bg-slate-50 border-b border-slate-200">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Phone -->
+                <div class="group p-10 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all duration-500">
+                    <div class="w-16 h-16 bg-blue-50 group-hover:bg-blue-600 rounded-2xl flex items-center justify-center text-blue-600 group-hover:text-white mb-8 transition-colors duration-500 text-2xl">
+                        <i class="fas fa-mobile-alt group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 mb-3 tracking-wide uppercase">Smartphones</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Broken screen? Battery issues? We fix all Galaxy series with original parts.</p>
+                </div>
+                <!-- TV -->
+                <div class="group p-10 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all duration-500">
+                    <div class="w-16 h-16 bg-indigo-50 group-hover:bg-indigo-600 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:text-white mb-8 transition-colors duration-500 text-2xl">
+                        <i class="fas fa-tv group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 mb-3 tracking-wide uppercase">TV Panels</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">From panel replacements to mainboard repairs, we restore your home theater.</p>
+                </div>
+                <!-- Laptops -->
+                <div class="group p-10 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all duration-500">
+                    <div class="w-16 h-16 bg-emerald-50 group-hover:bg-emerald-500 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:text-white mb-8 transition-colors duration-500 text-2xl">
+                        <i class="fas fa-laptop group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 mb-3 tracking-wide uppercase">Laptops</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Galaxy Book & Tab specialists. Upgrades, diagnostics, and component-level repair.</p>
+                </div>
+                <!-- Wearables -->
+                <div class="group p-10 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all duration-500">
+                    <div class="w-16 h-16 bg-cyan-50 group-hover:bg-cyan-500 rounded-2xl flex items-center justify-center text-cyan-600 group-hover:text-white mb-8 transition-colors duration-500 text-2xl">
+                        <i class="fas fa-stopwatch group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-slate-900 mb-3 tracking-wide uppercase">Wearables</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Precision diagnostics and repair for Galaxy Watches and premium audio accessories.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before & After Showcase -->
+    <section id="showcase" class="py-24 bg-slate-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-samsung-blue font-black uppercase tracking-[0.2em] text-[10px] mb-4 block">Our Results</span>
+                <h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-6">Restoration Showcase</h2>
+                <p class="text-slate-500 max-w-2xl mx-auto">Witness the precision our technicians bring to every repair. Drag the slider to compare.</p>
+            </div>
+
+            {% if repair_services %}
+            <div class="space-y-32">
+                {% for repair in repair_services %}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div class="{% if forloop.counter|divisibleby:2 %}lg:order-2{% endif %}">
+                        <div class="before-after-container group">
+                            <div class="comparison-slider" id="slider-{{ repair.id }}">
+                                {% if repair.before_image %}
+                                <img src="{{ repair.before_image.url }}" width="800" height="450" class="comparison-img comparison-before" alt="Before repair">
+                                {% else %}
+                                <div class="comparison-img comparison-before shimmer flex items-center justify-center text-slate-400">Before Image N/A</div>
+                                {% endif %}
+                                
+                                {% if repair.after_image %}
+                                <img src="{{ repair.after_image.url }}" width="800" height="450" class="comparison-img comparison-after" alt="After repair">
+                                {% else %}
+                                <div class="comparison-img comparison-after shimmer flex items-center justify-center text-slate-400">After Image N/A</div>
+                                {% endif %}
+                                
+                                <div class="comparison-handle"></div>
+                                
+                                <!-- Labels -->
+                                <div class="absolute bottom-6 left-6 px-5 py-2.5 bg-black/70 backdrop-blur-md text-white text-[10px] font-black rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.5)] z-20 border border-white/10 uppercase tracking-widest">Before</div>
+                                <div class="absolute bottom-6 right-6 px-5 py-2.5 bg-samsung-blue/90 backdrop-blur-md text-white text-[10px] font-black rounded-full shadow-[0_4px_20px_rgba(20,40,160,0.5)] z-20 border border-white/20 uppercase tracking-widest">After</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="{% if forloop.counter|divisibleby:2 %}lg:order-1{% endif %}">
+                        {% if user.is_staff %}
+                        <div class="flex items-center gap-3 mb-6 bg-slate-100 p-2 rounded-2xl inline-flex">
+                            <a href="{% url 'service_edit' repair.pk %}" class="px-5 py-2 bg-white text-samsung-blue text-[11px] font-black rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="{% url 'service_delete' repair.pk %}" method="post" onsubmit="return confirm('Delete this repair case?')" class="inline m-0 p-0 line-height-[0]">
+                                {% csrf_token %}
+                                <button type="submit" class="px-5 py-2 bg-transparent text-red-500 text-[11px] font-black rounded-xl hover:bg-red-50 transition-all flex items-center gap-2">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                        <br>
+                        {% endif %}
+                        <span class="inline-block px-3 py-1 bg-samsung-blue/10 text-samsung-blue font-black text-[10px] tracking-[0.2em] rounded-md mb-4 uppercase">Case Study #00{{ repair.id }}</span>
+                        <h3 class="text-4xl lg:text-5xl font-black text-slate-900 mb-6 leading-tight">{{ repair.title }}</h3>
+                        <p class="text-slate-500 text-lg leading-relaxed mb-10 border-l-4 border-samsung-blue/20 pl-6">
+                            {{ repair.description }}
+                        </p>
+                        
+                        <div class="flex flex-wrap items-center gap-6 mb-10">
+                            {% if repair.price_estimate %}
+                            <div class="flex flex-col gap-1 p-5 bg-white border border-slate-100 shadow-sm rounded-2xl min-w-[160px]">
+                                <span class="text-slate-400 text-[10px] font-black uppercase tracking-widest text-center">Cost Estimate</span>
+                                <span class="text-slate-900 text-xl font-black text-center">{{ repair.price_estimate }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="flex flex-col gap-1 p-5 bg-samsung-blue/5 border border-samsung-blue/10 rounded-2xl min-w-[140px]">
+                                <span class="text-samsung-blue text-[10px] font-black uppercase tracking-widest text-center">Original Parts</span>
+                                <span class="text-samsung-blue text-xl font-black text-center"><i class="fas fa-check-circle"></i> 100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Placeholder if no repairs in DB -->
+            <div class="text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-tools text-3xl text-slate-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-400 italic">Coming soon...</h3>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-24 bg-white border-y border-slate-50">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-16 items-center">
+                <div class="lg:w-1/2">
+                    <span class="text-samsung-blue font-black uppercase tracking-[0.2em] text-[10px] mb-4 block">World Class Service</span>
+                    <h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-8 leading-tight">World-Class Standards <br>Right in Nakuru</h2>
+                    <p class="text-slate-500 text-lg leading-relaxed mb-10">
+                        We don't just fix devices; we restore your connection to the world. Every repair undergoes rigorous quality checks to meet Samsung's global service standards.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-samsung-blue/5 text-samsung-blue flex items-center justify-center">
+                                <i class="fas fa-certificate text-sm"></i>
+                            </div>
+                            <span class="font-bold text-slate-700">Authorized Samsung Service Center</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-samsung-blue/5 text-samsung-blue flex items-center justify-center">
+                                <i class="fas fa-stethoscope text-sm"></i>
+                            </div>
+                            <span class="font-bold text-slate-700">Complimentary Diagnostic Check</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-samsung-blue/5 text-samsung-blue flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-sm"></i>
+                            </div>
+                            <span class="font-bold text-slate-700">90-Day Warranty on All Parts</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-samsung-blue transition-all group">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:bg-samsung-blue group-hover:text-white transition-all">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h4 class="text-slate-900 font-black mb-2 uppercase tracking-wide text-xs">Certified</h4>
+                        <p class="text-slate-500 text-xs leading-relaxed">Expert technicians trained to Samsung's highest global standards.</p>
+                    </div>
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-samsung-blue transition-all group">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:bg-samsung-blue group-hover:text-white transition-all">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h4 class="text-slate-900 font-black mb-2 uppercase tracking-wide text-xs">Express</h4>
+                        <p class="text-slate-500 text-xs leading-relaxed">Most smartphone screen repairs are completed the same day.</p>
+                    </div>
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-samsung-blue transition-all group">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:bg-samsung-blue group-hover:text-white transition-all">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h4 class="text-slate-900 font-black mb-2 uppercase tracking-wide text-xs">Genuine</h4>
+                        <p class="text-slate-500 text-xs leading-relaxed">100% original Samsung spare parts with factory-seal guarantee.</p>
+                    </div>
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-samsung-blue transition-all group">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:bg-samsung-blue group-hover:text-white transition-all">
+                            <i class="fas fa-smile-beam"></i>
+                        </div>
+                        <h4 class="text-slate-900 font-black mb-2 uppercase tracking-wide text-xs">Service</h4>
+                        <p class="text-slate-500 text-xs leading-relaxed">Experience why we are Nakuru's top-rated Samsung repair center.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking CTA -->
+    <section id="booking" class="py-24 bg-slate-50 relative overflow-hidden">
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-6">Ready to restore your device?</h2>
+            <p class="text-slate-500 mb-10 max-w-xl mx-auto text-lg leading-relaxed">Join thousands of happy customers. Fill out our quick form and get an instant quote.</p>
+            <a href="{% url 'home' %}#contact" class="inline-flex items-center gap-4 px-12 py-5 bg-samsung-blue text-white font-black rounded-full shadow-2xl shadow-samsung-blue/30 hover:scale-[1.03] transition-all group antialiased">
+                <span class="tracking-widest uppercase text-xs">Schedule Repair Now</span>
+                <i class="fas fa-arrow-right text-sm transform group-hover:translate-x-2 transition-transform"></i>
+            </a>
+        </div>
+        <!-- Subtle backround decoration -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-100/30 rounded-full blur-[120px] -z-10"></div>
+    </section>
+</main>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Before/After Comparison Sliders
+        const sliders = document.querySelectorAll('.comparison-slider');
+        
+        sliders.forEach(slider => {
+            const handle = slider.querySelector('.comparison-handle');
+            const beforeImg = slider.querySelector('.comparison-before');
+            let isResizing = false;
+
+            function updateSlider(x) {
+                const rect = slider.getBoundingClientRect();
+                let position = ((x - rect.left) / rect.width) * 100;
+                
+                // Bounds
+                if (position < 0) position = 0;
+                if (position > 100) position = 100;
+                
+                handle.style.left = `${position}%`;
+                // For before image, we clip from the right
+                beforeImg.style.clipPath = `inset(0 ${100 - position}% 0 0)`;
+            }
+
+            // Move function
+            const onMove = (e) => {
+                if (!isResizing) return;
+                const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+                updateSlider(x);
+            };
+
+            // Start function
+            const onStart = (e) => {
+                isResizing = true;
+                const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+                updateSlider(x);
+                slider.classList.add('active');
+            };
+
+            // End function
+            const onEnd = () => {
+                isResizing = false;
+                slider.classList.remove('active');
+            };
+
+            // Event Listeners
+            slider.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            slider.addEventListener('touchstart', onStart, {passive: true});
+            window.addEventListener('touchmove', onMove, {passive: true});
+            window.addEventListener('touchend', onEnd);
+        });
+    });
+</script>
+{% endblock extra_js %}

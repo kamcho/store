@@ -1,5 +1,35 @@
 from django.contrib import admin
-from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ContactMessage
+from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ContactMessage, RepairService
+
+@admin.register(RepairService)
+class RepairServiceAdmin(admin.ModelAdmin):
+    list_display = ('title', 'price_estimate', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('title', 'description')
+    readonly_fields = ('before_preview', 'after_preview')
+
+    def before_preview(self, obj):
+        from django.utils.safestring import mark_safe
+        if obj.before_image:
+            return mark_safe(f'<img src="{obj.before_image.url}" width="200" height="200" style="object-fit: contain; border-radius: 8px; border: 1px solid #ddd;" />')
+        return "No Image"
+
+    def after_preview(self, obj):
+        from django.utils.safestring import mark_safe
+        if obj.after_image:
+            return mark_safe(f'<img src="{obj.after_image.url}" width="200" height="200" style="object-fit: contain; border-radius: 8px; border: 1px solid #ddd;" />')
+        return "No Image"
+
+    fieldsets = (
+        ('Service Info', {
+            'fields': ('title', 'description', 'price_estimate', 'order', 'is_active')
+        }),
+        ('Before & After Showcase', {
+            'fields': (('before_image', 'before_preview'), ('after_image', 'after_preview')),
+            'description': 'Upload images showing the device before and after repair.'
+        }),
+    )
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage

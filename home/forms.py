@@ -203,7 +203,7 @@ ProductSpecificationFormSet = inlineformset_factory(
     can_delete=True
 )
 
-from .models import ProductVariant
+from .models import ProductVariant, RepairService
 
 class ProductVariantForm(forms.ModelForm):
     class Meta:
@@ -300,3 +300,18 @@ class ContactMessageForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'placeholder': 'Your Phone'}),
             'message': forms.Textarea(attrs={'rows': 4, 'placeholder': 'How can we help you?'}),
         }
+
+class RepairServiceForm(forms.ModelForm):
+    class Meta:
+        model = RepairService
+        fields = ['title', 'description', 'before_image', 'after_image', 'price_estimate', 'order', 'is_active']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'w-full px-5 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 focus:bg-white transition-all outline-none text-slate-900 font-medium', 'placeholder': 'e.g., Galaxy S24 Ultra Screen Replacement'}),
+            'description': forms.Textarea(attrs={'class': 'w-full px-5 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 focus:bg-white transition-all outline-none text-slate-900 font-medium', 'rows': 4, 'placeholder': 'Describe the condition and exactly what was repaired...'}),
+            'before_image': forms.FileInput(attrs={'class': 'w-full text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-black file:uppercase file:tracking-wider file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200 transition-all cursor-pointer', 'accept': 'image/*'}),
+            'after_image': forms.FileInput(attrs={'class': 'w-full text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:font-black file:uppercase file:tracking-wider file:bg-samsung-blue/10 file:text-samsung-blue hover:file:bg-samsung-blue/20 transition-all cursor-pointer', 'accept': 'image/*'}),
+            'price_estimate': forms.TextInput(attrs={'class': 'w-full px-5 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 focus:bg-white transition-all outline-none text-slate-900 font-medium', 'placeholder': 'e.g. KSH 15,000 (Optional)'}),
+            'order': forms.NumberInput(attrs={'class': 'w-full px-5 py-4 rounded-xl border border-slate-200 bg-slate-50 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/10 focus:bg-white transition-all outline-none text-slate-900 font-medium', 'min': '0'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'w-6 h-6 rounded-md border-slate-300 text-samsung-blue focus:ring-samsung-blue/30 cursor-pointer transition-all'}),
+        }
+

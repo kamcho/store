@@ -784,62 +784,7 @@
             {% endif %}
         </div>
     </section>
-    <!-- ══════════════════════════════════════════════ ABOUT / HISTORY ══════════════════════════════════════════════ -->
-    <section id="about" class="py-12 sm:py-24 bg-slate-50 relative overflow-hidden reveal">
-        <div class="container mx-auto px-5 sm:px-8 relative z-10">
-            <!-- Section Header -->
-            <div class="text-center mb-8 sm:mb-16">
-                <span class="text-samsung-blue font-bold tracking-widest text-xs uppercase mb-2 block">Our Journey</span>
-                <h2 class="text-3xl md:text-4xl text-slate-900 mb-4">
-                    <span class="font-light">The</span>
-                    <span class="font-bold text-samsung-blue">Story</span>
-                </h2>
-                <div class="w-16 h-1 bg-samsung-blue mx-auto rounded-full"></div>
-            </div>
-            <!-- Timeline -->
-            <div class="max-w-3xl mx-auto space-y-10 pl-2 sm:pl-0">
-                <!-- Milestone 1 -->
-                <div class="relative pl-8 md:pl-14 border-l-2 border-samsung-blue/20">
-                    <div
-                        class="absolute -left-[1.35rem] md:-left-7 top-0 w-10 h-10 md:w-14 md:h-14 rounded-full bg-samsung-blue flex items-center justify-center shadow-lg shadow-samsung-blue/20">
-                        <span class="text-white text-xs md:text-sm font-black">2018</span>
-                    </div>
-                    <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">Foundation</h3>
-                        <p class="text-slate-500 leading-relaxed text-sm">The company began in February 2018, mainly dealing in simple repairs and software updates.</p>
-                    </div>
-                </div>
-                <!-- Milestone 2 -->
-                <div class="relative pl-8 md:pl-14 border-l-2 border-samsung-blue/20">
-                    <div
-                        class="absolute -left-[1.35rem] md:-left-7 top-0 w-10 h-10 md:w-14 md:h-14 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20">
-                        <span class="text-white text-xs md:text-sm font-black">2019</span>
-                    </div>
-                    <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">Expansion</h3>
-                        <p class="text-slate-500 leading-relaxed text-sm">We later started selling Samsung phones & accessories, expanding our product range.</p>
-                    </div>
-                </div>
-                <!-- Milestone 3 -->
-                <div class="relative pl-8 md:pl-14 border-l-2 border-samsung-blue/20">
-                    <div
-                        class="absolute -left-[1.35rem] md:-left-7 top-0 w-10 h-10 md:w-14 md:h-14 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                        <span class="text-white text-xs md:text-sm font-black">2020</span>
-                    </div>
-                    <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <h3 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                            Authorized Partner
-                            <i class="fas fa-certificate text-samsung-blue text-base"></i>
-                        </h3>
-                        <p class="text-slate-500 leading-relaxed text-sm">
-                            In 2020, the business was registered and contracted by <strong class="text-slate-800">Samsung
-                            Electronics East Africa</strong> as an authorized service center.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
     <!-- ══════════════════════════════════════════════ PRODUCTS BY CATEGORY ══════════════════════════════════════════════ -->
     <section id="products" class="py-12 sm:py-24 bg-white relative overflow-hidden reveal">
         <div class="container mx-auto px-3 sm:px-6 relative z-10">
@@ -964,7 +909,7 @@
                         Screen replacement, battery service, camera
                         repair, and more.
                     </p>
-                    <a href="#contact"
+                    <a href="{% url 'services' %}"
                        class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">Book Service</a>
                 </div>
                 <!-- TV Repair -->
@@ -979,7 +924,7 @@
                         Display issues, sound problems, connectivity
                         repairs, and diagnostics.
                     </p>
-                    <a href="#contact"
+                    <a href="{% url 'services' %}"
                        class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">Book Service</a>
                 </div>
                 <!-- Watch Repair -->
@@ -994,7 +939,7 @@
                         Battery replacement, strap repair, sensor
                         calibration, and water damage.
                     </p>
-                    <a href="#contact"
+                    <a href="{% url 'services' %}"
                        class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">Book Service</a>
                 </div>
                 <!-- Tablet Repair -->
@@ -1009,7 +954,7 @@
                         Touchscreen repair, charging port fix, software
                         updates, and more.
                     </p>
-                    <a href="#contact"
+                    <a href="{% url 'services' %}"
                        class="inline-block px-5 py-2 rounded-xl bg-samsung-blue/5 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300 text-xs font-bold">Book Service</a>
                 </div>
             </div>
@@ -1108,6 +1053,71 @@
         </div>
     </section>
  
+    <!-- ══════════════════════════════════════════════ ABOUT / HISTORY ══════════════════════════════════════════════ -->
+    <section id="about" class="py-24 bg-[#0c1233] relative overflow-hidden reveal">
+        <!-- Ambient Glowing Backgrounds -->
+        <div class="absolute top-0 left-1/2 w-full h-[500px] bg-blue-600/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 mb-20 max-w-6xl mx-auto">
+                <div class="lg:w-1/2 text-center lg:text-left">
+                    <span class="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-black uppercase tracking-[0.2em] mb-6 shadow-[0_0_15px_rgba(59,130,246,0.1)]">Our Journey</span>
+                    <h2 class="text-3xl lg:text-5xl font-black text-white mb-6 leading-tight">Built on <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">Excellence</span></h2>
+                    <p class="text-slate-400 text-lg leading-relaxed mb-8">From simple software updates to becoming an official authorized Samsung service center, providing premium repairs and authentic accessories for the Samsung ecosystem.</p>
+                    <div class="flex items-center gap-4 justify-center lg:justify-start">
+                        <div class="flex -space-x-4">
+                            <div class="w-12 h-12 rounded-full border-2 border-[#0c1233] bg-blue-600 flex items-center justify-center text-white"><i class="fas fa-tools text-sm"></i></div>
+                            <div class="w-12 h-12 rounded-full border-2 border-[#0c1233] bg-indigo-600 flex items-center justify-center text-white"><i class="fas fa-mobile-alt text-sm"></i></div>
+                            <div class="w-12 h-12 rounded-full border-2 border-[#0c1233] bg-emerald-600 flex items-center justify-center text-white"><i class="fas fa-certificate text-sm"></i></div>
+                        </div>
+                        <span class="text-xs font-bold text-slate-300 uppercase tracking-wider pl-2 border-l border-white/10">Certified<br>Quality</span>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 w-full relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative bg-[#0c1233] border border-white/20 p-2 rounded-2xl backdrop-blur-sm">
+                        <!-- Samsung Certificate Image -->
+                        <img src="{% static 'images/certificate.jpg' %}" alt="Samsung Valued Partner Certificate" class="w-full rounded-xl shadow-2xl object-cover">
+                        
+                        <div class="absolute -bottom-5 -left-5 px-6 py-4 bg-white rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.5)] border border-slate-100 flex items-center gap-4 z-20">
+                            <i class="fas fa-award text-4xl text-amber-500"></i>
+                            <div>
+                                <h4 class="text-slate-900 font-black text-sm uppercase">Official Partner</h4>
+                                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Since 2020</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Card 1 -->
+                <div class="bg-white/5 border border-white/10 rounded-[2rem] p-8 backdrop-blur-md hover:-translate-y-2 transition-all duration-500 group">
+                    <span class="text-blue-400 font-black text-6xl opacity-20 absolute top-6 right-6 pointer-events-none group-hover:scale-110 group-hover:opacity-30 transition-all duration-500">18</span>
+                    <h3 class="text-2xl font-black text-white mb-2">2018</h3>
+                    <h4 class="text-sm font-bold text-blue-400 uppercase tracking-wider mb-6">The Genesis</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">We opened our doors in February 2018, initially focusing on general smartphone repairs and essential software updates for local clients.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-white/5 border border-white/10 rounded-[2rem] p-8 backdrop-blur-md hover:-translate-y-2 transition-all duration-500 group">
+                    <span class="text-indigo-400 font-black text-6xl opacity-20 absolute top-6 right-6 pointer-events-none group-hover:scale-110 group-hover:opacity-30 transition-all duration-500">19</span>
+                    <h3 class="text-2xl font-black text-white mb-2">2019</h3>
+                    <h4 class="text-sm font-bold text-indigo-400 uppercase tracking-wider mb-6">Expansion</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">Responding to high demand, we expanded into retail, providing genuine Samsung phones and premium accessories to true Samsung enthusiasts.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-white/5 border border-white/10 rounded-[2rem] p-8 backdrop-blur-md hover:-translate-y-2 transition-all duration-500 group relative">
+                    <div class="absolute -top-3 -right-3 w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.5)] z-20">
+                        <i class="fas fa-certificate text-lg"></i>
+                    </div>
+                    <span class="text-blue-500 font-black text-6xl opacity-20 absolute top-6 right-6 pointer-events-none group-hover:scale-110 group-hover:opacity-30 transition-all duration-500">20</span>
+                    <h3 class="text-2xl font-black text-white mb-2 mt-2">2020</h3>
+                    <h4 class="text-sm font-bold text-blue-500 uppercase tracking-wider mb-6">Authorized Partner</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed">Our commitment to quality earned us official registration. We were contracted by <strong class="text-white">Samsung Electronics East Africa</strong> as an authorized service center.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ══════════════════════════════════════════════ CONTACT ══════════════════════════════════════════════ -->
     <section id="contact"
              class="py-12 sm:py-24 bg-slate-50 relative overflow-hidden reveal">

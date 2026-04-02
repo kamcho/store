@@ -249,3 +249,20 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"Message from {self.phone or self.name or self.email} at {self.created_at}"
+
+
+class RepairService(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    before_image = models.ImageField(upload_to='repairs/before/', blank=True, null=True)
+    after_image = models.ImageField(upload_to='repairs/after/', blank=True, null=True)
+    price_estimate = models.CharField(max_length=100, blank=True, help_text="e.g. Starting from KSH 2,000")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.title

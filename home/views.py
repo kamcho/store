@@ -12,14 +12,86 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import cache_page
 import json
 import random
-from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage
-from .forms import ProductForm, ProductImageFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm, LeaveMessageForm
+from .models import Product, ProductCategory, ProductImage, ProductSpecification, ProductVariant, ProductVariantImage, ContactMessage, RepairService
+from .forms import ProductForm, ProductImageFormSet, ProductVariantForm, ProductVariantFormSet, ProductVariantImageFormSet, ContactMessageForm, LeaveMessageForm, RepairServiceForm
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms_login import CustomLoginForm
+import os
 
 
-@cache_page(60 * 60 * 5)
+def services(request):
+    repair_services = RepairService.objects.filter(is_active=True).order_by('order', '-created_at')
+    context = {
+        'repair_services': repair_services,
+        'title': 'Professional Samsung Repair Services',
+    }
+    return render(request, 'home/services.html', context)
+
+
+@login_required
+def service_create(request):
+    if not request.user.is_staff:
+        messages.error(request, "Permission denied.")
+        return redirect('services')
+        
+    if request.method == 'POST':
+        form = RepairServiceForm(request.POST, request.FILES)
+        if form.is_valid():
+            service = form.save()
+            messages.success(request, f'Repair case "{service.title}" created!')
+            return redirect('services')
+    else:
+        form = RepairServiceForm()
+    
+    context = {
+        'form': form,
+        'title': 'Add New Repair Case',
+        'button_text': 'Create Repair Case'
+    }
+    return render(request, 'home/service_form.html', context)
+
+
+@login_required
+def service_edit(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Permission denied.")
+        return redirect('services')
+        
+    service = get_object_or_404(RepairService, pk=pk)
+    if request.method == 'POST':
+        form = RepairServiceForm(request.POST, request.FILES, instance=service)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Repair case "{service.title}" updated!')
+            return redirect('services')
+    else:
+        form = RepairServiceForm(instance=service)
+    
+    context = {
+        'form': form,
+        'service': service,
+        'title': f'Edit Repair: {service.title}',
+        'button_text': 'Update Repair Case'
+    }
+    return render(request, 'home/service_form.html', context)
+
+
+@login_required
+def service_delete(request, pk):
+    if not request.user.is_staff:
+        return JsonResponse({'success': False, 'message': 'Permission denied.'})
+        
+    service = get_object_or_404(RepairService, pk=pk)
+    if request.method == 'POST':
+        title = service.title
+        service.delete()
+        messages.success(request, f'Repair case "{title}" deleted.')
+        return redirect('services')
+    return redirect('services')
+
+
+# @cache_page(60 * 60 * 5)
 def home(request):
     # Hero product: first featured product, or newest active product
     hero_product = Product.objects.filter(
